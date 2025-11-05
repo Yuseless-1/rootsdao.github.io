@@ -11,7 +11,7 @@ export default function TokenVerification() {
 
   if (!connected) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-yellow-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-4">Wallet Not Connected</h2>
@@ -29,9 +29,9 @@ export default function TokenVerification() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-400 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-400 mx-auto mb-4"></div>
           <p className="text-gray-400">Checking token balance...</p>
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function TokenVerification() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-4">Error</h2>
@@ -57,7 +57,7 @@ export default function TokenVerification() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 pt-20">
+    <div className="min-h-screen pt-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold gradient-text mb-2">Token Verification</h1>
@@ -85,9 +85,9 @@ export default function TokenVerification() {
               <div className="flex items-center justify-between">
                 <span className="text-gray-300 text-sm">Voting Rights</span>
                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                  tokenBalance.canVote ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                  tokenBalance.canVote ? 'bg-gray-700 text-gray-300' : 'bg-gray-800 text-gray-400'
                 }`}>
-                  {tokenBalance.canVote ? '✓ Available' : '✗ Insufficient'}
+                  {tokenBalance.canVote ? 'Available' : 'Insufficient'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -95,7 +95,7 @@ export default function TokenVerification() {
                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                   tokenBalance.canCreateProposal ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                 }`}>
-                  {tokenBalance.canCreateProposal ? '✓ Available' : '✗ Insufficient'}
+                  {tokenBalance.canCreateProposal ? 'Available' : 'Insufficient'}
                 </span>
               </div>
             </div>

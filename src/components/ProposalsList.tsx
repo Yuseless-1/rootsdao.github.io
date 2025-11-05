@@ -31,11 +31,11 @@ export default function ProposalsList() {
   const getStatusIcon = (status: Proposal['status']) => {
     switch (status) {
       case 'active':
-        return <Clock className="h-5 w-5 text-blue-400" />;
+        return <Clock className="h-5 w-5 text-gray-400" />;
       case 'completed':
-        return <CheckCircle className="h-5 w-5 text-green-400" />;
+        return <CheckCircle className="h-5 w-5 text-gray-400" />;
       case 'rejected':
-        return <XCircle className="h-5 w-5 text-red-400" />;
+        return <XCircle className="h-5 w-5 text-gray-400" />;
     }
   };
 
@@ -52,9 +52,9 @@ export default function ProposalsList() {
 
   if (!connected) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Vote className="h-16 w-16 text-yellow-400 mx-auto mb-4" />
+          <Vote className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-4">Wallet Not Connected</h2>
           <p className="text-gray-400 mb-6">Please connect your wallet to view proposals</p>
           <Link 
@@ -69,7 +69,7 @@ export default function ProposalsList() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 pt-20">
+    <div className="min-h-screen pt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
@@ -117,26 +117,26 @@ export default function ProposalsList() {
                   <p className="text-gray-300 text-sm mb-4 leading-relaxed">{proposal.description}</p>
 
                   <div className="grid grid-cols-3 gap-3 mb-4">
-                    <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-3">
+                    <div className="glass-effect-subtle rounded-lg p-3">
                       <div className="flex items-center mb-1">
-                        <ThumbsUp className="h-4 w-4 text-green-400 mr-1" />
-                        <span className="text-green-400 font-semibold text-xs">Votes For</span>
+                        <ThumbsUp className="h-4 w-4 text-gray-400 mr-1" />
+                        <span className="text-gray-400 font-semibold text-xs">Votes For</span>
                       </div>
                       <div className="text-lg font-bold text-white">{proposal.votesFor}</div>
                     </div>
                     
-                    <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3">
+                    <div className="glass-effect-subtle rounded-lg p-3">
                       <div className="flex items-center mb-1">
-                        <ThumbsDown className="h-4 w-4 text-red-400 mr-1" />
-                        <span className="text-red-400 font-semibold text-xs">Votes Against</span>
+                        <ThumbsDown className="h-4 w-4 text-gray-400 mr-1" />
+                        <span className="text-gray-400 font-semibold text-xs">Votes Against</span>
                       </div>
                       <div className="text-lg font-bold text-white">{proposal.votesAgainst}</div>
                     </div>
                     
-                    <div className="bg-blue-500/20 border border-blue-500/50 rounded-lg p-3">
+                    <div className="glass-effect-subtle rounded-lg p-3">
                       <div className="flex items-center mb-1">
-                        <Vote className="h-4 w-4 text-blue-400 mr-1" />
-                        <span className="text-blue-400 font-semibold text-xs">Total Votes</span>
+                        <Vote className="h-4 w-4 text-gray-400 mr-1" />
+                        <span className="text-gray-400 font-semibold text-xs">Total Votes</span>
                       </div>
                       <div className="text-lg font-bold text-white">{proposal.totalVotes}</div>
                     </div>
@@ -147,10 +147,10 @@ export default function ProposalsList() {
                       <button
                         onClick={() => handleVote(proposal.id, 'for')}
                         disabled={!tokenBalance.canVote || votingProposal === proposal.id}
-                        className="flex-1 bg-green-500/20 border border-green-500/50 text-green-400 px-4 py-2 rounded-lg hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm"
+                        className="flex-1 glass-effect-subtle text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-700/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm"
                       >
                         {votingProposal === proposal.id && votingLoading ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-400"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
                         ) : (
                           <>
                             <ThumbsUp className="h-4 w-4 mr-2" />
@@ -161,10 +161,10 @@ export default function ProposalsList() {
                       <button
                         onClick={() => handleVote(proposal.id, 'against')}
                         disabled={!tokenBalance.canVote || votingProposal === proposal.id}
-                        className="flex-1 bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm"
+                        className="flex-1 glass-effect-subtle text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-700/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm"
                       >
                         {votingProposal === proposal.id && votingLoading ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-400"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
                         ) : (
                           <>
                             <ThumbsDown className="h-4 w-4 mr-2" />
@@ -176,8 +176,8 @@ export default function ProposalsList() {
                   )}
 
                   {!tokenBalance.canVote && proposal.status === 'active' && (
-                    <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mt-3">
-                      <p className="text-yellow-300 text-xs">
+                    <div className="glass-effect-subtle rounded-lg p-3 mt-3">
+                      <p className="text-gray-400 text-xs">
                         You need at least 1 token to vote. You currently have {tokenBalance.balance.toFixed(2)} tokens.
                       </p>
                     </div>

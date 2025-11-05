@@ -136,7 +136,7 @@ export default function VotingInterface() {
   const borderColors = ['border-yellow-500', 'border-orange-500', 'border-gray-600'];
 
   return (
-    <div className="min-h-screen bg-gray-900 pt-20">
+    <div className="min-h-screen pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <div className="text-center mb-8">
@@ -159,19 +159,19 @@ export default function VotingInterface() {
               <p className="text-gray-400 text-sm mb-2">Time Remaining:</p>
               <div className="flex gap-3 text-xl sm:text-2xl font-bold">
                 <div className="text-white">
-                  <span className="text-green-400">{timeRemaining.days}</span>
+                  <span className="text-gray-300">{timeRemaining.days}</span>
                   <span className="text-gray-500 text-sm">d</span>
                 </div>
                 <div className="text-white">
-                  <span className="text-green-400">{String(timeRemaining.hours).padStart(2, '0')}</span>
+                  <span className="text-gray-300">{String(timeRemaining.hours).padStart(2, '0')}</span>
                   <span className="text-gray-500 text-sm">h</span>
                 </div>
                 <div className="text-white">
-                  <span className="text-green-400">{String(timeRemaining.minutes).padStart(2, '0')}</span>
+                  <span className="text-gray-300">{String(timeRemaining.minutes).padStart(2, '0')}</span>
                   <span className="text-gray-500 text-sm">m</span>
                 </div>
                 <div className="text-white">
-                  <span className="text-green-400">{String(timeRemaining.seconds).padStart(2, '0')}</span>
+                  <span className="text-gray-300">{String(timeRemaining.seconds).padStart(2, '0')}</span>
                   <span className="text-gray-500 text-sm">s</span>
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function VotingInterface() {
               className={`glass-effect rounded-xl p-6 border ${borderColors[index]} relative`}
             >
               {/* Rank Badge */}
-              <div className="absolute -top-3 -left-3 bg-gray-900 border border-gray-700 rounded-full px-3 py-1">
+              <div className="absolute -top-3 -left-3 glass-effect-strong border border-white/20 rounded-full px-3 py-1">
                 <span className="text-white font-semibold text-xs">#{coin.rank}</span>
               </div>
 
@@ -219,7 +219,7 @@ export default function VotingInterface() {
 
               {/* Vote Count */}
               <div className="text-center mb-4">
-                <div className="text-2xl font-bold text-green-400">{coin.votes} votes</div>
+                <div className="text-2xl font-bold text-gray-300">{coin.votes} votes</div>
               </div>
 
               {/* Social Icons */}
@@ -229,7 +229,7 @@ export default function VotingInterface() {
                     href={coin.socials.telegram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 hover:text-blue-400 transition-all hover:scale-110"
+                    className="text-gray-400 hover:text-gray-300 transition-all hover:scale-110"
                     aria-label="Telegram"
                   >
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -255,7 +255,7 @@ export default function VotingInterface() {
                     href={coin.socials.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-500 hover:text-blue-400 transition-all hover:scale-110"
+                    className="text-gray-400 hover:text-gray-300 transition-all hover:scale-110"
                     aria-label="Website"
                   >
                     <ExternalLink className="w-6 h-6" />
@@ -330,9 +330,9 @@ export default function VotingInterface() {
                     <p className="text-gray-400 text-xs font-mono">{coin.contractAddress}</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold text-green-400">{coin.votes} votes</div>
+                    <div className="text-lg font-bold text-gray-300">{coin.votes} votes</div>
                     {coin.voteChange > 0 && (
-                      <div className="text-xs text-green-400">+{coin.voteChange}</div>
+                      <div className="text-xs text-gray-300">+{coin.voteChange}</div>
                     )}
                   </div>
                 </div>
@@ -362,7 +362,7 @@ export default function VotingInterface() {
                             href={coin.socials.telegram}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-500 hover:text-blue-400 transition-all hover:scale-110"
+                            className="text-gray-400 hover:text-gray-300 transition-all hover:scale-110"
                             aria-label="Telegram"
                           >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -388,7 +388,7 @@ export default function VotingInterface() {
                             href={coin.socials.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-500 hover:text-blue-400 transition-all hover:scale-110"
+                            className="text-gray-400 hover:text-gray-300 transition-all hover:scale-110"
                             aria-label="Website"
                           >
                             <ExternalLink className="w-5 h-5" />
