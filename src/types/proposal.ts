@@ -22,7 +22,7 @@ export const MOCK_PROPOSALS: Proposal[] = [
   {
     id: '1',
     title: 'Doge to the Moon 🚀',
-    description: 'Classic Doge meme deserves to be the first tokenized meme on Root5 DAO. Much wow, very token!',
+    description: 'Classic Doge meme deserves to be the first tokenized meme on RootsDAO. Much wow, very token!',
     imageUrl: 'https://i.imgur.com/8QZ8QZ8.png',
     creator: '0x1234...5678',
     createdAt: new Date('2024-01-15'),
