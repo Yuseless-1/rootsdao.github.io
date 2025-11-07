@@ -344,6 +344,114 @@
             margin: 0 auto;
         }
         
+        .preview-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preview-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+        
+        #pfp-canvas {
+            border-radius: 10px;
+            display: block;
+        }
+        
+        .layer-tab {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .layer-tab:hover {
+            color: var(--primary);
+        }
+        
+        .layer-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .layer-options {
+            display: none;
+        }
+        
+        .layer-options.active {
+            display: block;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .option-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 85px;
+        }
+        
+        .option-item:hover {
+            border-color: var(--primary);
+            background: rgba(0, 255, 136, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .option-item.selected {
+            border-color: var(--primary);
+            background: rgba(0, 255, 136, 0.15);
+            box-shadow: 0 0 0 1px var(--primary), 0 4px 12px rgba(0, 255, 136, 0.2);
+        }
+        
+        .option-item img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        .option-item p {
+            font-size: 0.75rem;
+            color: var(--light);
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        .controls-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .layer-options-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
         /* Features Section */
         .features {
             padding: 100px 0;
@@ -522,8 +630,12 @@
                 justify-content: center;
             }
             
-            #pfpForm > div[style*="grid-template-columns"] {
+            .generator-container {
                 grid-template-columns: 1fr !important;
+            }
+            
+            .options-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
             }
             
             nav ul {
@@ -668,76 +780,169 @@
         <div class="container">
             <div class="text-center mb-12">
                 <h2 class="section-title">🎨 PFP Generator</h2>
-                <p style="font-size: 1.2rem; color: #cccccc; max-width: 800px; margin: 0 auto;">Create your unique Roots character profile picture with AI</p>
+                <p style="font-size: 1.2rem; color: #cccccc; max-width: 800px; margin: 0 auto;">Create your unique profile picture by combining different layers</p>
             </div>
             
-            <div class="generator-container" style="max-width: 800px; margin: 0 auto;">
-                <div style="background: rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 40px; border: 1px solid rgba(255, 255, 255, 0.1);">
-                    <form id="pfpForm" style="display: flex; flex-direction: column; gap: 20px;">
-                        <div>
-                            <label for="shirt" style="display: block; color: var(--primary); font-weight: 600; margin-bottom: 8px;">Shirt Style</label>
-                            <select id="shirt" required style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--primary); background: rgba(0, 0, 0, 0.5); color: var(--light); font-size: 1rem;">
-                                <option value="casual t-shirt">Casual T-Shirt</option>
-                                <option value="hoodie">Hoodie</option>
-                                <option value="polo shirt">Polo Shirt</option>
-                                <option value="tank top">Tank Top</option>
-                                <option value="button-up shirt">Button-Up Shirt</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label for="background" style="display: block; color: var(--primary); font-weight: 600; margin-bottom: 8px;">Background</label>
-                            <select id="background" required style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--primary); background: rgba(0, 0, 0, 0.5); color: var(--light); font-size: 1rem;">
-                                <option value="forest">Forest</option>
-                                <option value="solid color">Solid Color</option>
-                                <option value="sunset">Sunset</option>
-                                <option value="abstract">Abstract</option>
-                                <option value="nature">Nature</option>
-                                <option value="urban">Urban</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label for="sunglasses" style="display: block; color: var(--primary); font-weight: 600; margin-bottom: 8px;">Sunglasses</label>
-                            <select id="sunglasses" required style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--primary); background: rgba(0, 0, 0, 0.5); color: var(--light); font-size: 1rem;">
-                                <option value="none">None</option>
-                                <option value="aviator sunglasses">Aviator Sunglasses</option>
-                                <option value="round sunglasses">Round Sunglasses</option>
-                                <option value="square sunglasses">Square Sunglasses</option>
-                                <option value="cool shades">Cool Shades</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label for="hair" style="display: block; color: var(--primary); font-weight: 600; margin-bottom: 8px;">Hair Style</label>
-                            <select id="hair" required style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--primary); background: rgba(0, 0, 0, 0.5); color: var(--light); font-size: 1rem;">
-                                <option value="short hair">Short Hair</option>
-                                <option value="long hair">Long Hair</option>
-                                <option value="curly hair">Curly Hair</option>
-                                <option value="spiky hair">Spiky Hair</option>
-                                <option value="afro">Afro</option>
-                                <option value="bald">Bald</option>
-                                <option value="ponytail">Ponytail</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label for="theme" style="display: block; color: var(--primary); font-weight: 600; margin-bottom: 8px;">Character Theme</label>
-                            <select id="theme" required style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--primary); background: rgba(0, 0, 0, 0.5); color: var(--light); font-size: 1rem;">
-                                <option value="friendly and approachable">Friendly & Approachable</option>
-                                <option value="cool and confident">Cool & Confident</option>
-                                <option value="mysterious and edgy">Mysterious & Edgy</option>
-                                <option value="fun and playful">Fun & Playful</option>
-                                <option value="professional and serious">Professional & Serious</option>
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="cta-button pulse" style="width: 100%; margin-top: 10px;">
-                            ✨ Generate My PFP
+            <div class="generator-container" style="display: grid; grid-template-columns: 1fr 2fr; gap: 40px;">
+                <!-- Preview Canvas -->
+                <div class="preview-section">
+                    <h3 style="font-size: 1.8rem; font-weight: 600; margin-bottom: 30px; color: var(--primary);">Preview</h3>
+                    <div class="preview-container">
+                        <canvas id="pfp-canvas" width="320" height="320"></canvas>
+                    </div>
+                    <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 320px;">
+                        <button id="randomize-btn" class="cta-button" style="width: 100%;">
+                            🎲 Randomize
                         </button>
-                    </form>
+                        <button id="download-btn" class="secondary-button" style="width: 100%;">
+                            📥 Download PFP
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Layer Controls -->
+                <div class="controls-section">
+                    <h3 style="font-size: 1.8rem; font-weight: 600; margin-bottom: 30px; color: var(--primary);">Customize Layers</h3>
                     
-                    <div id="result" style="margin-top: 40px;"></div>
+                    <!-- Layer Tabs -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 10px;">
+                        <button class="layer-tab active" data-layer="background" style="padding: 12px 24px; font-weight: 500;">
+                            Background
+                        </button>
+                        <button class="layer-tab" data-layer="body" style="padding: 12px 24px; font-weight: 500;">
+                            Body
+                        </button>
+                        <button class="layer-tab" data-layer="head" style="padding: 12px 24px; font-weight: 500;">
+                            Head
+                        </button>
+                        <button class="layer-tab" data-layer="sunglasses" style="padding: 12px 24px; font-weight: 500;">
+                            Sunglasses
+                        </button>
+                        <button class="layer-tab" data-layer="hair" style="padding: 12px 24px; font-weight: 500;">
+                            Hair
+                        </button>
+                    </div>
+                    
+                    <!-- Layer Options -->
+                    <div class="layer-options-container">
+                        <!-- Background Options -->
+                        <div class="layer-options active" data-layer="background">
+                            <div class="options-grid">
+                                <div class="option-item selected" data-layer="background" data-value="background-1">
+                                    <img src="/layers/background/blue.png" alt="background 1">
+                                    <p>Background 1</p>
+                                </div>
+                                <div class="option-item" data-layer="background" data-value="background-2">
+                                    <img src="/layers/background/castle.png" alt="background 2">
+                                    <p>Background 2</p>
+                                </div>
+                                <div class="option-item" data-layer="background" data-value="background-3">
+                                    <img src="/layers/background/green.png" alt="background 3">
+                                    <p>Background 3</p>
+                                </div>
+                                <div class="option-item" data-layer="background" data-value="background-4">
+                                    <img src="/layers/background/pink.png" alt="background 4">
+                                    <p>Background 4</p>
+                                </div>
+                                <div class="option-item" data-layer="background" data-value="background-5">
+                                    <img src="/layers/background/red.png" alt="background 5">
+                                    <p>Background 5</p>
+                                </div>
+                                <div class="option-item" data-layer="background" data-value="background-6">
+                                    <img src="/layers/background/sky.png" alt="background 6">
+                                    <p>Background 6</p>
+                                </div>
+                                <div class="option-item" data-layer="background" data-value="background-7">
+                                    <img src="/layers/background/white.png" alt="background 7">
+                                    <p>Background 7</p>
+                                </div>
+                                <div class="option-item" data-layer="background" data-value="background-8">
+                                    <img src="/layers/background/yellow.png" alt="background 8">
+                                    <p>Background 8</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Body Options -->
+                        <div class="layer-options" data-layer="body">
+                            <div class="options-grid">
+                                <div class="option-item selected" data-layer="body" data-value="body-1">
+                                    <img src="/layers/body/base.png" alt="body 1">
+                                    <p>Body 1</p>
+                                </div>
+                                <div class="option-item" data-layer="body" data-value="body-2">
+                                    <img src="/layers/body/body 1-01.png" alt="body 2">
+                                    <p>Body 2</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Head Options -->
+                        <div class="layer-options" data-layer="head">
+                            <div class="options-grid">
+                                <div class="option-item selected" data-layer="head" data-value="head-1">
+                                    <img src="/layers/head/base.png" alt="head 1">
+                                    <p>Head 1</p>
+                                </div>
+                                <div class="option-item" data-layer="head" data-value="head-2">
+                                    <img src="/layers/head/face.png" alt="head 2">
+                                    <p>Head 2</p>
+                                </div>
+                                <div class="option-item" data-layer="head" data-value="head-3">
+                                    <img src="/layers/head/image.png" alt="head 3">
+                                    <p>Head 3</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sunglasses Options -->
+                        <div class="layer-options" data-layer="sunglasses">
+                            <div class="options-grid">
+                                <div class="option-item selected" data-layer="sunglasses" data-value="sunglasses-1">
+                                    <img src="/layers/sunglasses/nothing.png" alt="sunglasses 1">
+                                    <p>None</p>
+                                </div>
+                                <div class="option-item" data-layer="sunglasses" data-value="sunglasses-2">
+                                    <img src="/layers/sunglasses/sunglasses.png" alt="sunglasses 2">
+                                    <p>Sunglasses</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hair Options -->
+                        <div class="layer-options" data-layer="hair">
+                            <div class="options-grid">
+                                <div class="option-item selected" data-layer="hair" data-value="hair-1">
+                                    <img src="/layers/hair/2-done.png" alt="hair 1">
+                                    <p>Hair 1</p>
+                                </div>
+                                <div class="option-item" data-layer="hair" data-value="hair-2">
+                                    <img src="/layers/hair/3-done.png" alt="hair 2">
+                                    <p>Hair 2</p>
+                                </div>
+                                <div class="option-item" data-layer="hair" data-value="hair-3">
+                                    <img src="/layers/hair/4-done.png" alt="hair 3">
+                                    <p>Hair 3</p>
+                                </div>
+                                <div class="option-item" data-layer="hair" data-value="hair-4">
+                                    <img src="/layers/hair/5-done.png" alt="hair 4">
+                                    <p>Hair 4</p>
+                                </div>
+                                <div class="option-item" data-layer="hair" data-value="hair-5">
+                                    <img src="/layers/hair/6-done.png" alt="hair 5">
+                                    <p>Hair 5</p>
+                                </div>
+                                <div class="option-item" data-layer="hair" data-value="hair-6">
+                                    <img src="/layers/hair/base.png" alt="hair 6">
+                                    <p>Hair 6</p>
+                                </div>
+                                <div class="option-item" data-layer="hair" data-value="hair-7">
+                                    <img src="/layers/hair/golden-done.png" alt="hair 7">
+                                    <p>Hair 7</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -821,126 +1026,120 @@
             });
         }
         
-        // PFP Generator with AI API
-        document.getElementById('pfpForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            console.log('Form submitted!'); // Debug log
-            
-            const shirt = document.getElementById('shirt').value;
-            const background = document.getElementById('background').value;
-            const sunglasses = document.getElementById('sunglasses').value;
-            const hair = document.getElementById('hair').value;
-            const theme = document.getElementById('theme').value;
-            
-            const resultDiv = document.getElementById('result');
-            
-            // Show immediate loading feedback
-            resultDiv.innerHTML = `
-                <div style="padding: 30px; background: rgba(0, 255, 136, 0.1); border-radius: 15px; border: 2px solid var(--primary); text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 15px;">⏳</div>
-                    <p style="color: var(--primary); font-weight: 600; font-size: 1.2rem;">Generating your PFP...</p>
-                    <p style="color: #cccccc; margin-top: 10px;">This may take 20-60 seconds</p>
-                </div>
-            `;
-            
-            const prompt = `Create a character profile image based on this base: https://www.backtotheroots.fun/layers/head/base.png. 
-            Shirt: ${shirt}, Background: ${background}, Sunglasses: ${sunglasses}, Hair: ${hair}. Theme: ${theme}. Digital art style, profile picture.`;
-            
-            console.log('Prompt:', prompt); // Debug log
-            
-            try {
-                const response = await fetch("https://t2i.mcpcore.xyz/api/free/generate", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        prompt: prompt,
-                        model: "turbo"
-                    })
+        // PFP Generator functionality
+        const canvas = document.getElementById('pfp-canvas');
+        const ctx = canvas ? canvas.getContext('2d') : null;
+        
+        // Store current selections
+        const selections = {
+            background: 'background-1',
+            body: 'body-1',
+            head: 'head-1',
+            sunglasses: 'sunglasses-1',
+            hair: 'hair-1'
+        };
+        
+        // Layer tab switching
+        document.querySelectorAll('.layer-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.layer-tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all layer options
+                document.querySelectorAll('.layer-options').forEach(opt => opt.classList.remove('active'));
+                // Show selected layer options
+                const layer = this.dataset.layer;
+                document.querySelector(`.layer-options[data-layer="${layer}"]`).classList.add('active');
+            });
+        });
+        
+        // Option selection
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const layer = this.dataset.layer;
+                const value = this.dataset.value;
+                
+                // Remove selected class from all items in this layer
+                document.querySelectorAll(`.option-item[data-layer="${layer}"]`).forEach(i => {
+                    i.classList.remove('selected');
                 });
                 
-                console.log('Response status:', response.status); // Debug log
+                // Add selected class to clicked item
+                this.classList.add('selected');
                 
-                if (!response.ok) {
-                    throw new Error(`API returned status ${response.status}`);
-                }
+                // Update selection
+                selections[layer] = value;
                 
-                const reader = response.body
-                    .pipeThrough(new TextDecoderStream())
-                    .pipeThrough(new TransformStream({
-                        transform(chunk, controller) {
-                            console.log('Chunk received:', chunk); // Debug log
-                            
-                            const lines = chunk.split('\n');
-                            const messages = lines
-                                .filter(line => line.startsWith('data: '))
-                                .map(line => {
-                                    try {
-                                        return JSON.parse(line.slice(6));
-                                    } catch (e) {
-                                        console.error('Parse error:', e, 'Line:', line);
-                                        return null;
-                                    }
-                                })
-                                .filter(msg => msg !== null);
-                            
-                            messages.forEach(data => {
-                                console.log('Message data:', data); // Debug log
-                                
-                                switch (data.status) {
-                                    case 'processing':
-                                        resultDiv.innerHTML = `
-                                            <div style="padding: 30px; background: rgba(0, 255, 136, 0.1); border-radius: 15px; border: 2px solid var(--primary); text-align: center;">
-                                                <div style="font-size: 3rem; margin-bottom: 15px;">⚙️</div>
-                                                <p style="color: var(--primary); font-weight: 600; font-size: 1.1rem;">${data.message || 'Processing...'}</p>
-                                            </div>
-                                        `;
-                                        break;
-                                    case 'complete':
-                                        resultDiv.innerHTML = `
-                                            <div style="padding: 30px; background: rgba(0, 255, 136, 0.1); border-radius: 15px; border: 2px solid var(--primary); text-align: center;">
-                                                <div style="font-size: 3rem; margin-bottom: 15px;">✨</div>
-                                                <p style="color: var(--primary); font-weight: 600; font-size: 1.2rem; margin-bottom: 20px;">Your PFP is ready!</p>
-                                                <img src="${data.imageUrl}" alt="Generated PFP" style="max-width:100%; max-height: 500px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3); margin: 20px auto; display: block;">
-                                                <br>
-                                                <a href="${data.imageUrl}" download="roots-pfp.png" class="cta-button" style="display: inline-block; text-decoration: none; margin-top: 15px;">📥 Download Image</a>
-                                            </div>
-                                        `;
-                                        break;
-                                    case 'error':
-                                        resultDiv.innerHTML = `
-                                            <div style="padding: 30px; background: rgba(255, 0, 0, 0.1); border-radius: 15px; border: 2px solid #ff4444; text-align: center;">
-                                                <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
-                                                <p style="color: #ff4444; font-weight: 600; font-size: 1.1rem;">Error: ${data.message || 'Unknown error'}</p>
-                                                <p style="color: #cccccc; margin-top: 10px;">Please try again.</p>
-                                            </div>
-                                        `;
-                                        break;
-                                }
-                            });
-                        }
-                    }));
-                
-                // Read the stream
-                const streamReader = reader.getReader();
-                while (true) {
-                    const { done, value } = await streamReader.read();
-                    if (done) break;
-                }
-                
-            } catch (error) {
-                console.error('Error generating PFP:', error); // Debug log
-                resultDiv.innerHTML = `
-                    <div style="padding: 30px; background: rgba(255, 0, 0, 0.1); border-radius: 15px; border: 2px solid #ff4444; text-align: center;">
-                        <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
-                        <p style="color: #ff4444; font-weight: 600; font-size: 1.1rem;">Failed to generate PFP</p>
-                        <p style="color: #cccccc; margin-top: 10px;">Error: ${error.message}</p>
-                        <p style="color: #cccccc; margin-top: 10px;">Please check your internet connection and try again.</p>
-                        <button onclick="location.reload()" class="secondary-button" style="margin-top: 20px;">Refresh Page</button>
-                    </div>
-                `;
-            }
+                // Redraw canvas
+                drawPFP();
+            });
         });
+        
+        // Draw PFP on canvas
+        function drawPFP() {
+            if (!ctx) return;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw layers in order
+            const layers = ['background', 'body', 'head', 'sunglasses', 'hair'];
+            let loadedImages = 0;
+            
+            layers.forEach((layer, index) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                const selectedOption = document.querySelector(`.option-item[data-layer="${layer}"].selected`);
+                if (selectedOption) {
+                    const imgSrc = selectedOption.querySelector('img').src;
+                    img.src = imgSrc;
+                    img.onload = function() {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        loadedImages++;
+                    };
+                    img.onerror = function() {
+                        console.error(`Failed to load image: ${imgSrc}`);
+                        loadedImages++;
+                    };
+                }
+            });
+        }
+        
+        // Randomize button
+        const randomizeBtn = document.getElementById('randomize-btn');
+        if (randomizeBtn) {
+            randomizeBtn.addEventListener('click', function() {
+                // Randomize each layer
+                Object.keys(selections).forEach(layer => {
+                    const options = document.querySelectorAll(`.option-item[data-layer="${layer}"]`);
+                    if (options.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * options.length);
+                        options[randomIndex].click();
+                    }
+                });
+            });
+        }
+        
+        // Download button
+        const downloadBtn = document.getElementById('download-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function() {
+                if (!canvas) return;
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'roots-pfp.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+        
+        // Initial draw
+        if (canvas) {
+            setTimeout(drawPFP, 100);
+        }
         
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
