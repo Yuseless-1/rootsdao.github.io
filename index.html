@@ -825,55 +825,121 @@
         document.getElementById('pfpForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            console.log('Form submitted!'); // Debug log
+            
             const shirt = document.getElementById('shirt').value;
             const background = document.getElementById('background').value;
             const sunglasses = document.getElementById('sunglasses').value;
             const hair = document.getElementById('hair').value;
             const theme = document.getElementById('theme').value;
             
+            const resultDiv = document.getElementById('result');
+            
+            // Show immediate loading feedback
+            resultDiv.innerHTML = `
+                <div style="padding: 30px; background: rgba(0, 255, 136, 0.1); border-radius: 15px; border: 2px solid var(--primary); text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">⏳</div>
+                    <p style="color: var(--primary); font-weight: 600; font-size: 1.2rem;">Generating your PFP...</p>
+                    <p style="color: #cccccc; margin-top: 10px;">This may take 20-60 seconds</p>
+                </div>
+            `;
+            
             const prompt = `Create a character profile image based on this base: https://www.backtotheroots.fun/layers/head/base.png. 
-            Shirt: ${shirt}, Background: ${background}, Sunglasses: ${sunglasses}, Hair: ${hair}. Theme: ${theme}.`;
+            Shirt: ${shirt}, Background: ${background}, Sunglasses: ${sunglasses}, Hair: ${hair}. Theme: ${theme}. Digital art style, profile picture.`;
             
-            const response = await fetch("https://t2i.mcpcore.xyz/api/free/generate", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    prompt: prompt,
-                    model: "turbo" // You can also try "flux" or "magic"
-                })
-            });
+            console.log('Prompt:', prompt); // Debug log
             
-            const reader = response.body
-                .pipeThrough(new TextDecoderStream())
-                .pipeThrough(new TransformStream({
-                    transform(chunk, controller) {
-                        const lines = chunk.split('\n');
-                        const messages = lines
-                            .filter(line => line.startsWith('data: '))
-                            .map(line => JSON.parse(line.slice(6)));
-                        messages.forEach(data => {
-                            switch (data.status) {
-                                case 'processing':
-                                    document.getElementById('result').innerHTML = `<p style="color: var(--primary); font-size: 1.1rem;">Generating image: ${data.message}</p>`;
-                                    break;
-                                case 'complete':
-                                    document.getElementById('result').innerHTML = `
-                                        <div style="text-align: center;">
-                                            <p style="color: var(--primary); font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;">Your PFP is ready!</p>
-                                            <img src="${data.imageUrl}" alt="Generated PFP" style="max-width:100%; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3); margin: 20px 0;">
-                                            <br><a href="${data.imageUrl}" download="pfp.png" class="cta-button" style="display: inline-block; text-decoration: none;">Download Image</a>
-                                        </div>
-                                    `;
-                                    break;
-                                case 'error':
-                                    document.getElementById('result').innerHTML = `<p style="color: #ff4444; font-size: 1.1rem;">Error: ${data.message}</p>`;
-                                    break;
-                            }
-                        });
-                    }
-                }));
-            
-            reader.getReader().read();
+            try {
+                const response = await fetch("https://t2i.mcpcore.xyz/api/free/generate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        model: "turbo"
+                    })
+                });
+                
+                console.log('Response status:', response.status); // Debug log
+                
+                if (!response.ok) {
+                    throw new Error(`API returned status ${response.status}`);
+                }
+                
+                const reader = response.body
+                    .pipeThrough(new TextDecoderStream())
+                    .pipeThrough(new TransformStream({
+                        transform(chunk, controller) {
+                            console.log('Chunk received:', chunk); // Debug log
+                            
+                            const lines = chunk.split('\n');
+                            const messages = lines
+                                .filter(line => line.startsWith('data: '))
+                                .map(line => {
+                                    try {
+                                        return JSON.parse(line.slice(6));
+                                    } catch (e) {
+                                        console.error('Parse error:', e, 'Line:', line);
+                                        return null;
+                                    }
+                                })
+                                .filter(msg => msg !== null);
+                            
+                            messages.forEach(data => {
+                                console.log('Message data:', data); // Debug log
+                                
+                                switch (data.status) {
+                                    case 'processing':
+                                        resultDiv.innerHTML = `
+                                            <div style="padding: 30px; background: rgba(0, 255, 136, 0.1); border-radius: 15px; border: 2px solid var(--primary); text-align: center;">
+                                                <div style="font-size: 3rem; margin-bottom: 15px;">⚙️</div>
+                                                <p style="color: var(--primary); font-weight: 600; font-size: 1.1rem;">${data.message || 'Processing...'}</p>
+                                            </div>
+                                        `;
+                                        break;
+                                    case 'complete':
+                                        resultDiv.innerHTML = `
+                                            <div style="padding: 30px; background: rgba(0, 255, 136, 0.1); border-radius: 15px; border: 2px solid var(--primary); text-align: center;">
+                                                <div style="font-size: 3rem; margin-bottom: 15px;">✨</div>
+                                                <p style="color: var(--primary); font-weight: 600; font-size: 1.2rem; margin-bottom: 20px;">Your PFP is ready!</p>
+                                                <img src="${data.imageUrl}" alt="Generated PFP" style="max-width:100%; max-height: 500px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3); margin: 20px auto; display: block;">
+                                                <br>
+                                                <a href="${data.imageUrl}" download="roots-pfp.png" class="cta-button" style="display: inline-block; text-decoration: none; margin-top: 15px;">📥 Download Image</a>
+                                            </div>
+                                        `;
+                                        break;
+                                    case 'error':
+                                        resultDiv.innerHTML = `
+                                            <div style="padding: 30px; background: rgba(255, 0, 0, 0.1); border-radius: 15px; border: 2px solid #ff4444; text-align: center;">
+                                                <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
+                                                <p style="color: #ff4444; font-weight: 600; font-size: 1.1rem;">Error: ${data.message || 'Unknown error'}</p>
+                                                <p style="color: #cccccc; margin-top: 10px;">Please try again.</p>
+                                            </div>
+                                        `;
+                                        break;
+                                }
+                            });
+                        }
+                    }));
+                
+                // Read the stream
+                const streamReader = reader.getReader();
+                while (true) {
+                    const { done, value } = await streamReader.read();
+                    if (done) break;
+                }
+                
+            } catch (error) {
+                console.error('Error generating PFP:', error); // Debug log
+                resultDiv.innerHTML = `
+                    <div style="padding: 30px; background: rgba(255, 0, 0, 0.1); border-radius: 15px; border: 2px solid #ff4444; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">❌</div>
+                        <p style="color: #ff4444; font-weight: 600; font-size: 1.1rem;">Failed to generate PFP</p>
+                        <p style="color: #cccccc; margin-top: 10px;">Error: ${error.message}</p>
+                        <p style="color: #cccccc; margin-top: 10px;">Please check your internet connection and try again.</p>
+                        <button onclick="location.reload()" class="secondary-button" style="margin-top: 20px;">Refresh Page</button>
+                    </div>
+                `;
+            }
         });
         
         // Smooth scrolling for anchor links
