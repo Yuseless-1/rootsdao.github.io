@@ -373,3 +373,6 @@ vote(proposalId: string, amount: number, direction: 'for' | 'against'): Promise<
 
 For more information, see the [main README](../README.md) and [Whitepaper](../src/components/Whitepaper.tsx).
 
+
+
+

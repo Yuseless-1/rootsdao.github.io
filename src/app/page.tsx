@@ -10,7 +10,7 @@ export default function Home() {
   const { connected } = useWallet();
 
   const copyContract = () => {
-    const contractAddress = "12fgghtred233455ggreedd";
+    const contractAddress = "AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump";
     navigator.clipboard.writeText(contractAddress).then(() => {
       alert("Contract address copied to clipboard!");
     });
@@ -179,7 +179,7 @@ export default function Home() {
                 <div className="glass-effect rounded-xl p-4 card-hover">
                   <div className="grid grid-cols-3 gap-2">
                     <img
-                      src="https://i.imgur.com/8QZ8QZ8.png"
+                      src="/Dogecoin-Logo-emblem-of-the-cryptocurrency-transparent-png-image-jpg-768x768.webp"
                       alt="Doge"
                       className="w-full h-24 object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
@@ -187,7 +187,7 @@ export default function Home() {
                       }}
                     />
                     <img
-                      src="https://i.imgur.com/wojak.png"
+                      src="/Wojak_cropped.jpg"
                       alt="Wojak"
                       className="w-full h-24 object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
@@ -195,7 +195,7 @@ export default function Home() {
                       }}
                     />
                     <img
-                      src="https://i.imgur.com/pepe.png"
+                      src="/images.jpeg"
                       alt="Pepe"
                       className="w-full h-24 object-cover rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
@@ -222,7 +222,7 @@ export default function Home() {
                     <div className="flex-1">
                       <div className="text-xs text-gray-400 mb-1">Contract Address</div>
                       <span className="font-mono text-xs sm:text-sm text-gray-300 break-all">
-                        12fgghtred233455ggreedd
+                        AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump
                       </span>
                     </div>
                     <button
