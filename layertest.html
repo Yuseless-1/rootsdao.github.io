@@ -2,30 +2,94 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>ROOT5 Bridge Test</title>
+  <title>ROOT5 Omnichain Bridge Test</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- EVM -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
   <!-- Solana -->
   <script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+  <!-- SPL Token helpers (ATA + transfer) -->
+  <script>
+    // Minimal SPL Token helpers (no external spl-token lib)
+    const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+    const ASSOCIATED_TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey("ATokenGPvRzj7bS9u6u5QYQjeUu9QZb47G3fYx7hB");
+
+    function getAssociatedTokenAddress(mint, owner, allowOwnerOffCurve = false) {
+      return solanaWeb3.PublicKey.findProgramAddressSync(
+        [
+          owner.toBuffer(),
+          TOKEN_PROGRAM_ID.toBuffer(),
+          mint.toBuffer()
+        ],
+        ASSOCIATED_TOKEN_PROGRAM_ID
+      )[0];
+    }
+
+    function createAssociatedTokenAccountInstruction(payer, ata, owner, mint) {
+      return new solanaWeb3.TransactionInstruction({
+        programId: ASSOCIATED_TOKEN_PROGRAM_ID,
+        keys: [
+          { pubkey: payer, isSigner: true, isWritable: true },
+          { pubkey: ata, isSigner: false, isWritable: true },
+          { pubkey: owner, isSigner: false, isWritable: false },
+          { pubkey: mint, isSigner: false, isWritable: false },
+          { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false },
+          { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: solanaWeb3.SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
+        ],
+        data: Buffer.alloc(0),
+      });
+    }
+
+    // SPL Token 'transfer' instruction layout (amount as u64 little-endian)
+    function createSplTransferInstruction(source, destination, owner, amount) {
+      const dataLayout = Buffer.alloc(1 + 8);
+      dataLayout.writeUInt8(3, 0); // Token instruction enum: Transfer = 3
+      // write amount as u64 LE
+      const bn = BigInt(amount);
+      for (let i = 0; i < 8; i++) {
+        dataLayout[1 + i] = Number((bn >> BigInt(8 * i)) & BigInt(0xff));
+      }
+
+      return new solanaWeb3.TransactionInstruction({
+        programId: TOKEN_PROGRAM_ID,
+        keys: [
+          { pubkey: source, isSigner: false, isWritable: true },
+          { pubkey: destination, isSigner: false, isWritable: true },
+          { pubkey: owner, isSigner: true, isWritable: false },
+        ],
+        data: dataLayout,
+      });
+    }
+  </script>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
-    h1 { margin-bottom: 0.5rem; }
-    .row { margin: 0.5rem 0; }
-    label { display: inline-block; width: 180px; }
-    input, select, button { padding: 0.4rem 0.6rem; }
-    #status { margin-top: 0.5rem; }
-    .grid { display: grid; grid-template-columns: 220px 1fr; gap: 8px; max-width: 720px; }
-    .hint { color: #666; font-size: 0.9rem; }
-    .divider { margin: 1.2rem 0; border-top: 1px solid #ddd; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
+    h1 { margin: 0 0 8px; }
+    .grid { display: grid; grid-template-columns: 220px 1fr; gap: 10px; max-width: 860px; }
+    label { display: inline-block; font-weight: 600; }
+    input, select, button { padding: 8px 10px; font-size: 14px; }
+    .row { margin: 12px 0; }
+    #status { margin-top: 8px; min-height: 20px; color: #333; }
+    .divider { border-top: 1px solid #ddd; margin: 16px 0; }
+    .hint { color: #666; font-size: 13px; }
+    .flex { display: flex; gap: 12px; align-items: center; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   </style>
 </head>
 <body>
-  <h1>ROOT5 Bridge Test</h1>
-  <div class="hint">Select a network, connect your wallet, view your token balance, enter an amount, choose a destination, and send.</div>
+  <h1>ROOT5 Omnichain Bridge Test</h1>
+  <div class="hint">Choose wallet and network, connect, view balances, enter amount, choose destination, and send.</div>
 
   <div class="grid">
-    <div><label for="network">Select network</label></div>
+    <div><label for="wallet">Wallet</label></div>
+    <div>
+      <select id="wallet">
+        <option value="evm">MetaMask (EVM)</option>
+        <option value="solana">Phantom / MetaMask Solana</option>
+      </select>
+    </div>
+
+    <div><label for="network">Network</label></div>
     <div>
       <select id="network">
         <option value="solana-devnet">Solana Devnet</option>
@@ -37,14 +101,17 @@
       </select>
     </div>
 
-    <div><label>Wallet address</label></div>
-    <div id="address">-</div>
+    <div><label>Connected address</label></div>
+    <div id="address" class="mono">-</div>
 
     <div><label>Token balance</label></div>
     <div id="balance">-</div>
 
-    <div><label for="amount">Amount to send</label></div>
+    <div><label for="amount">Amount</label></div>
     <div><input id="amount" type="text" placeholder="e.g., 10"></div>
+
+    <div><label for="recipient">Recipient</label></div>
+    <div><input id="recipient" type="text" placeholder="0x... or Solana address"></div>
 
     <div><label for="destination">Destination</label></div>
     <div>
@@ -57,31 +124,29 @@
         <option value="bsc-testnet">BSC Testnet</option>
       </select>
     </div>
-
-    <div><label for="recipient">Recipient</label></div>
-    <div><input id="recipient" type="text" placeholder="0x... or Solana address"></div>
   </div>
 
-  <div class="row">
-    <button id="connect">Connect wallet</button>
-    <button id="send">Send tokens</button>
+  <div class="row flex">
+    <button id="connect">Connect</button>
+    <button id="send">Send</button>
     <div id="status"></div>
   </div>
 
   <div class="divider"></div>
   <div class="hint">
-    EVM path: switches MetaMask to the selected testnet, reads ERC‑20/OFT balance, and calls contract.send(...).<br>
-    Solana path: connects a Solana wallet and shows SPL token balance for your mint via RPC. Sending on Solana is not wired here.
+    EVM: switches MetaMask to selected testnet, reads ERC‑20/OFT balance, calls contract.send(...).<br>
+    Solana: connects wallet, reads SPL balance for your mint, and transfers SPL tokens using ATA accounts.<br>
+    Replace configuration values below to match your deployment.
   </div>
 
   <script>
-    // ----- Configuration -----
-    const DECIMALS = 6;
+    // -------------------- Configuration (EDIT THESE) --------------------
+    const DECIMALS = 6; // your token decimals
 
-    // Your SPL mint on Solana (from your devnet setup)
+    // Your SPL mint on Solana Devnet
     const SOLANA_MINT = "9Z3t8mK2Svw5zmS6pwWCfZ6rcKw4QF5gFkHfh94DzkYN";
 
-    // EVM contract addresses by network (replace with your deployed OFT contracts)
+    // EVM OFT/Token contract addresses by network
     const EVM_CONTRACTS = {
       "arbitrum-sepolia": "0xYourArbitrumContract",
       "base-sepolia": "0xYourBaseContract",
@@ -90,7 +155,7 @@
       "bsc-testnet": "0xYourBscContract"
     };
 
-    // EVM chain params (used to add/switch chains in MetaMask)
+    // EVM chain params for MetaMask add/switch
     const EVM_NETWORKS = {
       "arbitrum-sepolia": {
         chainId: "0x66eee",
@@ -107,7 +172,7 @@
         blockExplorerUrls: ["https://sepolia.basescan.org"]
       },
       "optimism-sepolia": {
-        chainId: "0xaa36a7", // Optimism Sepolia uses Ethereum Sepolia chainId in some setups; adjust if needed
+        chainId: "0xaa36a7",
         chainName: "Optimism Sepolia",
         rpcUrls: ["https://sepolia.optimism.io"],
         nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
@@ -129,14 +194,13 @@
       }
     };
 
-    // Minimal ERC-20/OFT ABI (adjust to your contract)
+    // Minimal ABI — replace with your OFT ABI if different (e.g., sendFrom with dstChainId)
     const EVM_CONTRACT_ABI = [
       "function balanceOf(address) view returns (uint256)",
       "function send(address recipient, uint256 amount) external"
-      // If your OFT uses sendFrom/compose with dstChainId, add those signatures here
     ];
 
-    // ----- State -----
+    // -------------------- State --------------------
     let evmProvider = null;
     let evmSigner = null;
     let evmContract = null;
@@ -144,15 +208,18 @@
     let solanaConnection = null;
     let solanaPublicKey = null;
 
-    const statusEl = document.getElementById("status");
     const addressEl = document.getElementById("address");
     const balanceEl = document.getElementById("balance");
+    const statusEl = document.getElementById("status");
+    const walletSel = document.getElementById("wallet");
+    const networkSel = document.getElementById("network");
+    const destinationSel = document.getElementById("destination");
 
-    function setStatus(txt) { statusEl.textContent = txt; }
-    function setAddress(txt) { addressEl.textContent = txt || "-"; }
+    function setStatus(msg) { statusEl.textContent = msg; }
+    function setAddress(addr) { addressEl.textContent = addr || "-"; }
     function setBalance(txt) { balanceEl.textContent = txt || "-"; }
 
-    // ----- Network switch for EVM -----
+    // -------------------- Helpers --------------------
     async function ensureEvmNetwork(netKey) {
       const params = EVM_NETWORKS[netKey];
       if (!params) throw new Error("Unknown EVM network: " + netKey);
@@ -162,138 +229,186 @@
           params: [{ chainId: params.chainId }]
         });
       } catch (err) {
-        // If the chain is not added, add it and then switch
         if (err.code === 4902 || (err.message && err.message.includes("Unrecognized chain ID"))) {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [params]
-          });
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: params.chainId }]
-          });
+          await window.ethereum.request({ method: "wallet_addEthereumChain", params: [params] });
+          await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: params.chainId }] });
         } else {
           throw err;
         }
       }
     }
 
-    // ----- Connect flow -----
-    async function connectWallet() {
-      const net = document.getElementById("network").value;
-      setStatus("Connecting...");
+    async function evmConnectAndLoad() {
+      if (!window.ethereum) throw new Error("MetaMask not found");
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      const net = networkSel.value;
+      await ensureEvmNetwork(net);
+      evmProvider = new ethers.providers.Web3Provider(window.ethereum);
+      evmSigner = evmProvider.getSigner();
+      const addr = await evmSigner.getAddress();
+      setAddress(addr);
 
-      if (net === "solana-devnet") {
-        // Connect Solana wallet (MetaMask Solana or Phantom/others that expose window.solana)
-        if (!window.solana) {
-          setStatus("Solana wallet provider not found. Please enable Solana in MetaMask or install Phantom.");
-          return;
-        }
-        try {
-          const resp = await window.solana.connect(); // Prompts the wallet
-          solanaPublicKey = resp.publicKey;
-          setAddress(solanaPublicKey.toString());
-
-          solanaConnection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("devnet"), "confirmed");
-
-          // Fetch SPL token balance for your mint
-          const accounts = await solanaConnection.getParsedTokenAccountsByOwner(
-            solanaPublicKey,
-            { mint: new solanaWeb3.PublicKey(SOLANA_MINT) }
-          );
-          let raw = 0n;
-          if (accounts.value.length > 0) {
-            const info = accounts.value[0].account.data.parsed.info;
-            raw = BigInt(info.tokenAmount.amount);
-          }
-          const human = Number(raw) / Math.pow(10, DECIMALS);
-          setBalance(human.toLocaleString(undefined, { maximumFractionDigits: DECIMALS }));
-          setStatus("Connected to Solana Devnet");
-        } catch (err) {
-          console.error(err);
-          setStatus("Solana connect error: " + (err.message || err));
-        }
+      const contractAddr = EVM_CONTRACTS[net];
+      if (!contractAddr || contractAddr.startsWith("0xYour")) {
+        setStatus("Set contract address for " + net);
+        setBalance("-");
         return;
       }
-
-      // EVM path
-      if (!window.ethereum) {
-        setStatus("MetaMask not found.");
-        return;
-      }
-      try {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        await ensureEvmNetwork(net);
-
-        evmProvider = new ethers.providers.Web3Provider(window.ethereum);
-        evmSigner = evmProvider.getSigner();
-        const addr = await evmSigner.getAddress();
-        setAddress(addr);
-
-        const contractAddr = EVM_CONTRACTS[net];
-        if (!contractAddr || contractAddr === "0xYourArbitrumContract") {
-          setStatus("Please set the contract address for " + net);
-          return;
-        }
-        evmContract = new ethers.Contract(contractAddr, EVM_CONTRACT_ABI, evmSigner);
-
-        const bal = await evmContract.balanceOf(addr);
-        const human = ethers.utils.formatUnits(bal, DECIMALS);
-        setBalance(human);
-        setStatus("Connected to " + net);
-      } catch (err) {
-        console.error(err);
-        setStatus("EVM connect error: " + (err.message || err));
-      }
+      evmContract = new ethers.Contract(contractAddr, EVM_CONTRACT_ABI, evmSigner);
+      const bal = await evmContract.balanceOf(addr);
+      setBalance(ethers.utils.formatUnits(bal, DECIMALS));
+      setStatus("Connected: " + net);
     }
 
-    // ----- Send flow -----
-    async function sendTokens() {
-      const net = document.getElementById("network").value;
-      const dest = document.getElementById("destination").value;
+    async function solanaConnectAndLoad() {
+      if (!window.solana) throw new Error("Solana wallet provider not found");
+      const resp = await window.solana.connect();
+      solanaPublicKey = resp.publicKey;
+      setAddress(solanaPublicKey.toString());
+
+      solanaConnection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("devnet"), "confirmed");
+
+      // Get SPL token balance for your mint
+      const accounts = await solanaConnection.getParsedTokenAccountsByOwner(
+        solanaPublicKey,
+        { mint: new solanaWeb3.PublicKey(SOLANA_MINT) }
+      );
+      let raw = 0n;
+      if (accounts.value.length > 0) {
+        const info = accounts.value[0].account.data.parsed.info;
+        raw = BigInt(info.tokenAmount.amount);
+      }
+      const human = Number(raw) / Math.pow(10, DECIMALS);
+      setBalance(human.toLocaleString(undefined, { maximumFractionDigits: DECIMALS }));
+      setStatus("Connected: Solana Devnet");
+    }
+
+    // -------------------- Send flows --------------------
+    async function sendEvm() {
+      if (!evmContract || !evmSigner) throw new Error("Connect MetaMask first.");
       const recipient = document.getElementById("recipient").value.trim();
       const amountStr = document.getElementById("amount").value.trim();
+      if (!recipient) throw new Error("Enter recipient (0x...).");
+      if (!amountStr) throw new Error("Enter amount.");
 
-      if (!amountStr) { setStatus("Enter an amount."); return; }
-      if (!recipient) { setStatus("Enter a recipient."); return; }
+      const amountWei = ethers.utils.parseUnits(amountStr, DECIMALS);
+      setStatus("Submitting EVM tx...");
+      // Replace with your OFT method if different (e.g., sendFrom with dstChainId)
+      const tx = await evmContract.send(recipient, amountWei);
+      setStatus("EVM tx submitted: " + tx.hash);
+      await tx.wait();
+      setStatus("EVM tx confirmed: " + tx.hash);
 
-      if (net === "solana-devnet") {
-        if (!solanaPublicKey) { setStatus("Connect Solana wallet first."); return; }
-        // This template does not sign Solana OFT transactions in-browser.
-        // You can extend here to build and send a transaction to your Solana adapter program.
-        setStatus("Solana send is not wired in this demo. Use the EVM networks for sending.");
-        return;
-      }
-
-      if (!evmContract || !evmSigner) { setStatus("Connect MetaMask first."); return; }
-
-      try {
-        // For OFT bridging, you likely need a method with destination chain parameters (e.g., sendFrom with dstChainId).
-        // Update this call to match your OFT ABI. For demo, using simple send(recipient, amount).
-        const amountWei = ethers.utils.parseUnits(amountStr, DECIMALS);
-        setStatus("Submitting transaction...");
-        const tx = await evmContract.send(recipient, amountWei);
-        setStatus("Tx submitted: " + tx.hash);
-        await tx.wait();
-        setStatus("Tx confirmed: " + tx.hash);
-        // Refresh balance
-        const addr = await evmSigner.getAddress();
-        const bal = await evmContract.balanceOf(addr);
-        setBalance(ethers.utils.formatUnits(bal, DECIMALS));
-      } catch (err) {
-        console.error(err);
-        setStatus("Send error: " + (err.data?.message || err.message || err));
-      }
+      const addr = await evmSigner.getAddress();
+      const bal = await evmContract.balanceOf(addr);
+      setBalance(ethers.utils.formatUnits(bal, DECIMALS));
     }
 
-    document.getElementById("connect").addEventListener("click", connectWallet);
-    document.getElementById("send").addEventListener("click", sendTokens);
+    async function sendSolana() {
+      if (!solanaPublicKey || !solanaConnection) throw new Error("Connect Solana wallet first.");
+      const recipientStr = document.getElementById("recipient").value.trim();
+      const amountStr = document.getElementById("amount").value.trim();
+      if (!recipientStr) throw new Error("Enter recipient (Solana address).");
+      if (!amountStr) throw new Error("Enter amount.");
 
-    // Optional: update UI hints when network selection changes
-    document.getElementById("network").addEventListener("change", () => {
+      const mint = new solanaWeb3.PublicKey(SOLANA_MINT);
+      const payer = solanaPublicKey;
+      const owner = solanaPublicKey;
+      const recipientPk = new solanaWeb3.PublicKey(recipientStr);
+
+      const ownerAta = getAssociatedTokenAddress(mint, owner);
+      const recipientAta = getAssociatedTokenAddress(mint, recipientPk);
+
+      const ix = [];
+      // Ensure recipient ATA exists
+      const recipientAtaInfo = await solanaConnection.getAccountInfo(recipientAta);
+      if (!recipientAtaInfo) {
+        ix.push(createAssociatedTokenAccountInstruction(payer, recipientAta, recipientPk, mint));
+      }
+
+      // Transfer SPL tokens
+      const amountRaw = BigInt(Math.floor(parseFloat(amountStr) * Math.pow(10, DECIMALS)));
+      ix.push(createSplTransferInstruction(ownerAta, recipientAta, owner, amountRaw));
+
+      const tx = new solanaWeb3.Transaction().add(...ix);
+      tx.feePayer = payer;
+      tx.recentBlockhash = (await solanaConnection.getLatestBlockhash()).blockhash;
+
+      setStatus("Submitting Solana tx...");
+      const signed = await window.solana.signTransaction(tx);
+      const sig = await solanaConnection.sendRawTransaction(signed.serialize(), { skipPreflight: false });
+      await solanaConnection.confirmTransaction(sig, "confirmed");
+      setStatus("Solana tx confirmed: " + sig);
+
+      // Refresh balance
+      const accounts = await solanaConnection.getParsedTokenAccountsByOwner(
+        owner, { mint }
+      );
+      let raw = 0n;
+      if (accounts.value.length > 0) {
+        const info = accounts.value[0].account.data.parsed.info;
+        raw = BigInt(info.tokenAmount.amount);
+      }
+      const human = Number(raw) / Math.pow(10, DECIMALS);
+      setBalance(human.toLocaleString(undefined, { maximumFractionDigits: DECIMALS }));
+    }
+
+    // -------------------- UI bindings --------------------
+    document.getElementById("connect").addEventListener("click", async () => {
+      setStatus("Connecting...");
+      try {
+        const walletType = walletSel.value;
+        const net = networkSel.value;
+
+        if (walletType === "evm") {
+          if (!EVM_CONTRACTS[net]) {
+            setStatus("Select an EVM testnet for MetaMask.");
+            return;
+          }
+          await evmConnectAndLoad();
+        } else {
+          if (net !== "solana-devnet") {
+            setStatus("Select Solana Devnet for Solana wallet.");
+            return;
+          }
+          await solanaConnectAndLoad();
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus(err.message || String(err));
+      }
+    });
+
+    document.getElementById("send").addEventListener("click", async () => {
+      setStatus("Preparing send...");
+      try {
+        const walletType = walletSel.value;
+        const net = networkSel.value;
+        const dest = destinationSel.value;
+
+        // This demo sends on the currently selected wallet/network.
+        // For true bridging, call your OFT adapter methods with dstChainId/peer addresses.
+        if (walletType === "evm") {
+          await sendEvm();
+        } else {
+          await sendSolana();
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus(err?.data?.message || err.message || String(err));
+      }
+    });
+
+    networkSel.addEventListener("change", () => {
       setAddress("-");
       setBalance("-");
-      setStatus("Select a network and connect.");
+      setStatus("Select wallet, then connect.");
+    });
+
+    walletSel.addEventListener("change", () => {
+      setAddress("-");
+      setBalance("-");
+      setStatus("Select network, then connect.");
     });
   </script>
 </body>
