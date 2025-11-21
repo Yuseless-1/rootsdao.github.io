@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ROOT5 Bridge Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+</head>
+<body>
+  <h1>ROOT5 Bridge Test</h1>
+  <button id="connect">Connect MetaMask</button>
+  <p id="status"></p>
+
+  <button id="send">Send Test Tx</button>
+
+  <script>
+    let provider, signer, contract;
+
+    // Replace with your deployed contract address + ABI
+    const CONTRACT_ADDRESS = "0xYourOFTContractAddress";
+    const CONTRACT_ABI = [
+      // Minimal ABI fragment for send function
+      "function send(address recipient, uint256 amount) external"
+    ];
+
+    document.getElementById("connect").onclick = async () => {
+      if (!window.ethereum) {
+        alert("MetaMask not found!");
+        return;
+      }
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+      document.getElementById("status").innerText = "Connected: " + await signer.getAddress();
+      contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    };
+
+    document.getElementById("send").onclick = async () => {
+      if (!contract) {
+        alert("Connect first!");
+        return;
+      }
+      try {
+        const tx = await contract.send("0xRecipientAddressHere", ethers.utils.parseUnits("1", 6));
+        document.getElementById("status").innerText = "Tx sent: " + tx.hash;
+      } catch (err) {
+        console.error(err);
+        alert("Error: " + err.message);
+      }
+    };
+  </script>
+</body>
+</html>
