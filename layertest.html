@@ -3,57 +3,86 @@
 <head>
   <meta charset="utf-8">
   <title>ROOT5 Bridge Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- EVM -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <!-- Solana -->
+  <script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; }
+    h1 { margin-bottom: 0.5rem; }
+    .row { margin: 0.5rem 0; }
+    label { display: inline-block; width: 180px; }
+    input, select, button { padding: 0.4rem 0.6rem; }
+    #status { margin-top: 0.5rem; }
+    .grid { display: grid; grid-template-columns: 220px 1fr; gap: 8px; max-width: 720px; }
+    .hint { color: #666; font-size: 0.9rem; }
+    .divider { margin: 1.2rem 0; border-top: 1px solid #ddd; }
+  </style>
 </head>
 <body>
   <h1>ROOT5 Bridge Test</h1>
+  <div class="hint">Select a network, connect your wallet, view your token balance, enter an amount, choose a destination, and send.</div>
 
-  <!-- Network selector -->
-  <label for="network">Select Network:</label>
-  <select id="network">
-    <option value="arbitrum-sepolia">Arbitrum Sepolia</option>
-    <option value="base-sepolia">Base Sepolia</option>
-    <option value="optimism-sepolia">Optimism Sepolia</option>
-    <option value="polygon-amoy">Polygon Amoy</option>
-    <option value="bsc-testnet">BSC Testnet</option>
-  </select>
+  <div class="grid">
+    <div><label for="network">Select network</label></div>
+    <div>
+      <select id="network">
+        <option value="solana-devnet">Solana Devnet</option>
+        <option value="arbitrum-sepolia">Arbitrum Sepolia</option>
+        <option value="base-sepolia">Base Sepolia</option>
+        <option value="optimism-sepolia">Optimism Sepolia</option>
+        <option value="polygon-amoy">Polygon Amoy</option>
+        <option value="bsc-testnet">BSC Testnet</option>
+      </select>
+    </div>
 
-  <br><br>
+    <div><label>Wallet address</label></div>
+    <div id="address">-</div>
 
-  <!-- Connect button -->
-  <button id="connect">Connect MetaMask</button>
-  <p id="status"></p>
+    <div><label>Token balance</label></div>
+    <div id="balance">-</div>
 
-  <!-- Balance display -->
-  <p>Wallet balance: <span id="balance">-</span></p>
+    <div><label for="amount">Amount to send</label></div>
+    <div><input id="amount" type="text" placeholder="e.g., 10"></div>
 
-  <!-- Amount input -->
-  <label for="amount">Amount to send:</label>
-  <input type="text" id="amount" placeholder="Enter amount">
+    <div><label for="destination">Destination</label></div>
+    <div>
+      <select id="destination">
+        <option value="solana-devnet">Solana Devnet</option>
+        <option value="arbitrum-sepolia">Arbitrum Sepolia</option>
+        <option value="base-sepolia">Base Sepolia</option>
+        <option value="optimism-sepolia">Optimism Sepolia</option>
+        <option value="polygon-amoy">Polygon Amoy</option>
+        <option value="bsc-testnet">BSC Testnet</option>
+      </select>
+    </div>
 
-  <br><br>
+    <div><label for="recipient">Recipient</label></div>
+    <div><input id="recipient" type="text" placeholder="0x... or Solana address"></div>
+  </div>
 
-  <!-- Destination selector -->
-  <label for="destination">Send to:</label>
-  <select id="destination">
-    <option value="solana">Solana</option>
-    <option value="arbitrum-sepolia">Arbitrum Sepolia</option>
-    <option value="base-sepolia">Base Sepolia</option>
-    <option value="optimism-sepolia">Optimism Sepolia</option>
-    <option value="polygon-amoy">Polygon Amoy</option>
-    <option value="bsc-testnet">BSC Testnet</option>
-  </select>
+  <div class="row">
+    <button id="connect">Connect wallet</button>
+    <button id="send">Send tokens</button>
+    <div id="status"></div>
+  </div>
 
-  <br><br>
-
-  <!-- Send button -->
-  <button id="send">Send Tokens</button>
+  <div class="divider"></div>
+  <div class="hint">
+    EVM path: switches MetaMask to the selected testnet, reads ERC‑20/OFT balance, and calls contract.send(...).<br>
+    Solana path: connects a Solana wallet and shows SPL token balance for your mint via RPC. Sending on Solana is not wired here.
+  </div>
 
   <script>
-    let provider, signer, contract;
+    // ----- Configuration -----
+    const DECIMALS = 6;
 
-    // Replace with your deployed contract addresses per network
-    const CONTRACTS = {
+    // Your SPL mint on Solana (from your devnet setup)
+    const SOLANA_MINT = "9Z3t8mK2Svw5zmS6pwWCfZ6rcKw4QF5gFkHfh94DzkYN";
+
+    // EVM contract addresses by network (replace with your deployed OFT contracts)
+    const EVM_CONTRACTS = {
       "arbitrum-sepolia": "0xYourArbitrumContract",
       "base-sepolia": "0xYourBaseContract",
       "optimism-sepolia": "0xYourOptimismContract",
@@ -61,53 +90,211 @@
       "bsc-testnet": "0xYourBscContract"
     };
 
-    // Replace with your contract ABI
-    const CONTRACT_ABI = [
+    // EVM chain params (used to add/switch chains in MetaMask)
+    const EVM_NETWORKS = {
+      "arbitrum-sepolia": {
+        chainId: "0x66eee",
+        chainName: "Arbitrum Sepolia",
+        rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
+        nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+        blockExplorerUrls: ["https://sepolia.arbiscan.io"]
+      },
+      "base-sepolia": {
+        chainId: "0x14a34",
+        chainName: "Base Sepolia",
+        rpcUrls: ["https://sepolia.base.org"],
+        nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+        blockExplorerUrls: ["https://sepolia.basescan.org"]
+      },
+      "optimism-sepolia": {
+        chainId: "0xaa36a7", // Optimism Sepolia uses Ethereum Sepolia chainId in some setups; adjust if needed
+        chainName: "Optimism Sepolia",
+        rpcUrls: ["https://sepolia.optimism.io"],
+        nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+        blockExplorerUrls: ["https://sepolia-optimism.etherscan.io"]
+      },
+      "polygon-amoy": {
+        chainId: "0x13882",
+        chainName: "Polygon Amoy",
+        rpcUrls: ["https://rpc-amoy.polygon.technology/"],
+        nativeCurrency: { name: "MATIC", symbol: "MATIC", decimals: 18 },
+        blockExplorerUrls: ["https://www.oklink.com/amoy"]
+      },
+      "bsc-testnet": {
+        chainId: "0x61",
+        chainName: "BSC Testnet",
+        rpcUrls: ["https://bsc-testnet.publicnode.com"],
+        nativeCurrency: { name: "tBNB", symbol: "tBNB", decimals: 18 },
+        blockExplorerUrls: ["https://testnet.bscscan.com"]
+      }
+    };
+
+    // Minimal ERC-20/OFT ABI (adjust to your contract)
+    const EVM_CONTRACT_ABI = [
       "function balanceOf(address) view returns (uint256)",
       "function send(address recipient, uint256 amount) external"
+      // If your OFT uses sendFrom/compose with dstChainId, add those signatures here
     ];
 
-    async function connect() {
-      if (!window.ethereum) {
-        alert("MetaMask not found!");
-        return;
+    // ----- State -----
+    let evmProvider = null;
+    let evmSigner = null;
+    let evmContract = null;
+
+    let solanaConnection = null;
+    let solanaPublicKey = null;
+
+    const statusEl = document.getElementById("status");
+    const addressEl = document.getElementById("address");
+    const balanceEl = document.getElementById("balance");
+
+    function setStatus(txt) { statusEl.textContent = txt; }
+    function setAddress(txt) { addressEl.textContent = txt || "-"; }
+    function setBalance(txt) { balanceEl.textContent = txt || "-"; }
+
+    // ----- Network switch for EVM -----
+    async function ensureEvmNetwork(netKey) {
+      const params = EVM_NETWORKS[netKey];
+      if (!params) throw new Error("Unknown EVM network: " + netKey);
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: params.chainId }]
+        });
+      } catch (err) {
+        // If the chain is not added, add it and then switch
+        if (err.code === 4902 || (err.message && err.message.includes("Unrecognized chain ID"))) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [params]
+          });
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: params.chainId }]
+          });
+        } else {
+          throw err;
+        }
       }
-      await window.ethereum.request({ method: "eth_requestAccounts" });
-      provider = new ethers.providers.Web3Provider(window.ethereum);
-      signer = provider.getSigner();
-      const addr = await signer.getAddress();
-      document.getElementById("status").innerText = "Connected: " + addr;
-
-      // Set contract for selected network
-      const net = document.getElementById("network").value;
-      const contractAddr = CONTRACTS[net];
-      contract = new ethers.Contract(contractAddr, CONTRACT_ABI, signer);
-
-      // Show balance
-      const bal = await contract.balanceOf(addr);
-      document.getElementById("balance").innerText = ethers.utils.formatUnits(bal, 6);
     }
 
-    async function sendTokens() {
-      if (!contract) {
-        alert("Connect first!");
+    // ----- Connect flow -----
+    async function connectWallet() {
+      const net = document.getElementById("network").value;
+      setStatus("Connecting...");
+
+      if (net === "solana-devnet") {
+        // Connect Solana wallet (MetaMask Solana or Phantom/others that expose window.solana)
+        if (!window.solana) {
+          setStatus("Solana wallet provider not found. Please enable Solana in MetaMask or install Phantom.");
+          return;
+        }
+        try {
+          const resp = await window.solana.connect(); // Prompts the wallet
+          solanaPublicKey = resp.publicKey;
+          setAddress(solanaPublicKey.toString());
+
+          solanaConnection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("devnet"), "confirmed");
+
+          // Fetch SPL token balance for your mint
+          const accounts = await solanaConnection.getParsedTokenAccountsByOwner(
+            solanaPublicKey,
+            { mint: new solanaWeb3.PublicKey(SOLANA_MINT) }
+          );
+          let raw = 0n;
+          if (accounts.value.length > 0) {
+            const info = accounts.value[0].account.data.parsed.info;
+            raw = BigInt(info.tokenAmount.amount);
+          }
+          const human = Number(raw) / Math.pow(10, DECIMALS);
+          setBalance(human.toLocaleString(undefined, { maximumFractionDigits: DECIMALS }));
+          setStatus("Connected to Solana Devnet");
+        } catch (err) {
+          console.error(err);
+          setStatus("Solana connect error: " + (err.message || err));
+        }
         return;
       }
-      const amount = document.getElementById("amount").value;
-      const dest = document.getElementById("destination").value;
-      const recipient = await signer.getAddress(); // for demo, send to self; replace with mapping
 
+      // EVM path
+      if (!window.ethereum) {
+        setStatus("MetaMask not found.");
+        return;
+      }
       try {
-        const tx = await contract.send(recipient, ethers.utils.parseUnits(amount, 6));
-        document.getElementById("status").innerText = "Tx sent: " + tx.hash;
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        await ensureEvmNetwork(net);
+
+        evmProvider = new ethers.providers.Web3Provider(window.ethereum);
+        evmSigner = evmProvider.getSigner();
+        const addr = await evmSigner.getAddress();
+        setAddress(addr);
+
+        const contractAddr = EVM_CONTRACTS[net];
+        if (!contractAddr || contractAddr === "0xYourArbitrumContract") {
+          setStatus("Please set the contract address for " + net);
+          return;
+        }
+        evmContract = new ethers.Contract(contractAddr, EVM_CONTRACT_ABI, evmSigner);
+
+        const bal = await evmContract.balanceOf(addr);
+        const human = ethers.utils.formatUnits(bal, DECIMALS);
+        setBalance(human);
+        setStatus("Connected to " + net);
       } catch (err) {
         console.error(err);
-        alert("Error: " + err.message);
+        setStatus("EVM connect error: " + (err.message || err));
       }
     }
 
-    document.getElementById("connect").onclick = connect;
-    document.getElementById("send").onclick = sendTokens;
+    // ----- Send flow -----
+    async function sendTokens() {
+      const net = document.getElementById("network").value;
+      const dest = document.getElementById("destination").value;
+      const recipient = document.getElementById("recipient").value.trim();
+      const amountStr = document.getElementById("amount").value.trim();
+
+      if (!amountStr) { setStatus("Enter an amount."); return; }
+      if (!recipient) { setStatus("Enter a recipient."); return; }
+
+      if (net === "solana-devnet") {
+        if (!solanaPublicKey) { setStatus("Connect Solana wallet first."); return; }
+        // This template does not sign Solana OFT transactions in-browser.
+        // You can extend here to build and send a transaction to your Solana adapter program.
+        setStatus("Solana send is not wired in this demo. Use the EVM networks for sending.");
+        return;
+      }
+
+      if (!evmContract || !evmSigner) { setStatus("Connect MetaMask first."); return; }
+
+      try {
+        // For OFT bridging, you likely need a method with destination chain parameters (e.g., sendFrom with dstChainId).
+        // Update this call to match your OFT ABI. For demo, using simple send(recipient, amount).
+        const amountWei = ethers.utils.parseUnits(amountStr, DECIMALS);
+        setStatus("Submitting transaction...");
+        const tx = await evmContract.send(recipient, amountWei);
+        setStatus("Tx submitted: " + tx.hash);
+        await tx.wait();
+        setStatus("Tx confirmed: " + tx.hash);
+        // Refresh balance
+        const addr = await evmSigner.getAddress();
+        const bal = await evmContract.balanceOf(addr);
+        setBalance(ethers.utils.formatUnits(bal, DECIMALS));
+      } catch (err) {
+        console.error(err);
+        setStatus("Send error: " + (err.data?.message || err.message || err));
+      }
+    }
+
+    document.getElementById("connect").addEventListener("click", connectWallet);
+    document.getElementById("send").addEventListener("click", sendTokens);
+
+    // Optional: update UI hints when network selection changes
+    document.getElementById("network").addEventListener("change", () => {
+      setAddress("-");
+      setBalance("-");
+      setStatus("Select a network and connect.");
+    });
   </script>
 </body>
 </html>
