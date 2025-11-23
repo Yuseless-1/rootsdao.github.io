@@ -642,8 +642,15 @@
       const card = document.createElement('div');
       card.className = 'chain-card';
       card.dataset.chain = key;
+      
+      // Add 'connected' class if this is the currently connected chain
+      const isConnected = state.connectedChain === key;
+      
       card.innerHTML = `
-        <div class="chain-name">${chain.icon} ${chain.name}</div>
+        <div class="chain-name">
+          ${chain.icon} ${chain.name}
+          ${isConnected ? '<span style="color: var(--success); font-size: 0.75rem; margin-left: 5px;">● Connected</span>' : ''}
+        </div>
         <div class="chain-balance" id="${type}-balance-${key}">Balance: -</div>
       `;
       
@@ -651,7 +658,7 @@
       return card;
     }
 
-    function selectChain(chainKey, type) {
+    async function selectChain(chainKey, type) {
       if (type === 'source') {
         // Deselect all source chains
         document.querySelectorAll('#sourceChainGrid .chain-card').forEach(c => c.classList.remove('selected'));
@@ -659,9 +666,26 @@
         document.querySelector(`#sourceChainGrid .chain-card[data-chain="${chainKey}"]`).classList.add('selected');
         state.sourceChain = chainKey;
         
-        // Update balance
+        // Auto-switch network if wallet is connected
         if (state.wallet) {
-          loadBalance(chainKey);
+          const selectedChain = CONFIG.CHAINS[chainKey];
+          
+          // Check if this is an EVM chain and we have an EVM wallet
+          if (selectedChain.chainId !== 'solana' && (state.walletType === 'metamask' || state.walletType === 'phantom-evm' || state.walletType === 'coinbase')) {
+            try {
+              showStatus(`Switching to ${selectedChain.name}...`, 'info');
+              await ensureChain(chainKey);
+              showStatus(`✅ Switched to ${selectedChain.name}`, 'success');
+            } catch (error) {
+              debugLog(`Failed to switch network: ${error.message}`);
+              showStatus(`⚠️ Please manually switch to ${selectedChain.name} in your wallet`, 'warning');
+            }
+          } else if (selectedChain.chainId === 'solana' && state.walletType !== 'phantom-solana') {
+            showStatus(`⚠️ Please connect with Phantom wallet to use Solana`, 'warning');
+          }
+          
+          // Load balance for selected chain
+          await loadBalance(chainKey);
         }
       } else {
         // Deselect all dest chains
@@ -887,6 +911,15 @@
       document.getElementById('walletChain').textContent = state.connectedChain 
         ? CONFIG.CHAINS[state.connectedChain].name 
         : 'Unknown';
+      
+      // Re-render chain grids to show connection status
+      renderChainGrids();
+      
+      // Auto-select the connected chain as source
+      if (state.connectedChain && !state.sourceChain) {
+        debugLog(`Auto-selecting source chain: ${state.connectedChain}`);
+        selectChain(state.connectedChain, 'source');
+      }
     }
 
     // ==================== BALANCE LOADING ====================
@@ -894,12 +927,14 @@
       const chain = CONFIG.CHAINS[chainKey];
       const balanceEl = document.getElementById(`source-balance-${chainKey}`);
       
+      if (!balanceEl) return; // Element not found
+      
       try {
         let balance;
         
         if (chainKey === 'solanaDevnet') {
           if (!state.solanaConnection || !state.solanaPublicKey) {
-            balanceEl.textContent = 'Not connected';
+            balanceEl.textContent = 'Connect Phantom';
             return;
           }
           
@@ -916,13 +951,17 @@
             balance = 0;
           }
         } else {
+          // EVM chain
           if (!state.provider || !state.wallet) {
-            balanceEl.textContent = 'Not connected';
+            balanceEl.textContent = 'Connect wallet';
             return;
           }
           
-          // Switch to the chain if needed
-          await ensureChain(chainKey);
+          // Check if we're on the right network
+          if (state.connectedChain !== chainKey && (state.walletType === 'metamask' || state.walletType === 'phantom-evm' || state.walletType === 'coinbase')) {
+            balanceEl.textContent = 'Click to switch';
+            return;
+          }
           
           const contract = new ethers.Contract(chain.contract, OFT_ABI, state.provider);
           const bal = await contract.balanceOf(state.wallet);
@@ -936,7 +975,7 @@
           document.getElementById('sourceBalance').textContent = balance.toFixed(2);
         }
       } catch (error) {
-        console.error(`Error loading balance for ${chainKey}:`, error);
+        debugLog(`Error loading balance for ${chainKey}: ${error.message}`);
         balanceEl.textContent = 'Error loading';
       }
     }
@@ -955,11 +994,15 @@
         return; // Already on the right chain
       }
       
+      debugLog(`Switching from ${currentChainId} to ${chain.chainId} (${chain.name})`);
+      
       try {
         await state.provider.send('wallet_switchEthereumChain', [{ chainId: chain.chainId }]);
+        debugLog(`✅ Switched to ${chain.name}`);
       } catch (switchError) {
         // Chain not added, try to add it
         if (switchError.code === 4902) {
+          debugLog(`Chain not found, adding ${chain.name}...`);
           await state.provider.send('wallet_addEthereumChain', [{
             chainId: chain.chainId,
             chainName: chain.name,
@@ -967,14 +1010,32 @@
             nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
             blockExplorerUrls: [chain.explorer]
           }]);
+          debugLog(`✅ Added ${chain.name}`);
         } else {
           throw switchError;
         }
       }
       
+      // Update state
+      state.connectedChain = chainKey;
+      
       // Reload provider after switch
       state.provider = new ethers.providers.Web3Provider(window.ethereum);
       state.signer = state.provider.getSigner();
+      
+      // Update display
+      document.getElementById('walletChain').textContent = chain.name;
+      
+      // Re-render grids to update connection indicators
+      renderChainGrids();
+      
+      // Re-select the source chain to maintain selection
+      if (state.sourceChain) {
+        document.querySelector(`#sourceChainGrid .chain-card[data-chain="${state.sourceChain}"]`)?.classList.add('selected');
+      }
+      if (state.destChain) {
+        document.querySelector(`#destChainGrid .chain-card[data-chain="${state.destChain}"]`)?.classList.add('selected');
+      }
     }
 
     // ==================== BRIDGE EXECUTION ====================
