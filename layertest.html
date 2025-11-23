@@ -451,8 +451,10 @@
         Bridge Tokens
       </button>
 
-      <!-- Status Box -->
-      <div id="statusBox" style="display: none;"></div>
+      <!-- Status Box - Always visible -->
+      <div id="statusBox" class="status-box status-info">
+        Click "Connect Wallet" above to get started
+      </div>
     </div>
 
     <!-- Info Card -->
@@ -470,6 +472,29 @@
         <br><br>
         Get testnet tokens from faucets, then try bridging small amounts to test the omnichain functionality!
       </p>
+    </div>
+
+    <!-- Debug Console Card -->
+    <div class="card" style="background: #1a1a2e;">
+      <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
+        🛠️ Debug Console
+        <button class="btn btn-secondary" onclick="toggleDebug()" style="padding: 6px 12px; font-size: 0.85rem;">
+          Toggle
+        </button>
+      </div>
+      <div id="debugConsole" style="
+        background: #0f0f1e; 
+        padding: 15px; 
+        border-radius: 8px; 
+        font-family: 'Courier New', monospace; 
+        font-size: 0.85rem; 
+        max-height: 200px; 
+        overflow-y: auto;
+        color: #00ff00;
+        display: none;
+      ">
+        <div id="debugLog">Console initialized...</div>
+      </div>
     </div>
   </div>
 
@@ -665,7 +690,7 @@
     }
 
     async function connectWallet(walletType) {
-      showStatus('Connecting wallet...', 'info');
+      debugLog(`=== Connecting ${walletType} ===`);
       
       try {
         if (walletType === 'metamask') {
@@ -677,82 +702,158 @@
         }
         
         closeWalletModal();
-        showStatus('Wallet connected successfully!', 'success');
+        showStatus('✅ Wallet connected successfully!', 'success');
         updateBridgeButton();
       } catch (error) {
-        console.error('Wallet connection error:', error);
-        showStatus(`Failed to connect: ${error.message}`, 'error');
+        debugLog(`❌ Connection failed: ${error.message}`);
+        showStatus(`❌ Failed to connect: ${error.message}`, 'error');
+        // Don't close modal on error so user can try again
       }
     }
 
     async function connectMetaMask() {
+      debugLog('Attempting MetaMask connection...');
+      
       if (!window.ethereum) {
-        throw new Error('MetaMask not installed');
+        throw new Error('MetaMask not installed. Please install MetaMask from metamask.io');
       }
       
-      state.provider = new ethers.providers.Web3Provider(window.ethereum);
-      await state.provider.send('eth_requestAccounts', []);
-      state.signer = state.provider.getSigner();
-      state.wallet = await state.signer.getAddress();
-      state.walletType = 'metamask';
+      debugLog('window.ethereum detected');
       
-      // Get current chain
-      const network = await state.provider.getNetwork();
-      state.connectedChain = findChainByChainId('0x' + network.chainId.toString(16));
-      
-      updateWalletDisplay();
-      
-      // Listen for account/chain changes
-      window.ethereum.on('accountsChanged', handleAccountsChanged);
-      window.ethereum.on('chainChanged', () => window.location.reload());
+      try {
+        // Request accounts
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        debugLog(`Accounts received: ${accounts.length} account(s)`);
+        
+        if (!accounts || accounts.length === 0) {
+          throw new Error('No accounts found. Please unlock MetaMask.');
+        }
+        
+        state.provider = new ethers.providers.Web3Provider(window.ethereum);
+        state.signer = state.provider.getSigner();
+        state.wallet = accounts[0];
+        state.walletType = 'metamask';
+        
+        debugLog(`Wallet address: ${state.wallet}`);
+        
+        // Get current chain
+        const network = await state.provider.getNetwork();
+        const chainIdHex = '0x' + network.chainId.toString(16);
+        state.connectedChain = findChainByChainId(chainIdHex);
+        
+        debugLog(`Network: ${network.name} (ChainID: ${chainIdHex})`);
+        debugLog(`Matched chain: ${state.connectedChain || 'Unknown'}`);
+        
+        updateWalletDisplay();
+        
+        // Listen for account/chain changes
+        window.ethereum.on('accountsChanged', handleAccountsChanged);
+        window.ethereum.on('chainChanged', () => window.location.reload());
+        
+        debugLog('✅ MetaMask connected successfully');
+      } catch (error) {
+        debugLog(`❌ MetaMask error: ${error.message}`);
+        throw new Error(`MetaMask connection failed: ${error.message}`);
+      }
     }
 
     async function connectPhantom() {
+      console.log('connectPhantom called');
+      
       // Try Phantom for Solana first
       if (window.solana && window.solana.isPhantom) {
-        const resp = await window.solana.connect();
-        state.solanaPublicKey = resp.publicKey;
-        state.wallet = resp.publicKey.toString();
-        state.walletType = 'phantom-solana';
-        state.connectedChain = 'solanaDevnet';
-        state.solanaConnection = new solanaWeb3.Connection('https://api.devnet.solana.com', 'confirmed');
-        updateWalletDisplay();
-        return;
+        console.log('Phantom Solana detected');
+        try {
+          const resp = await window.solana.connect();
+          state.solanaPublicKey = resp.publicKey;
+          state.wallet = resp.publicKey.toString();
+          state.walletType = 'phantom-solana';
+          state.connectedChain = 'solanaDevnet';
+          state.solanaConnection = new solanaWeb3.Connection('https://api.devnet.solana.com', 'confirmed');
+          
+          console.log('Phantom Solana connected:', state.wallet);
+          updateWalletDisplay();
+          return;
+        } catch (error) {
+          console.error('Phantom Solana connection error:', error);
+          throw new Error(`Phantom Solana connection failed: ${error.message}`);
+        }
       }
       
       // Try Phantom for EVM
       if (window.phantom?.ethereum) {
-        state.provider = new ethers.providers.Web3Provider(window.phantom.ethereum);
-        await state.provider.send('eth_requestAccounts', []);
-        state.signer = state.provider.getSigner();
-        state.wallet = await state.signer.getAddress();
-        state.walletType = 'phantom-evm';
-        
-        const network = await state.provider.getNetwork();
-        state.connectedChain = findChainByChainId('0x' + network.chainId.toString(16));
-        
-        updateWalletDisplay();
-        return;
+        console.log('Phantom EVM detected');
+        try {
+          const accounts = await window.phantom.ethereum.request({ method: 'eth_requestAccounts' });
+          
+          if (!accounts || accounts.length === 0) {
+            throw new Error('No accounts found');
+          }
+          
+          state.provider = new ethers.providers.Web3Provider(window.phantom.ethereum);
+          state.signer = state.provider.getSigner();
+          state.wallet = accounts[0];
+          state.walletType = 'phantom-evm';
+          
+          const network = await state.provider.getNetwork();
+          const chainIdHex = '0x' + network.chainId.toString(16);
+          state.connectedChain = findChainByChainId(chainIdHex);
+          
+          console.log('Phantom EVM connected:', state.wallet);
+          updateWalletDisplay();
+          return;
+        } catch (error) {
+          console.error('Phantom EVM connection error:', error);
+          throw new Error(`Phantom EVM connection failed: ${error.message}`);
+        }
       }
       
-      throw new Error('Phantom wallet not found');
+      throw new Error('Phantom wallet not found. Please install Phantom from phantom.app');
     }
 
     async function connectCoinbase() {
-      if (!window.ethereum || !window.ethereum.isCoinbaseWallet) {
-        throw new Error('Coinbase Wallet not installed');
+      console.log('connectCoinbase called');
+      
+      // Check if Coinbase Wallet is available
+      // Coinbase Wallet injects itself as window.ethereum when it's the only wallet
+      // or as window.coinbaseWalletExtension
+      let provider = null;
+      
+      if (window.coinbaseWalletExtension) {
+        provider = window.coinbaseWalletExtension;
+      } else if (window.ethereum && window.ethereum.isCoinbaseWallet) {
+        provider = window.ethereum;
       }
       
-      state.provider = new ethers.providers.Web3Provider(window.ethereum);
-      await state.provider.send('eth_requestAccounts', []);
-      state.signer = state.provider.getSigner();
-      state.wallet = await state.signer.getAddress();
-      state.walletType = 'coinbase';
+      if (!provider) {
+        throw new Error('Coinbase Wallet not installed. Please install from coinbase.com/wallet');
+      }
       
-      const network = await state.provider.getNetwork();
-      state.connectedChain = findChainByChainId('0x' + network.chainId.toString(16));
+      console.log('Coinbase Wallet provider found');
       
-      updateWalletDisplay();
+      try {
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        console.log('Accounts:', accounts);
+        
+        if (!accounts || accounts.length === 0) {
+          throw new Error('No accounts found');
+        }
+        
+        state.provider = new ethers.providers.Web3Provider(provider);
+        state.signer = state.provider.getSigner();
+        state.wallet = accounts[0];
+        state.walletType = 'coinbase';
+        
+        const network = await state.provider.getNetwork();
+        const chainIdHex = '0x' + network.chainId.toString(16);
+        state.connectedChain = findChainByChainId(chainIdHex);
+        
+        console.log('Coinbase Wallet connected:', state.wallet);
+        updateWalletDisplay();
+      } catch (error) {
+        console.error('Coinbase Wallet connection error:', error);
+        throw new Error(`Coinbase Wallet connection failed: ${error.message}`);
+      }
     }
 
     function findChainByChainId(chainId) {
@@ -1018,10 +1119,43 @@
       statusBox.style.display = 'block';
       statusBox.className = `status-box status-${type}`;
       statusBox.innerHTML = message;
+      debugLog(`[STATUS ${type.toUpperCase()}]: ${message.replace(/<[^>]*>/g, '')}`);
+    }
+
+    function toggleDebug() {
+      const debugConsole = document.getElementById('debugConsole');
+      debugConsole.style.display = debugConsole.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function debugLog(message) {
+      const debugLogEl = document.getElementById('debugLog');
+      const timestamp = new Date().toLocaleTimeString();
+      const logLine = `[${timestamp}] ${message}`;
+      console.log(logLine);
+      
+      if (debugLogEl) {
+        debugLogEl.innerHTML += `<div>${logLine}</div>`;
+        debugLogEl.scrollTop = debugLogEl.scrollHeight;
+      }
     }
 
     // ==================== INIT ====================
-    window.addEventListener('load', init);
+    window.addEventListener('load', () => {
+      debugLog('=== ROOT5 Bridge Interface Loaded ===');
+      debugLog('Checking for wallet providers...');
+      debugLog(`window.ethereum: ${!!window.ethereum ? '✅ Found' : '❌ Not found'}`);
+      debugLog(`window.solana: ${!!window.solana ? '✅ Found' : '❌ Not found'}`);
+      debugLog(`window.phantom: ${!!window.phantom ? '✅ Found' : '❌ Not found'}`);
+      
+      if (window.ethereum) {
+        debugLog(`ethereum.isMetaMask: ${window.ethereum.isMetaMask}`);
+        debugLog(`ethereum.isCoinbaseWallet: ${window.ethereum.isCoinbaseWallet}`);
+      }
+      
+      init();
+      
+      showStatus('👋 Welcome! Click "Connect Wallet" to get started.', 'info');
+    });
   </script>
 </body>
 </html>
