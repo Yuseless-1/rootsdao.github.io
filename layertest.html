@@ -670,22 +670,34 @@
         if (state.wallet) {
           const selectedChain = CONFIG.CHAINS[chainKey];
           
+          // Check if switching to Solana with non-Solana wallet
+          if (selectedChain.chainId === 'solana' && state.walletType !== 'phantom-solana') {
+            showStatus(`⚠️ Solana requires Phantom wallet. Please reconnect with Phantom for Solana.`, 'warning');
+            return;
+          }
+          
+          // Check if switching from Solana to EVM
+          if (state.connectedChain === 'solanaDevnet' && selectedChain.chainId !== 'solana') {
+            showStatus(`⚠️ To use EVM chains, please reconnect with MetaMask or Phantom (EVM mode).`, 'warning');
+            return;
+          }
+          
           // Check if this is an EVM chain and we have an EVM wallet
           if (selectedChain.chainId !== 'solana' && (state.walletType === 'metamask' || state.walletType === 'phantom-evm' || state.walletType === 'coinbase')) {
             try {
               showStatus(`Switching to ${selectedChain.name}...`, 'info');
               await ensureChain(chainKey);
               showStatus(`✅ Switched to ${selectedChain.name}`, 'success');
+              // Load balance after successful switch
+              await loadBalance(chainKey);
             } catch (error) {
               debugLog(`Failed to switch network: ${error.message}`);
               showStatus(`⚠️ Please manually switch to ${selectedChain.name} in your wallet`, 'warning');
             }
-          } else if (selectedChain.chainId === 'solana' && state.walletType !== 'phantom-solana') {
-            showStatus(`⚠️ Please connect with Phantom wallet to use Solana`, 'warning');
+          } else if (selectedChain.chainId === 'solana' && state.walletType === 'phantom-solana') {
+            // Already on Solana with Phantom
+            await loadBalance(chainKey);
           }
-          
-          // Load balance for selected chain
-          await loadBalance(chainKey);
         }
       } else {
         // Deselect all dest chains
@@ -742,18 +754,29 @@
         throw new Error('MetaMask not installed. Please install MetaMask from metamask.io');
       }
       
-      debugLog('window.ethereum detected');
+      // Check if MetaMask is the provider (not Phantom or others)
+      if (!window.ethereum.isMetaMask) {
+        throw new Error('MetaMask not detected. Please make sure MetaMask is enabled.');
+      }
+      
+      debugLog('MetaMask detected');
       
       try {
-        // Request accounts
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        // Request accounts - this triggers the MetaMask popup
+        debugLog('Requesting accounts...');
+        const accounts = await window.ethereum.request({ 
+          method: 'eth_requestAccounts' 
+        });
+        
         debugLog(`Accounts received: ${accounts.length} account(s)`);
+        debugLog(`Primary account: ${accounts[0]}`);
         
         if (!accounts || accounts.length === 0) {
-          throw new Error('No accounts found. Please unlock MetaMask.');
+          throw new Error('No accounts found. Please unlock MetaMask and try again.');
         }
         
-        state.provider = new ethers.providers.Web3Provider(window.ethereum);
+        // Create provider
+        state.provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
         state.signer = state.provider.getSigner();
         state.wallet = accounts[0];
         state.walletType = 'metamask';
@@ -768,15 +791,32 @@
         debugLog(`Network: ${network.name} (ChainID: ${chainIdHex})`);
         debugLog(`Matched chain: ${state.connectedChain || 'Unknown'}`);
         
+        if (!state.connectedChain) {
+          debugLog(`⚠️ Unknown network, defaulting to first EVM chain`);
+          // Default to first EVM chain if unknown
+          state.connectedChain = 'sepolia';
+        }
+        
         updateWalletDisplay();
         
         // Listen for account/chain changes
         window.ethereum.on('accountsChanged', handleAccountsChanged);
-        window.ethereum.on('chainChanged', () => window.location.reload());
+        window.ethereum.on('chainChanged', () => {
+          debugLog('Chain changed, reloading...');
+          window.location.reload();
+        });
         
         debugLog('✅ MetaMask connected successfully');
       } catch (error) {
         debugLog(`❌ MetaMask error: ${error.message}`);
+        
+        // Check for specific error codes
+        if (error.code === 4001) {
+          throw new Error('Connection rejected. Please approve the connection in MetaMask.');
+        } else if (error.code === -32002) {
+          throw new Error('Connection request already pending. Please check MetaMask.');
+        }
+        
         throw new Error(`MetaMask connection failed: ${error.message}`);
       }
     }
