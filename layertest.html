@@ -1083,9 +1083,92 @@
     }
 
     async function bridgeFromSolana(amount) {
-      showStatus('Solana → EVM bridging will be enabled soon! For now, please bridge from EVM chains to Solana or between EVM chains.', 'warning');
-      // Note: Solana OFT bridging requires calling the Solana program directly
-      // This will be implemented in a future update
+      debugLog('=== Starting Solana → EVM Bridge ===');
+      
+      if (!state.solanaConnection || !state.solanaPublicKey) {
+        throw new Error('Solana wallet not connected');
+      }
+      
+      const destChain = CONFIG.CHAINS[state.destChain];
+      if (!destChain) {
+        throw new Error('Destination chain not selected');
+      }
+      
+      debugLog(`Bridging ${amount} ROOT5 to ${destChain.name}`);
+      showStatus(`Preparing Solana transaction to bridge to ${destChain.name}...`, 'info');
+      
+      try {
+        // Get recipient address
+        let recipientInput = document.getElementById('recipientInput').value.trim();
+        let toAddressBytes32;
+        
+        if (!recipientInput) {
+          // Use sender's address if it's an EVM chain
+          if (destChain.chainId === 'solana') {
+            throw new Error('Please specify a Solana recipient address');
+          }
+          // For EVM destinations, need to prompt for address since Solana wallet doesn't have EVM address
+          throw new Error('Please enter the destination EVM address (0x...)');
+        } else {
+          if (destChain.chainId === 'solana') {
+            // Solana to Solana (same chain transfer)
+            toAddressBytes32 = solanaAddressToBytes32(recipientInput);
+          } else {
+            // Solana to EVM
+            toAddressBytes32 = addressToBytes32(recipientInput);
+          }
+        }
+        
+        debugLog(`Recipient (bytes32): ${toAddressBytes32}`);
+        
+        // Parse amount (convert to smallest unit)
+        const amountLD = Math.floor(parseFloat(amount) * Math.pow(10, CONFIG.TOKEN_DECIMALS));
+        debugLog(`Amount (raw): ${amountLD}`);
+        
+        // Build the Solana OFT send instruction
+        // Note: This is a simplified version - the actual implementation would need
+        // to match your Solana program's exact instruction format
+        
+        showStatus(`⚠️ Solana → EVM bridging requires direct Solana program interaction. This feature needs to be completed with your specific OFT program's instruction format.`, 'warning');
+        
+        debugLog('Solana OFT send instruction would be built here');
+        debugLog('Required accounts: oft_store, peer, token_mint, user_token_account, etc.');
+        debugLog('This requires knowledge of your specific Solana program layout');
+        
+        // TODO: Complete implementation once we have the exact Solana program instruction format
+        // The instruction would look something like:
+        /*
+        const oftProgramId = new solanaWeb3.PublicKey(CONFIG.SOLANA_OFT_PROGRAM);
+        const oftStorePubkey = new solanaWeb3.PublicKey('6k4a54QsewbaujFm7XiLTYzF5VFz6R51za9wUHwxsJGn');
+        
+        // Derive peer PDA
+        const [peerPda] = await solanaWeb3.PublicKey.findProgramAddress(
+          [Buffer.from('Peer'), oftStorePubkey.toBuffer(), Buffer.from([destChain.lzEid >> 24, destChain.lzEid >> 16, destChain.lzEid >> 8, destChain.lzEid])],
+          oftProgramId
+        );
+        
+        // Build send instruction with proper accounts
+        const sendIx = new solanaWeb3.TransactionInstruction({
+          programId: oftProgramId,
+          keys: [
+            // ... proper account list based on your program
+          ],
+          data: // ... properly serialized instruction data
+        });
+        
+        const tx = new solanaWeb3.Transaction().add(sendIx);
+        const signature = await window.solana.signAndSendTransaction(tx);
+        */
+        
+        showStatus(
+          `📝 To enable Solana → EVM bridging, we need to add the specific Solana program instruction format. For now, please bridge from EVM chains to Solana or between EVM chains.`,
+          'warning'
+        );
+        
+      } catch (error) {
+        debugLog(`❌ Solana bridge error: ${error.message}`);
+        throw error;
+      }
     }
 
     // ==================== UTILITY FUNCTIONS ====================
