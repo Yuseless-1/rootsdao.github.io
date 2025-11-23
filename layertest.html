@@ -1,415 +1,1027 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>ROOT5 Omnichain Bridge Test</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- EVM -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROOT5 Omnichain Bridge | Community Test</title>
+  
+  <!-- External Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-  <!-- Solana -->
   <script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
-  <!-- SPL Token helpers (ATA + transfer) -->
-  <script>
-    // Minimal SPL Token helpers (no external spl-token lib)
-    const TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
-    const ASSOCIATED_TOKEN_PROGRAM_ID = new solanaWeb3.PublicKey("ATokenGPvRzj7bS9u6u5QYQjeUu9QZb47G3fYx7hB");
-
-    function getAssociatedTokenAddress(mint, owner, allowOwnerOffCurve = false) {
-      return solanaWeb3.PublicKey.findProgramAddressSync(
-        [
-          owner.toBuffer(),
-          TOKEN_PROGRAM_ID.toBuffer(),
-          mint.toBuffer()
-        ],
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      )[0];
-    }
-
-    function createAssociatedTokenAccountInstruction(payer, ata, owner, mint) {
-      return new solanaWeb3.TransactionInstruction({
-        programId: ASSOCIATED_TOKEN_PROGRAM_ID,
-        keys: [
-          { pubkey: payer, isSigner: true, isWritable: true },
-          { pubkey: ata, isSigner: false, isWritable: true },
-          { pubkey: owner, isSigner: false, isWritable: false },
-          { pubkey: mint, isSigner: false, isWritable: false },
-          { pubkey: solanaWeb3.SystemProgram.programId, isSigner: false, isWritable: false },
-          { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-          { pubkey: solanaWeb3.SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
-        ],
-        data: Buffer.alloc(0),
-      });
-    }
-
-    // SPL Token 'transfer' instruction layout (amount as u64 little-endian)
-    function createSplTransferInstruction(source, destination, owner, amount) {
-      const dataLayout = Buffer.alloc(1 + 8);
-      dataLayout.writeUInt8(3, 0); // Token instruction enum: Transfer = 3
-      // write amount as u64 LE
-      const bn = BigInt(amount);
-      for (let i = 0; i < 8; i++) {
-        dataLayout[1 + i] = Number((bn >> BigInt(8 * i)) & BigInt(0xff));
-      }
-
-      return new solanaWeb3.TransactionInstruction({
-        programId: TOKEN_PROGRAM_ID,
-        keys: [
-          { pubkey: source, isSigner: false, isWritable: true },
-          { pubkey: destination, isSigner: false, isWritable: true },
-          { pubkey: owner, isSigner: true, isWritable: false },
-        ],
-        data: dataLayout,
-      });
-    }
-  </script>
+  
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
-    h1 { margin: 0 0 8px; }
-    .grid { display: grid; grid-template-columns: 220px 1fr; gap: 10px; max-width: 860px; }
-    label { display: inline-block; font-weight: 600; }
-    input, select, button { padding: 8px 10px; font-size: 14px; }
-    .row { margin: 12px 0; }
-    #status { margin-top: 8px; min-height: 20px; color: #333; }
-    .divider { border-top: 1px solid #ddd; margin: 16px 0; }
-    .hint { color: #666; font-size: 13px; }
-    .flex { display: flex; gap: 12px; align-items: center; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --bg-input: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .wallet-section {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--border);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .connected-wallet {
+      background: var(--bg-input);
+      padding: 15px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .connected-wallet-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+
+    .connected-wallet-address {
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .chain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .chain-card {
+      background: var(--bg-input);
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .chain-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .chain-card.selected {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .chain-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .chain-card.disabled:hover {
+      border-color: transparent;
+      transform: none;
+    }
+
+    .chain-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .chain-balance {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .status-box {
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      border-left: 4px solid;
+    }
+
+    .status-info {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+      color: #93c5fd;
+    }
+
+    .status-success {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--success);
+      color: #6ee7b7;
+    }
+
+    .status-error {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--error);
+      color: #fca5a5;
+    }
+
+    .status-warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: var(--warning);
+      color: #fcd34d;
+    }
+
+    .tx-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .tx-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      border: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .wallet-option {
+      background: var(--bg-input);
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .wallet-option:hover {
+      border-color: var(--primary);
+      transform: translateX(5px);
+    }
+
+    .wallet-option.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .wallet-option.disabled:hover {
+      border-color: transparent;
+      transform: none;
+    }
+
+    .wallet-icon {
+      font-size: 2rem;
+    }
+
+    .wallet-info h3 {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .wallet-info p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .chain-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>ROOT5 Omnichain Bridge Test</h1>
-  <div class="hint">Choose wallet and network, connect, view balances, enter amount, choose destination, and send.</div>
-
-  <div class="grid">
-    <div><label for="wallet">Wallet</label></div>
-    <div>
-      <select id="wallet">
-        <option value="evm">MetaMask (EVM)</option>
-        <option value="solana">Phantom / MetaMask Solana</option>
-      </select>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🌉 ROOT5 Omnichain Bridge</h1>
+      <p>Community Testing Interface - Send tokens across 6 testnets</p>
     </div>
 
-    <div><label for="network">Network</label></div>
-    <div>
-      <select id="network">
-        <option value="solana-devnet">Solana Devnet</option>
-        <option value="arbitrum-sepolia">Arbitrum Sepolia</option>
-        <option value="base-sepolia">Base Sepolia</option>
-        <option value="optimism-sepolia">Optimism Sepolia</option>
-        <option value="polygon-amoy">Polygon Amoy</option>
-        <option value="bsc-testnet">BSC Testnet</option>
-      </select>
+    <!-- Wallet Connection Card -->
+    <div class="card">
+      <div class="card-title">🔐 Wallet Connection</div>
+      <div class="wallet-section">
+        <button class="btn btn-primary" id="connectBtn" onclick="openWalletModal()">
+          Connect Wallet
+        </button>
+        <div class="connected-wallet" id="walletInfo" style="display: none; flex: 1;">
+          <div class="connected-wallet-label">Connected</div>
+          <div class="connected-wallet-address">
+            <span id="walletAddress">-</span>
+            <span class="badge badge-success" id="walletChain">-</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div><label>Connected address</label></div>
-    <div id="address" class="mono">-</div>
+    <!-- Bridge Interface Card -->
+    <div class="card">
+      <div class="card-title">🚀 Bridge Tokens</div>
+      
+      <!-- Source Chain -->
+      <div class="form-group">
+        <label class="form-label">From Chain</label>
+        <div class="chain-grid" id="sourceChainGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
 
-    <div><label>Token balance</label></div>
-    <div id="balance">-</div>
+      <!-- Amount Input -->
+      <div class="form-group">
+        <label class="form-label">Amount (ROOT5)</label>
+        <input type="number" class="form-input" id="amountInput" placeholder="0.00" step="0.01" min="0">
+        <div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+          Balance: <span id="sourceBalance">-</span> ROOT5
+        </div>
+      </div>
 
-    <div><label for="amount">Amount</label></div>
-    <div><input id="amount" type="text" placeholder="e.g., 10"></div>
+      <!-- Destination Chain -->
+      <div class="form-group">
+        <label class="form-label">To Chain</label>
+        <div class="chain-grid" id="destChainGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
 
-    <div><label for="recipient">Recipient</label></div>
-    <div><input id="recipient" type="text" placeholder="0x... or Solana address"></div>
+      <!-- Recipient Address (optional for same address) -->
+      <div class="form-group">
+        <label class="form-label">Recipient Address (optional, defaults to your address)</label>
+        <input type="text" class="form-input" id="recipientInput" placeholder="0x... or Solana address">
+      </div>
 
-    <div><label for="destination">Destination</label></div>
-    <div>
-      <select id="destination">
-        <option value="solana-devnet">Solana Devnet</option>
-        <option value="arbitrum-sepolia">Arbitrum Sepolia</option>
-        <option value="base-sepolia">Base Sepolia</option>
-        <option value="optimism-sepolia">Optimism Sepolia</option>
-        <option value="polygon-amoy">Polygon Amoy</option>
-        <option value="bsc-testnet">BSC Testnet</option>
-      </select>
+      <!-- Bridge Button -->
+      <button class="btn btn-primary" id="bridgeBtn" onclick="executeBridge()" style="width: 100%; font-size: 1.1rem;" disabled>
+        Bridge Tokens
+      </button>
+
+      <!-- Status Box -->
+      <div id="statusBox" style="display: none;"></div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="card">
+      <div class="card-title">ℹ️ Information</div>
+      <p style="color: var(--text-secondary); line-height: 1.6;">
+        This is a testnet bridge for the ROOT5 community. You can transfer ROOT5 tokens between:
+        <br><br>
+        <strong>• Ethereum Sepolia</strong><br>
+        <strong>• Arbitrum Sepolia</strong><br>
+        <strong>• Base Sepolia</strong><br>
+        <strong>• BSC Testnet</strong><br>
+        <strong>• Optimism Sepolia</strong><br>
+        <strong>• Solana Devnet</strong>
+        <br><br>
+        Get testnet tokens from faucets, then try bridging small amounts to test the omnichain functionality!
+      </p>
     </div>
   </div>
 
-  <div class="row flex">
-    <button id="connect">Connect</button>
-    <button id="send">Send</button>
-    <div id="status"></div>
-  </div>
+  <!-- Wallet Connection Modal -->
+  <div class="modal" id="walletModal">
+    <div class="modal-content">
+      <div class="modal-title">Connect Wallet</div>
+      
+      <div class="wallet-option" onclick="connectWallet('metamask')">
+        <div class="wallet-icon">🦊</div>
+        <div class="wallet-info">
+          <h3>MetaMask</h3>
+          <p>Connect using MetaMask browser extension</p>
+        </div>
+      </div>
 
-  <div class="divider"></div>
-  <div class="hint">
-    EVM: switches MetaMask to selected testnet, reads ERC‑20/OFT balance, calls contract.send(...).<br>
-    Solana: connects wallet, reads SPL balance for your mint, and transfers SPL tokens using ATA accounts.<br>
-    Replace configuration values below to match your deployment.
+      <div class="wallet-option" onclick="connectWallet('phantom')">
+        <div class="wallet-icon">👻</div>
+        <div class="wallet-info">
+          <h3>Phantom</h3>
+          <p>Connect using Phantom (Solana & EVM)</p>
+        </div>
+      </div>
+
+      <div class="wallet-option" onclick="connectWallet('coinbase')">
+        <div class="wallet-icon">🔵</div>
+        <div class="wallet-info">
+          <h3>Coinbase Wallet</h3>
+          <p>Connect using Coinbase Wallet</p>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="closeWalletModal()" style="width: 100%; margin-top: 15px;">
+        Cancel
+      </button>
+    </div>
   </div>
 
   <script>
-    // -------------------- Configuration (EDIT THESE) --------------------
-    const DECIMALS = 6; // your token decimals
-
-    // Your SPL mint on Solana Devnet
-    const SOLANA_MINT = "9Z3t8mK2Svw5zmS6pwWCfZ6rcKw4QF5gFkHfh94DzkYN";
-
-    // EVM OFT/Token contract addresses by network
-    const EVM_CONTRACTS = {
-      "arbitrum-sepolia": "0xYourArbitrumContract",
-      "base-sepolia": "0xYourBaseContract",
-      "optimism-sepolia": "0xYourOptimismContract",
-      "polygon-amoy": "0xYourPolygonContract",
-      "bsc-testnet": "0xYourBscContract"
-    };
-
-    // EVM chain params for MetaMask add/switch
-    const EVM_NETWORKS = {
-      "arbitrum-sepolia": {
-        chainId: "0x66eee",
-        chainName: "Arbitrum Sepolia",
-        rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
-        nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-        blockExplorerUrls: ["https://sepolia.arbiscan.io"]
-      },
-      "base-sepolia": {
-        chainId: "0x14a34",
-        chainName: "Base Sepolia",
-        rpcUrls: ["https://sepolia.base.org"],
-        nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-        blockExplorerUrls: ["https://sepolia.basescan.org"]
-      },
-      "optimism-sepolia": {
-        chainId: "0xaa36a7",
-        chainName: "Optimism Sepolia",
-        rpcUrls: ["https://sepolia.optimism.io"],
-        nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-        blockExplorerUrls: ["https://sepolia-optimism.etherscan.io"]
-      },
-      "polygon-amoy": {
-        chainId: "0x13882",
-        chainName: "Polygon Amoy",
-        rpcUrls: ["https://rpc-amoy.polygon.technology/"],
-        nativeCurrency: { name: "MATIC", symbol: "MATIC", decimals: 18 },
-        blockExplorerUrls: ["https://www.oklink.com/amoy"]
-      },
-      "bsc-testnet": {
-        chainId: "0x61",
-        chainName: "BSC Testnet",
-        rpcUrls: ["https://bsc-testnet.publicnode.com"],
-        nativeCurrency: { name: "tBNB", symbol: "tBNB", decimals: 18 },
-        blockExplorerUrls: ["https://testnet.bscscan.com"]
+    // ==================== CONFIGURATION ====================
+    const CONFIG = {
+      TOKEN_DECIMALS: 6,
+      SOLANA_MINT: '9Z3t8mK2Svw5zmS6pwWCfZ6rcKw4QF5gFkHfh94DzkYN',
+      SOLANA_OFT_PROGRAM: 'HhsXchaPXZh5FtcfhDrs3Nd9bEE7huqQwUEvmzxjZQUz',
+      
+      CHAINS: {
+        sepolia: {
+          name: 'Ethereum Sepolia',
+          chainId: '0xaa36a7',
+          rpc: 'https://rpc.sepolia.org',
+          explorer: 'https://sepolia.etherscan.io',
+          contract: '0x3932107F4cD2F6a5Ff2788641630A4bb0AB4Fca9',
+          lzEid: 40161,
+          icon: '🔷'
+        },
+        arbitrumSepolia: {
+          name: 'Arbitrum Sepolia',
+          chainId: '0x66eee',
+          rpc: 'https://sepolia-rollup.arbitrum.io/rpc',
+          explorer: 'https://sepolia.arbiscan.io',
+          contract: '0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E',
+          lzEid: 40231,
+          icon: '🔵'
+        },
+        baseSepolia: {
+          name: 'Base Sepolia',
+          chainId: '0x14a34',
+          rpc: 'https://sepolia.base.org',
+          explorer: 'https://sepolia.basescan.org',
+          contract: '0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E',
+          lzEid: 40245,
+          icon: '🔵'
+        },
+        bscTestnet: {
+          name: 'BSC Testnet',
+          chainId: '0x61',
+          rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+          explorer: 'https://testnet.bscscan.com',
+          contract: '0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E',
+          lzEid: 40102,
+          icon: '🟡'
+        },
+        optimismSepolia: {
+          name: 'Optimism Sepolia',
+          chainId: '0xaa37dc',
+          rpc: 'https://sepolia.optimism.io',
+          explorer: 'https://sepolia-optimism.etherscan.io',
+          contract: '0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E',
+          lzEid: 40232,
+          icon: '🔴'
+        },
+        solanaDevnet: {
+          name: 'Solana Devnet',
+          chainId: 'solana',
+          rpc: 'https://api.devnet.solana.com',
+          explorer: 'https://explorer.solana.com',
+          lzEid: 40168,
+          icon: '🟣'
+        }
       }
     };
 
-    // Minimal ABI — replace with your OFT ABI if different (e.g., sendFrom with dstChainId)
-    const EVM_CONTRACT_ABI = [
-      "function balanceOf(address) view returns (uint256)",
-      "function send(address recipient, uint256 amount) external"
+    // OFT ABI for LayerZero V2
+    const OFT_ABI = [
+      'function balanceOf(address account) view returns (uint256)',
+      'function send((uint32 dstEid, bytes32 to, uint256 amountLD, uint256 minAmountLD, bytes extraOptions, bytes composeMsg, bytes oftCmd) calldata _sendParam, (uint256 nativeFee, uint256 lzTokenFee) calldata _fee, address _refundAddress) payable returns ((bytes32 guid, uint64 nonce, (uint256 nativeFee, uint256 lzTokenFee) fee))',
+      'function quoteSend((uint32 dstEid, bytes32 to, uint256 amountLD, uint256 minAmountLD, bytes extraOptions, bytes composeMsg, bytes oftCmd) calldata _sendParam, bool _payInLzToken) view returns ((uint256 nativeFee, uint256 lzTokenFee) fee)'
     ];
 
-    // -------------------- State --------------------
-    let evmProvider = null;
-    let evmSigner = null;
-    let evmContract = null;
+    // ==================== STATE ====================
+    let state = {
+      wallet: null,
+      walletType: null,
+      provider: null,
+      signer: null,
+      connectedChain: null,
+      sourceChain: null,
+      destChain: null,
+      solanaConnection: null,
+      solanaPublicKey: null
+    };
 
-    let solanaConnection = null;
-    let solanaPublicKey = null;
+    // ==================== INITIALIZATION ====================
+    function init() {
+      renderChainGrids();
+      updateBridgeButton();
+    }
 
-    const addressEl = document.getElementById("address");
-    const balanceEl = document.getElementById("balance");
-    const statusEl = document.getElementById("status");
-    const walletSel = document.getElementById("wallet");
-    const networkSel = document.getElementById("network");
-    const destinationSel = document.getElementById("destination");
+    function renderChainGrids() {
+      const sourceGrid = document.getElementById('sourceChainGrid');
+      const destGrid = document.getElementById('destChainGrid');
+      
+      sourceGrid.innerHTML = '';
+      destGrid.innerHTML = '';
+      
+      Object.entries(CONFIG.CHAINS).forEach(([key, chain]) => {
+        const sourceCard = createChainCard(key, chain, 'source');
+        const destCard = createChainCard(key, chain, 'dest');
+        sourceGrid.appendChild(sourceCard);
+        destGrid.appendChild(destCard);
+      });
+    }
 
-    function setStatus(msg) { statusEl.textContent = msg; }
-    function setAddress(addr) { addressEl.textContent = addr || "-"; }
-    function setBalance(txt) { balanceEl.textContent = txt || "-"; }
+    function createChainCard(key, chain, type) {
+      const card = document.createElement('div');
+      card.className = 'chain-card';
+      card.dataset.chain = key;
+      card.innerHTML = `
+        <div class="chain-name">${chain.icon} ${chain.name}</div>
+        <div class="chain-balance" id="${type}-balance-${key}">Balance: -</div>
+      `;
+      
+      card.onclick = () => selectChain(key, type);
+      return card;
+    }
 
-    // -------------------- Helpers --------------------
-    async function ensureEvmNetwork(netKey) {
-      const params = EVM_NETWORKS[netKey];
-      if (!params) throw new Error("Unknown EVM network: " + netKey);
-      try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: params.chainId }]
-        });
-      } catch (err) {
-        if (err.code === 4902 || (err.message && err.message.includes("Unrecognized chain ID"))) {
-          await window.ethereum.request({ method: "wallet_addEthereumChain", params: [params] });
-          await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: params.chainId }] });
-        } else {
-          throw err;
+    function selectChain(chainKey, type) {
+      if (type === 'source') {
+        // Deselect all source chains
+        document.querySelectorAll('#sourceChainGrid .chain-card').forEach(c => c.classList.remove('selected'));
+        // Select this one
+        document.querySelector(`#sourceChainGrid .chain-card[data-chain="${chainKey}"]`).classList.add('selected');
+        state.sourceChain = chainKey;
+        
+        // Update balance
+        if (state.wallet) {
+          loadBalance(chainKey);
         }
+      } else {
+        // Deselect all dest chains
+        document.querySelectorAll('#destChainGrid .chain-card').forEach(c => c.classList.remove('selected'));
+        // Select this one
+        document.querySelector(`#destChainGrid .chain-card[data-chain="${chainKey}"]`).classList.add('selected');
+        state.destChain = chainKey;
+      }
+      
+      updateBridgeButton();
+    }
+
+    function updateBridgeButton() {
+      const btn = document.getElementById('bridgeBtn');
+      const canBridge = state.wallet && state.sourceChain && state.destChain && state.sourceChain !== state.destChain;
+      btn.disabled = !canBridge;
+    }
+
+    // ==================== WALLET CONNECTION ====================
+    function openWalletModal() {
+      document.getElementById('walletModal').classList.add('active');
+    }
+
+    function closeWalletModal() {
+      document.getElementById('walletModal').classList.remove('active');
+    }
+
+    async function connectWallet(walletType) {
+      showStatus('Connecting wallet...', 'info');
+      
+      try {
+        if (walletType === 'metamask') {
+          await connectMetaMask();
+        } else if (walletType === 'phantom') {
+          await connectPhantom();
+        } else if (walletType === 'coinbase') {
+          await connectCoinbase();
+        }
+        
+        closeWalletModal();
+        showStatus('Wallet connected successfully!', 'success');
+        updateBridgeButton();
+      } catch (error) {
+        console.error('Wallet connection error:', error);
+        showStatus(`Failed to connect: ${error.message}`, 'error');
       }
     }
 
-    async function evmConnectAndLoad() {
-      if (!window.ethereum) throw new Error("MetaMask not found");
-      await window.ethereum.request({ method: "eth_requestAccounts" });
-      const net = networkSel.value;
-      await ensureEvmNetwork(net);
-      evmProvider = new ethers.providers.Web3Provider(window.ethereum);
-      evmSigner = evmProvider.getSigner();
-      const addr = await evmSigner.getAddress();
-      setAddress(addr);
+    async function connectMetaMask() {
+      if (!window.ethereum) {
+        throw new Error('MetaMask not installed');
+      }
+      
+      state.provider = new ethers.providers.Web3Provider(window.ethereum);
+      await state.provider.send('eth_requestAccounts', []);
+      state.signer = state.provider.getSigner();
+      state.wallet = await state.signer.getAddress();
+      state.walletType = 'metamask';
+      
+      // Get current chain
+      const network = await state.provider.getNetwork();
+      state.connectedChain = findChainByChainId('0x' + network.chainId.toString(16));
+      
+      updateWalletDisplay();
+      
+      // Listen for account/chain changes
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('chainChanged', () => window.location.reload());
+    }
 
-      const contractAddr = EVM_CONTRACTS[net];
-      if (!contractAddr || contractAddr.startsWith("0xYour")) {
-        setStatus("Set contract address for " + net);
-        setBalance("-");
+    async function connectPhantom() {
+      // Try Phantom for Solana first
+      if (window.solana && window.solana.isPhantom) {
+        const resp = await window.solana.connect();
+        state.solanaPublicKey = resp.publicKey;
+        state.wallet = resp.publicKey.toString();
+        state.walletType = 'phantom-solana';
+        state.connectedChain = 'solanaDevnet';
+        state.solanaConnection = new solanaWeb3.Connection('https://api.devnet.solana.com', 'confirmed');
+        updateWalletDisplay();
         return;
       }
-      evmContract = new ethers.Contract(contractAddr, EVM_CONTRACT_ABI, evmSigner);
-      const bal = await evmContract.balanceOf(addr);
-      setBalance(ethers.utils.formatUnits(bal, DECIMALS));
-      setStatus("Connected: " + net);
-    }
-
-    async function solanaConnectAndLoad() {
-      if (!window.solana) throw new Error("Solana wallet provider not found");
-      const resp = await window.solana.connect();
-      solanaPublicKey = resp.publicKey;
-      setAddress(solanaPublicKey.toString());
-
-      solanaConnection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("devnet"), "confirmed");
-
-      // Get SPL token balance for your mint
-      const accounts = await solanaConnection.getParsedTokenAccountsByOwner(
-        solanaPublicKey,
-        { mint: new solanaWeb3.PublicKey(SOLANA_MINT) }
-      );
-      let raw = 0n;
-      if (accounts.value.length > 0) {
-        const info = accounts.value[0].account.data.parsed.info;
-        raw = BigInt(info.tokenAmount.amount);
+      
+      // Try Phantom for EVM
+      if (window.phantom?.ethereum) {
+        state.provider = new ethers.providers.Web3Provider(window.phantom.ethereum);
+        await state.provider.send('eth_requestAccounts', []);
+        state.signer = state.provider.getSigner();
+        state.wallet = await state.signer.getAddress();
+        state.walletType = 'phantom-evm';
+        
+        const network = await state.provider.getNetwork();
+        state.connectedChain = findChainByChainId('0x' + network.chainId.toString(16));
+        
+        updateWalletDisplay();
+        return;
       }
-      const human = Number(raw) / Math.pow(10, DECIMALS);
-      setBalance(human.toLocaleString(undefined, { maximumFractionDigits: DECIMALS }));
-      setStatus("Connected: Solana Devnet");
+      
+      throw new Error('Phantom wallet not found');
     }
 
-    // -------------------- Send flows --------------------
-    async function sendEvm() {
-      if (!evmContract || !evmSigner) throw new Error("Connect MetaMask first.");
-      const recipient = document.getElementById("recipient").value.trim();
-      const amountStr = document.getElementById("amount").value.trim();
-      if (!recipient) throw new Error("Enter recipient (0x...).");
-      if (!amountStr) throw new Error("Enter amount.");
-
-      const amountWei = ethers.utils.parseUnits(amountStr, DECIMALS);
-      setStatus("Submitting EVM tx...");
-      // Replace with your OFT method if different (e.g., sendFrom with dstChainId)
-      const tx = await evmContract.send(recipient, amountWei);
-      setStatus("EVM tx submitted: " + tx.hash);
-      await tx.wait();
-      setStatus("EVM tx confirmed: " + tx.hash);
-
-      const addr = await evmSigner.getAddress();
-      const bal = await evmContract.balanceOf(addr);
-      setBalance(ethers.utils.formatUnits(bal, DECIMALS));
-    }
-
-    async function sendSolana() {
-      if (!solanaPublicKey || !solanaConnection) throw new Error("Connect Solana wallet first.");
-      const recipientStr = document.getElementById("recipient").value.trim();
-      const amountStr = document.getElementById("amount").value.trim();
-      if (!recipientStr) throw new Error("Enter recipient (Solana address).");
-      if (!amountStr) throw new Error("Enter amount.");
-
-      const mint = new solanaWeb3.PublicKey(SOLANA_MINT);
-      const payer = solanaPublicKey;
-      const owner = solanaPublicKey;
-      const recipientPk = new solanaWeb3.PublicKey(recipientStr);
-
-      const ownerAta = getAssociatedTokenAddress(mint, owner);
-      const recipientAta = getAssociatedTokenAddress(mint, recipientPk);
-
-      const ix = [];
-      // Ensure recipient ATA exists
-      const recipientAtaInfo = await solanaConnection.getAccountInfo(recipientAta);
-      if (!recipientAtaInfo) {
-        ix.push(createAssociatedTokenAccountInstruction(payer, recipientAta, recipientPk, mint));
+    async function connectCoinbase() {
+      if (!window.ethereum || !window.ethereum.isCoinbaseWallet) {
+        throw new Error('Coinbase Wallet not installed');
       }
-
-      // Transfer SPL tokens
-      const amountRaw = BigInt(Math.floor(parseFloat(amountStr) * Math.pow(10, DECIMALS)));
-      ix.push(createSplTransferInstruction(ownerAta, recipientAta, owner, amountRaw));
-
-      const tx = new solanaWeb3.Transaction().add(...ix);
-      tx.feePayer = payer;
-      tx.recentBlockhash = (await solanaConnection.getLatestBlockhash()).blockhash;
-
-      setStatus("Submitting Solana tx...");
-      const signed = await window.solana.signTransaction(tx);
-      const sig = await solanaConnection.sendRawTransaction(signed.serialize(), { skipPreflight: false });
-      await solanaConnection.confirmTransaction(sig, "confirmed");
-      setStatus("Solana tx confirmed: " + sig);
-
-      // Refresh balance
-      const accounts = await solanaConnection.getParsedTokenAccountsByOwner(
-        owner, { mint }
-      );
-      let raw = 0n;
-      if (accounts.value.length > 0) {
-        const info = accounts.value[0].account.data.parsed.info;
-        raw = BigInt(info.tokenAmount.amount);
-      }
-      const human = Number(raw) / Math.pow(10, DECIMALS);
-      setBalance(human.toLocaleString(undefined, { maximumFractionDigits: DECIMALS }));
+      
+      state.provider = new ethers.providers.Web3Provider(window.ethereum);
+      await state.provider.send('eth_requestAccounts', []);
+      state.signer = state.provider.getSigner();
+      state.wallet = await state.signer.getAddress();
+      state.walletType = 'coinbase';
+      
+      const network = await state.provider.getNetwork();
+      state.connectedChain = findChainByChainId('0x' + network.chainId.toString(16));
+      
+      updateWalletDisplay();
     }
 
-    // -------------------- UI bindings --------------------
-    document.getElementById("connect").addEventListener("click", async () => {
-      setStatus("Connecting...");
+    function findChainByChainId(chainId) {
+      for (const [key, chain] of Object.entries(CONFIG.CHAINS)) {
+        if (chain.chainId === chainId) {
+          return key;
+        }
+      }
+      return null;
+    }
+
+    function handleAccountsChanged(accounts) {
+      if (accounts.length === 0) {
+        // Disconnected
+        window.location.reload();
+      } else {
+        state.wallet = accounts[0];
+        updateWalletDisplay();
+      }
+    }
+
+    function updateWalletDisplay() {
+      document.getElementById('connectBtn').style.display = 'none';
+      document.getElementById('walletInfo').style.display = 'flex';
+      
+      const shortAddress = state.wallet.length > 42 
+        ? `${state.wallet.slice(0, 4)}...${state.wallet.slice(-4)}`
+        : `${state.wallet.slice(0, 6)}...${state.wallet.slice(-4)}`;
+      
+      document.getElementById('walletAddress').textContent = shortAddress;
+      document.getElementById('walletChain').textContent = state.connectedChain 
+        ? CONFIG.CHAINS[state.connectedChain].name 
+        : 'Unknown';
+    }
+
+    // ==================== BALANCE LOADING ====================
+    async function loadBalance(chainKey) {
+      const chain = CONFIG.CHAINS[chainKey];
+      const balanceEl = document.getElementById(`source-balance-${chainKey}`);
+      
       try {
-        const walletType = walletSel.value;
-        const net = networkSel.value;
-
-        if (walletType === "evm") {
-          if (!EVM_CONTRACTS[net]) {
-            setStatus("Select an EVM testnet for MetaMask.");
+        let balance;
+        
+        if (chainKey === 'solanaDevnet') {
+          if (!state.solanaConnection || !state.solanaPublicKey) {
+            balanceEl.textContent = 'Not connected';
             return;
           }
-          await evmConnectAndLoad();
+          
+          const mint = new solanaWeb3.PublicKey(CONFIG.SOLANA_MINT);
+          const accounts = await state.solanaConnection.getParsedTokenAccountsByOwner(
+            state.solanaPublicKey,
+            { mint }
+          );
+          
+          if (accounts.value.length > 0) {
+            const amount = accounts.value[0].account.data.parsed.info.tokenAmount.amount;
+            balance = Number(amount) / Math.pow(10, CONFIG.TOKEN_DECIMALS);
+          } else {
+            balance = 0;
+          }
         } else {
-          if (net !== "solana-devnet") {
-            setStatus("Select Solana Devnet for Solana wallet.");
+          if (!state.provider || !state.wallet) {
+            balanceEl.textContent = 'Not connected';
             return;
           }
-          await solanaConnectAndLoad();
+          
+          // Switch to the chain if needed
+          await ensureChain(chainKey);
+          
+          const contract = new ethers.Contract(chain.contract, OFT_ABI, state.provider);
+          const bal = await contract.balanceOf(state.wallet);
+          balance = parseFloat(ethers.utils.formatUnits(bal, CONFIG.TOKEN_DECIMALS));
         }
-      } catch (err) {
-        console.error(err);
-        setStatus(err.message || String(err));
+        
+        balanceEl.textContent = `Balance: ${balance.toFixed(2)} ROOT5`;
+        
+        // Update main balance display if this is the selected source chain
+        if (state.sourceChain === chainKey) {
+          document.getElementById('sourceBalance').textContent = balance.toFixed(2);
+        }
+      } catch (error) {
+        console.error(`Error loading balance for ${chainKey}:`, error);
+        balanceEl.textContent = 'Error loading';
       }
-    });
+    }
 
-    document.getElementById("send").addEventListener("click", async () => {
-      setStatus("Preparing send...");
+    async function ensureChain(chainKey) {
+      const chain = CONFIG.CHAINS[chainKey];
+      
+      if (chainKey === 'solanaDevnet') {
+        // Can't switch to Solana from EVM wallet
+        throw new Error('Please use Phantom wallet for Solana');
+      }
+      
+      const currentChainId = await state.provider.send('eth_chainId', []);
+      
+      if (currentChainId === chain.chainId) {
+        return; // Already on the right chain
+      }
+      
       try {
-        const walletType = walletSel.value;
-        const net = networkSel.value;
-        const dest = destinationSel.value;
-
-        // This demo sends on the currently selected wallet/network.
-        // For true bridging, call your OFT adapter methods with dstChainId/peer addresses.
-        if (walletType === "evm") {
-          await sendEvm();
+        await state.provider.send('wallet_switchEthereumChain', [{ chainId: chain.chainId }]);
+      } catch (switchError) {
+        // Chain not added, try to add it
+        if (switchError.code === 4902) {
+          await state.provider.send('wallet_addEthereumChain', [{
+            chainId: chain.chainId,
+            chainName: chain.name,
+            rpcUrls: [chain.rpc],
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            blockExplorerUrls: [chain.explorer]
+          }]);
         } else {
-          await sendSolana();
+          throw switchError;
         }
-      } catch (err) {
-        console.error(err);
-        setStatus(err?.data?.message || err.message || String(err));
       }
-    });
+      
+      // Reload provider after switch
+      state.provider = new ethers.providers.Web3Provider(window.ethereum);
+      state.signer = state.provider.getSigner();
+    }
 
-    networkSel.addEventListener("change", () => {
-      setAddress("-");
-      setBalance("-");
-      setStatus("Select wallet, then connect.");
-    });
+    // ==================== BRIDGE EXECUTION ====================
+    async function executeBridge() {
+      if (!state.sourceChain || !state.destChain || !state.wallet) {
+        showStatus('Please connect wallet and select chains', 'error');
+        return;
+      }
+      
+      const amount = document.getElementById('amountInput').value;
+      if (!amount || parseFloat(amount) <= 0) {
+        showStatus('Please enter a valid amount', 'error');
+        return;
+      }
+      
+      const btn = document.getElementById('bridgeBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loading"><div class="spinner"></div> Bridging...</div>';
+      
+      try {
+        if (state.sourceChain === 'solanaDevnet') {
+          await bridgeFromSolana(amount);
+        } else {
+          await bridgeFromEVM(amount);
+        }
+      } catch (error) {
+        console.error('Bridge error:', error);
+        showStatus(`Bridge failed: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Bridge Tokens';
+      }
+    }
 
-    walletSel.addEventListener("change", () => {
-      setAddress("-");
-      setBalance("-");
-      setStatus("Select network, then connect.");
-    });
+    async function bridgeFromEVM(amount) {
+      showStatus('Preparing bridge transaction...', 'info');
+      
+      const sourceChain = CONFIG.CHAINS[state.sourceChain];
+      const destChain = CONFIG.CHAINS[state.destChain];
+      
+      await ensureChain(state.sourceChain);
+      
+      const contract = new ethers.Contract(sourceChain.contract, OFT_ABI, state.signer);
+      
+      // Parse amount
+      const amountLD = ethers.utils.parseUnits(amount, CONFIG.TOKEN_DECIMALS);
+      
+      // Get recipient address
+      let recipientInput = document.getElementById('recipientInput').value.trim();
+      let toAddressBytes32;
+      
+      if (!recipientInput) {
+        // Use sender's address
+        if (destChain.chainId === 'solana') {
+          throw new Error('Please specify a Solana recipient address');
+        }
+        toAddressBytes32 = addressToBytes32(state.wallet);
+      } else {
+        if (destChain.chainId === 'solana') {
+          toAddressBytes32 = solanaAddressToBytes32(recipientInput);
+        } else {
+          toAddressBytes32 = addressToBytes32(recipientInput);
+        }
+      }
+      
+      // Build send params
+      const sendParam = {
+        dstEid: destChain.lzEid,
+        to: toAddressBytes32,
+        amountLD: amountLD,
+        minAmountLD: amountLD, // No slippage for now
+        extraOptions: '0x',
+        composeMsg: '0x',
+        oftCmd: '0x'
+      };
+      
+      // Quote the fee
+      showStatus('Calculating bridge fee...', 'info');
+      const quote = await contract.quoteSend(sendParam, false);
+      
+      showStatus(`Bridge fee: ${ethers.utils.formatEther(quote.nativeFee)} ETH - Sending transaction...`, 'info');
+      
+      // Send the transaction
+      const tx = await contract.send(
+        sendParam,
+        { nativeFee: quote.nativeFee, lzTokenFee: 0 },
+        state.wallet,
+        { value: quote.nativeFee }
+      );
+      
+      showStatus(`Transaction submitted! Hash: ${tx.hash}`, 'info');
+      
+      // Wait for confirmation
+      const receipt = await tx.wait();
+      
+      const explorerLink = `${sourceChain.explorer}/tx/${tx.hash}`;
+      showStatus(
+        `✅ Bridge successful! <a href="${explorerLink}" target="_blank" class="tx-link">View on ${sourceChain.name} explorer</a>`,
+        'success'
+      );
+      
+      // Reload balances
+      setTimeout(() => {
+        if (state.sourceChain) loadBalance(state.sourceChain);
+      }, 2000);
+    }
+
+    async function bridgeFromSolana(amount) {
+      showStatus('Solana → EVM bridging will be enabled soon! For now, please bridge from EVM chains to Solana or between EVM chains.', 'warning');
+      // Note: Solana OFT bridging requires calling the Solana program directly
+      // This will be implemented in a future update
+    }
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function addressToBytes32(address) {
+      // Remove 0x and pad to 32 bytes (64 hex chars)
+      const addr = address.toLowerCase().replace('0x', '');
+      return '0x' + addr.padStart(64, '0');
+    }
+
+    function solanaAddressToBytes32(solAddress) {
+      // Simple base58 decode implementation
+      const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+      const BASE = BigInt(58);
+      
+      let decoded = BigInt(0);
+      for (let i = 0; i < solAddress.length; i++) {
+        const char = solAddress[i];
+        const value = ALPHABET.indexOf(char);
+        if (value === -1) throw new Error('Invalid Solana address');
+        decoded = decoded * BASE + BigInt(value);
+      }
+      
+      // Convert to hex and pad to 32 bytes
+      let hex = decoded.toString(16);
+      hex = hex.padStart(64, '0');
+      return '0x' + hex;
+    }
+
+    function showStatus(message, type) {
+      const statusBox = document.getElementById('statusBox');
+      statusBox.style.display = 'block';
+      statusBox.className = `status-box status-${type}`;
+      statusBox.innerHTML = message;
+    }
+
+    // ==================== INIT ====================
+    window.addEventListener('load', init);
   </script>
 </body>
 </html>
