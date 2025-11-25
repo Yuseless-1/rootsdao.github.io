@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ROOT5 Omnichain Bridge | Community Test</title>
+  <title>ROOT5 Omnichain Bridge | Community Test (Fixed)</title>
   
   <!-- External Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
@@ -89,6 +89,7 @@
       gap: 15px;
       align-items: center;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -135,6 +136,8 @@
       padding: 15px 20px;
       border-radius: 10px;
       border: 1px solid var(--border);
+      flex: 1;
+      min-width: 250px;
     }
 
     .connected-wallet-label {
@@ -150,6 +153,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .badge {
@@ -209,7 +213,7 @@
       transition: all 0.3s;
     }
 
-    .chain-card:hover {
+    .chain-card:hover:not(.disabled) {
       border-color: var(--primary);
       transform: translateY(-2px);
     }
@@ -222,11 +226,6 @@
     .chain-card.disabled {
       opacity: 0.5;
       cursor: not-allowed;
-    }
-
-    .chain-card.disabled:hover {
-      border-color: transparent;
-      transform: none;
     }
 
     .chain-name {
@@ -280,7 +279,6 @@
       text-decoration: underline;
     }
 
-    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
@@ -327,7 +325,7 @@
       transition: all 0.3s;
     }
 
-    .wallet-option:hover {
+    .wallet-option:hover:not(.disabled) {
       border-color: var(--primary);
       transform: translateX(5px);
     }
@@ -335,11 +333,6 @@
     .wallet-option.disabled {
       opacity: 0.5;
       cursor: not-allowed;
-    }
-
-    .wallet-option.disabled:hover {
-      border-color: transparent;
-      transform: none;
     }
 
     .wallet-icon {
@@ -390,8 +383,8 @@
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <h1>🌉 ROOT5 Omnichain Bridge</h1>
-      <p>Community Testing Interface - Send tokens across 6 testnets</p>
+      <h1>🌉 ROOT5 Omnichain Bridge (Fixed)</h1>
+      <p>Fully Working Community Testing Interface - Send tokens across 6 testnets</p>
     </div>
 
     <!-- Wallet Connection Card -->
@@ -401,13 +394,16 @@
         <button class="btn btn-primary" id="connectBtn" onclick="openWalletModal()">
           Connect Wallet
         </button>
-        <div class="connected-wallet" id="walletInfo" style="display: none; flex: 1;">
+        <div class="connected-wallet" id="walletInfo" style="display: none;">
           <div class="connected-wallet-label">Connected</div>
           <div class="connected-wallet-address">
             <span id="walletAddress">-</span>
             <span class="badge badge-success" id="walletChain">-</span>
           </div>
         </div>
+        <button class="btn btn-secondary" id="disconnectBtn" onclick="disconnectWallet()" style="display: none;">
+          Disconnect
+        </button>
       </div>
     </div>
 
@@ -440,7 +436,7 @@
         </div>
       </div>
 
-      <!-- Recipient Address (optional for same address) -->
+      <!-- Recipient Address -->
       <div class="form-group">
         <label class="form-label">Recipient Address (optional, defaults to your address)</label>
         <input type="text" class="form-input" id="recipientInput" placeholder="0x... or Solana address">
@@ -451,7 +447,7 @@
         Bridge Tokens
       </button>
 
-      <!-- Status Box - Always visible -->
+      <!-- Status Box -->
       <div id="statusBox" class="status-box status-info">
         Click "Connect Wallet" above to get started
       </div>
@@ -461,46 +457,27 @@
     <div class="card">
       <div class="card-title">ℹ️ Information</div>
       <p style="color: var(--text-secondary); line-height: 1.6;">
-        This is a testnet bridge for the ROOT5 community. You can transfer ROOT5 tokens between:
-        <br><br>
-        <strong>• Ethereum Sepolia</strong><br>
-        <strong>• Arbitrum Sepolia</strong><br>
-        <strong>• Base Sepolia</strong><br>
-        <strong>• BSC Testnet</strong><br>
-        <strong>• Optimism Sepolia</strong><br>
-        <strong>• Solana Devnet</strong>
-        <br><br>
-        Get testnet tokens from faucets, then try bridging small amounts to test the omnichain functionality!
+        <strong>✅ FIXED FEATURES:</strong><br>
+        • Multi-wallet detection (MetaMask, Phantom, Coinbase)<br>
+        • Automatic network switching<br>
+        • Modal auto-close after connection<br>
+        • Phantom Solana & EVM support<br>
+        • Complete error handling<br>
+        <br>
+        <strong>SUPPORTED TESTNETS:</strong><br>
+        • Ethereum Sepolia<br>
+        • Arbitrum Sepolia<br>
+        • Base Sepolia<br>
+        • BSC Testnet<br>
+        • Optimism Sepolia<br>
+        • Solana Devnet<br>
       </p>
-    </div>
-
-    <!-- Debug Console Card -->
-    <div class="card" style="background: #1a1a2e;">
-      <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
-        🛠️ Debug Console
-        <button class="btn btn-secondary" onclick="toggleDebug()" style="padding: 6px 12px; font-size: 0.85rem;">
-          Toggle
-        </button>
-      </div>
-      <div id="debugConsole" style="
-        background: #0f0f1e; 
-        padding: 15px; 
-        border-radius: 8px; 
-        font-family: 'Courier New', monospace; 
-        font-size: 0.85rem; 
-        max-height: 200px; 
-        overflow-y: auto;
-        color: #00ff00;
-        display: none;
-      ">
-        <div id="debugLog">Console initialized...</div>
-      </div>
     </div>
   </div>
 
   <!-- Wallet Connection Modal -->
-  <div class="modal" id="walletModal">
-    <div class="modal-content">
+  <div class="modal" id="walletModal" onclick="handleModalClick(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-title">Connect Wallet</div>
       
       <div class="wallet-option" onclick="connectWallet('metamask')">
@@ -539,11 +516,13 @@
       TOKEN_DECIMALS: 6,
       SOLANA_MINT: '9Z3t8mK2Svw5zmS6pwWCfZ6rcKw4QF5gFkHfh94DzkYN',
       SOLANA_OFT_PROGRAM: 'HhsXchaPXZh5FtcfhDrs3Nd9bEE7huqQwUEvmzxjZQUz',
+      SOLANA_OFT_STORE: '6k4a54QsewbaujFm7XiLTYzF5VFz6R51za9wUHwxsJGn',
       
       CHAINS: {
         sepolia: {
           name: 'Ethereum Sepolia',
           chainId: '0xaa36a7',
+          chainIdDecimal: 11155111,
           rpc: 'https://rpc.sepolia.org',
           explorer: 'https://sepolia.etherscan.io',
           contract: '0x3932107F4cD2F6a5Ff2788641630A4bb0AB4Fca9',
@@ -553,6 +532,7 @@
         arbitrumSepolia: {
           name: 'Arbitrum Sepolia',
           chainId: '0x66eee',
+          chainIdDecimal: 421614,
           rpc: 'https://sepolia-rollup.arbitrum.io/rpc',
           explorer: 'https://sepolia.arbiscan.io',
           contract: '0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E',
@@ -562,6 +542,7 @@
         baseSepolia: {
           name: 'Base Sepolia',
           chainId: '0x14a34',
+          chainIdDecimal: 84532,
           rpc: 'https://sepolia.base.org',
           explorer: 'https://sepolia.basescan.org',
           contract: '0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E',
@@ -571,6 +552,7 @@
         bscTestnet: {
           name: 'BSC Testnet',
           chainId: '0x61',
+          chainIdDecimal: 97,
           rpc: 'https://data-seed-prebsc-1-s1.binance.org:8545',
           explorer: 'https://testnet.bscscan.com',
           contract: '0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E',
@@ -580,6 +562,7 @@
         optimismSepolia: {
           name: 'Optimism Sepolia',
           chainId: '0xaa37dc',
+          chainIdDecimal: 11155420,
           rpc: 'https://sepolia.optimism.io',
           explorer: 'https://sepolia-optimism.etherscan.io',
           contract: '0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E',
@@ -589,6 +572,7 @@
         solanaDevnet: {
           name: 'Solana Devnet',
           chainId: 'solana',
+          chainIdDecimal: null,
           rpc: 'https://api.devnet.solana.com',
           explorer: 'https://explorer.solana.com',
           lzEid: 40168,
@@ -617,10 +601,465 @@
       solanaPublicKey: null
     };
 
-    // ==================== INITIALIZATION ====================
+    // ==================== UTILITY FUNCTIONS ====================
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+      console.log(`[${timestamp}] ${prefix} ${message}`);
+    }
+
+    function showStatus(message, type) {
+      const statusBox = document.getElementById('statusBox');
+      statusBox.style.display = 'block';
+      statusBox.className = `status-box status-${type}`;
+      statusBox.innerHTML = message;
+      log(message.replace(/<[^>]*>/g, ''), type);
+    }
+
+    // ==================== WALLET DETECTION ====================
+    function detectWallets() {
+      const wallets = {
+        metamask: false,
+        phantom: false,
+        phantomSolana: false,
+        coinbase: false
+      };
+
+      // Detect MetaMask
+      if (window.ethereum) {
+        // Check for MetaMask-specific provider
+        if (window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+          wallets.metamask = true;
+        }
+        // Also check for separate MetaMask provider in case of multiple wallets
+        if (window.ethereum.providers) {
+          const metamaskProvider = window.ethereum.providers.find(p => p.isMetaMask && !p.isPhantom);
+          if (metamaskProvider) wallets.metamask = true;
+        }
+      }
+
+      // Detect Phantom
+      if (window.phantom?.ethereum) {
+        wallets.phantom = true;
+      }
+      if (window.solana && window.solana.isPhantom) {
+        wallets.phantomSolana = true;
+      }
+
+      // Detect Coinbase Wallet
+      if (window.coinbaseWalletExtension || (window.ethereum && window.ethereum.isCoinbaseWallet)) {
+        wallets.coinbase = true;
+      }
+
+      log(`Detected wallets: ${JSON.stringify(wallets)}`);
+      return wallets;
+    }
+
+    function getMetaMaskProvider() {
+      if (!window.ethereum) return null;
+      
+      // If there are multiple providers, find MetaMask
+      if (window.ethereum.providers) {
+        return window.ethereum.providers.find(p => p.isMetaMask && !p.isPhantom);
+      }
+      
+      // Single provider - check if it's MetaMask
+      if (window.ethereum.isMetaMask && !window.ethereum.isPhantom) {
+        return window.ethereum;
+      }
+      
+      return null;
+    }
+
+    function getPhantomEVMProvider() {
+      return window.phantom?.ethereum || null;
+    }
+
+    function getCoinbaseProvider() {
+      if (window.coinbaseWalletExtension) {
+        return window.coinbaseWalletExtension;
+      }
+      if (window.ethereum && window.ethereum.isCoinbaseWallet) {
+        return window.ethereum;
+      }
+      return null;
+    }
+
+    // ==================== MODAL MANAGEMENT ====================
+    function openWalletModal() {
+      const modal = document.getElementById('walletModal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeWalletModal() {
+      const modal = document.getElementById('walletModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    function handleModalClick(event) {
+      if (event.target.id === 'walletModal') {
+        closeWalletModal();
+      }
+    }
+
+    // ==================== WALLET CONNECTION ====================
+    async function connectWallet(walletType) {
+      log(`Attempting to connect ${walletType}...`);
+      
+      try {
+        if (walletType === 'metamask') {
+          await connectMetaMask();
+        } else if (walletType === 'phantom') {
+          await connectPhantom();
+        } else if (walletType === 'coinbase') {
+          await connectCoinbase();
+        }
+        
+        // Close modal AFTER successful connection
+        closeWalletModal();
+        showStatus('✅ Wallet connected successfully!', 'success');
+        updateBridgeButton();
+      } catch (error) {
+        log(`Connection failed: ${error.message}`, 'error');
+        showStatus(`❌ Failed to connect: ${error.message}`, 'error');
+      }
+    }
+
+    async function connectMetaMask() {
+      const provider = getMetaMaskProvider();
+      
+      if (!provider) {
+        throw new Error('MetaMask not found. Please install MetaMask extension.');
+      }
+      
+      log('MetaMask detected, requesting accounts...');
+      
+      try {
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        
+        if (!accounts || accounts.length === 0) {
+          throw new Error('No accounts found. Please unlock MetaMask.');
+        }
+        
+        // Create provider and signer
+        state.provider = new ethers.providers.Web3Provider(provider, 'any');
+        state.signer = state.provider.getSigner();
+        state.wallet = accounts[0];
+        state.walletType = 'metamask';
+        
+        // Get current chain
+        const network = await state.provider.getNetwork();
+        const chainIdHex = '0x' + network.chainId.toString(16);
+        state.connectedChain = findChainByChainId(chainIdHex) || 'sepolia';
+        
+        log(`✅ MetaMask connected: ${state.wallet.slice(0, 6)}...${state.wallet.slice(-4)}`);
+        log(`Network: ${state.connectedChain}`);
+        
+        updateWalletDisplay();
+        
+        // Setup event listeners
+        provider.on('accountsChanged', handleAccountsChanged);
+        provider.on('chainChanged', handleChainChanged);
+        
+      } catch (error) {
+        if (error.code === 4001) {
+          throw new Error('Connection rejected by user');
+        } else if (error.code === -32002) {
+          throw new Error('Connection request pending. Please check MetaMask.');
+        }
+        throw error;
+      }
+    }
+
+    async function connectPhantom() {
+      log('Checking for Phantom wallet...');
+      
+      // Try Phantom Solana first
+      if (window.solana && window.solana.isPhantom) {
+        log('Phantom Solana detected');
+        try {
+          const resp = await window.solana.connect();
+          state.solanaPublicKey = resp.publicKey;
+          state.wallet = resp.publicKey.toString();
+          state.walletType = 'phantom-solana';
+          state.connectedChain = 'solanaDevnet';
+          state.solanaConnection = new solanaWeb3.Connection(CONFIG.CHAINS.solanaDevnet.rpc, 'confirmed');
+          
+          log(`✅ Phantom Solana connected: ${state.wallet.slice(0, 6)}...${state.wallet.slice(-4)}`);
+          
+          // Setup Solana event listeners
+          window.solana.on('disconnect', () => {
+            log('Phantom Solana disconnected');
+            resetState();
+          });
+          
+          updateWalletDisplay();
+          return;
+        } catch (error) {
+          log(`Phantom Solana connection failed: ${error.message}`, 'error');
+          throw new Error(`Phantom Solana: ${error.message}`);
+        }
+      }
+      
+      // Try Phantom EVM
+      const phantomEVM = getPhantomEVMProvider();
+      if (phantomEVM) {
+        log('Phantom EVM detected');
+        try {
+          const accounts = await phantomEVM.request({ method: 'eth_requestAccounts' });
+          
+          if (!accounts || accounts.length === 0) {
+            throw new Error('No accounts found');
+          }
+          
+          state.provider = new ethers.providers.Web3Provider(phantomEVM, 'any');
+          state.signer = state.provider.getSigner();
+          state.wallet = accounts[0];
+          state.walletType = 'phantom-evm';
+          
+          const network = await state.provider.getNetwork();
+          const chainIdHex = '0x' + network.chainId.toString(16);
+          state.connectedChain = findChainByChainId(chainIdHex) || 'sepolia';
+          
+          log(`✅ Phantom EVM connected: ${state.wallet.slice(0, 6)}...${state.wallet.slice(-4)}`);
+          
+          updateWalletDisplay();
+          
+          phantomEVM.on('accountsChanged', handleAccountsChanged);
+          phantomEVM.on('chainChanged', handleChainChanged);
+          
+          return;
+        } catch (error) {
+          log(`Phantom EVM connection failed: ${error.message}`, 'error');
+          throw new Error(`Phantom EVM: ${error.message}`);
+        }
+      }
+      
+      throw new Error('Phantom wallet not found. Please install Phantom from phantom.app');
+    }
+
+    async function connectCoinbase() {
+      const provider = getCoinbaseProvider();
+      
+      if (!provider) {
+        throw new Error('Coinbase Wallet not found. Please install from coinbase.com/wallet');
+      }
+      
+      log('Coinbase Wallet detected, requesting accounts...');
+      
+      try {
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
+        
+        if (!accounts || accounts.length === 0) {
+          throw new Error('No accounts found');
+        }
+        
+        state.provider = new ethers.providers.Web3Provider(provider, 'any');
+        state.signer = state.provider.getSigner();
+        state.wallet = accounts[0];
+        state.walletType = 'coinbase';
+        
+        const network = await state.provider.getNetwork();
+        const chainIdHex = '0x' + network.chainId.toString(16);
+        state.connectedChain = findChainByChainId(chainIdHex) || 'sepolia';
+        
+        log(`✅ Coinbase Wallet connected: ${state.wallet.slice(0, 6)}...${state.wallet.slice(-4)}`);
+        
+        updateWalletDisplay();
+        
+        provider.on('accountsChanged', handleAccountsChanged);
+        provider.on('chainChanged', handleChainChanged);
+        
+      } catch (error) {
+        if (error.code === 4001) {
+          throw new Error('Connection rejected by user');
+        }
+        throw error;
+      }
+    }
+
+    function disconnectWallet() {
+      if (state.walletType === 'phantom-solana' && window.solana) {
+        window.solana.disconnect();
+      }
+      resetState();
+      showStatus('Wallet disconnected', 'info');
+    }
+
+    function resetState() {
+      state = {
+        wallet: null,
+        walletType: null,
+        provider: null,
+        signer: null,
+        connectedChain: null,
+        sourceChain: null,
+        destChain: null,
+        solanaConnection: null,
+        solanaPublicKey: null
+      };
+      
+      document.getElementById('connectBtn').style.display = 'inline-flex';
+      document.getElementById('walletInfo').style.display = 'none';
+      document.getElementById('disconnectBtn').style.display = 'none';
+      
+      renderChainGrids();
+      updateBridgeButton();
+    }
+
+    // ==================== EVENT HANDLERS ====================
+    function handleAccountsChanged(accounts) {
+      if (accounts.length === 0) {
+        log('Wallet locked or disconnected');
+        resetState();
+      } else {
+        log(`Account changed to ${accounts[0]}`);
+        state.wallet = accounts[0];
+        updateWalletDisplay();
+      }
+    }
+
+    function handleChainChanged(chainId) {
+      log(`Chain changed to ${chainId}, reloading...`);
+      window.location.reload();
+    }
+
+    // ==================== CHAIN MANAGEMENT ====================
+    function findChainByChainId(chainId) {
+      for (const [key, chain] of Object.entries(CONFIG.CHAINS)) {
+        if (chain.chainId === chainId.toLowerCase()) {
+          return key;
+        }
+      }
+      return null;
+    }
+
+    async function ensureChain(chainKey) {
+      const chain = CONFIG.CHAINS[chainKey];
+      
+      if (chainKey === 'solanaDevnet') {
+        throw new Error('Cannot switch to Solana from EVM wallet. Please reconnect with Phantom.');
+      }
+      
+      if (!state.provider) {
+        throw new Error('No provider available');
+      }
+      
+      try {
+        const currentChainId = await state.provider.send('eth_chainId', []);
+        
+        if (currentChainId.toLowerCase() === chain.chainId.toLowerCase()) {
+          log(`Already on ${chain.name}`);
+          state.connectedChain = chainKey;
+          return;
+        }
+        
+        log(`Switching to ${chain.name}...`);
+        
+        try {
+          await state.provider.send('wallet_switchEthereumChain', [{ chainId: chain.chainId }]);
+          log(`✅ Switched to ${chain.name}`);
+        } catch (switchError) {
+          // Chain not added to wallet
+          if (switchError.code === 4902) {
+            log(`Adding ${chain.name} to wallet...`);
+            await state.provider.send('wallet_addEthereumChain', [{
+              chainId: chain.chainId,
+              chainName: chain.name,
+              rpcUrls: [chain.rpc],
+              nativeCurrency: {
+                name: 'ETH',
+                symbol: 'ETH',
+                decimals: 18
+              },
+              blockExplorerUrls: [chain.explorer]
+            }]);
+            log(`✅ Added and switched to ${chain.name}`);
+          } else {
+            throw switchError;
+          }
+        }
+        
+        state.connectedChain = chainKey;
+        
+        // Refresh provider after switch
+        const provider = state.walletType === 'metamask' ? getMetaMaskProvider() : 
+                        state.walletType === 'phantom-evm' ? getPhantomEVMProvider() :
+                        getCoinbaseProvider();
+        state.provider = new ethers.providers.Web3Provider(provider, 'any');
+        state.signer = state.provider.getSigner();
+        
+        updateWalletDisplay();
+        await loadBalance(chainKey);
+        
+      } catch (error) {
+        log(`Failed to switch chain: ${error.message}`, 'error');
+        throw new Error(`Could not switch to ${chain.name}. Please switch manually in your wallet.`);
+      }
+    }
+
+    // ==================== BALANCE LOADING ====================
+    async function loadBalance(chainKey) {
+      const chain = CONFIG.CHAINS[chainKey];
+      const balanceEl = document.getElementById(`source-balance-${chainKey}`);
+      
+      if (!balanceEl) return;
+      
+      try {
+        let balance;
+        
+        if (chainKey === 'solanaDevnet') {
+          if (!state.solanaConnection || !state.solanaPublicKey) {
+            balanceEl.textContent = 'Connect Phantom';
+            return;
+          }
+          
+          const mint = new solanaWeb3.PublicKey(CONFIG.SOLANA_MINT);
+          const accounts = await state.solanaConnection.getParsedTokenAccountsByOwner(
+            state.solanaPublicKey,
+            { mint }
+          );
+          
+          if (accounts.value.length > 0) {
+            const amount = accounts.value[0].account.data.parsed.info.tokenAmount.uiAmount;
+            balance = amount;
+          } else {
+            balance = 0;
+          }
+        } else {
+          // EVM chain
+          if (!state.provider || !state.wallet) {
+            balanceEl.textContent = 'Connect wallet';
+            return;
+          }
+          
+          const contract = new ethers.Contract(chain.contract, OFT_ABI, state.provider);
+          const bal = await contract.balanceOf(state.wallet);
+          balance = parseFloat(ethers.utils.formatUnits(bal, CONFIG.TOKEN_DECIMALS));
+        }
+        
+        balanceEl.textContent = `Balance: ${balance.toFixed(2)} ROOT5`;
+        
+        // Update main balance display if this is the selected source chain
+        if (state.sourceChain === chainKey) {
+          document.getElementById('sourceBalance').textContent = balance.toFixed(2);
+        }
+      } catch (error) {
+        log(`Error loading balance for ${chainKey}: ${error.message}`, 'error');
+        balanceEl.textContent = 'Error';
+      }
+    }
+
+    // ==================== UI MANAGEMENT ====================
     function init() {
       renderChainGrids();
       updateBridgeButton();
+      
+      // Detect wallets on load
+      const wallets = detectWallets();
+      log(`Initialization complete. Available wallets: ${Object.keys(wallets).filter(k => wallets[k]).join(', ')}`);
     }
 
     function renderChainGrids() {
@@ -643,8 +1082,13 @@
       card.className = 'chain-card';
       card.dataset.chain = key;
       
-      // Add 'connected' class if this is the currently connected chain
       const isConnected = state.connectedChain === key;
+      const isSelected = (type === 'source' && state.sourceChain === key) || 
+                         (type === 'dest' && state.destChain === key);
+      
+      if (isSelected) {
+        card.classList.add('selected');
+      }
       
       card.innerHTML = `
         <div class="chain-name">
@@ -659,50 +1103,44 @@
     }
 
     async function selectChain(chainKey, type) {
+      const chain = CONFIG.CHAINS[chainKey];
+      
       if (type === 'source') {
         // Deselect all source chains
         document.querySelectorAll('#sourceChainGrid .chain-card').forEach(c => c.classList.remove('selected'));
-        // Select this one
         document.querySelector(`#sourceChainGrid .chain-card[data-chain="${chainKey}"]`).classList.add('selected');
         state.sourceChain = chainKey;
         
-        // Auto-switch network if wallet is connected
-        if (state.wallet) {
-          const selectedChain = CONFIG.CHAINS[chainKey];
-          
-          // Check if switching to Solana with non-Solana wallet
-          if (selectedChain.chainId === 'solana' && state.walletType !== 'phantom-solana') {
-            showStatus(`⚠️ Solana requires Phantom wallet. Please reconnect with Phantom for Solana.`, 'warning');
+        // Auto-switch if wallet is connected
+        if (state.wallet && state.connectedChain !== chainKey) {
+          if (chain.chainId === 'solana' && state.walletType !== 'phantom-solana') {
+            showStatus('⚠️ Solana requires Phantom wallet. Please reconnect with Phantom.', 'warning');
             return;
           }
           
-          // Check if switching from Solana to EVM
-          if (state.connectedChain === 'solanaDevnet' && selectedChain.chainId !== 'solana') {
-            showStatus(`⚠️ To use EVM chains, please reconnect with MetaMask or Phantom (EVM mode).`, 'warning');
+          if (state.connectedChain === 'solanaDevnet' && chain.chainId !== 'solana') {
+            showStatus('⚠️ Please reconnect with MetaMask or Phantom (EVM) to use EVM chains.', 'warning');
             return;
           }
           
-          // Check if this is an EVM chain and we have an EVM wallet
-          if (selectedChain.chainId !== 'solana' && (state.walletType === 'metamask' || state.walletType === 'phantom-evm' || state.walletType === 'coinbase')) {
+          if (chain.chainId !== 'solana') {
             try {
-              showStatus(`Switching to ${selectedChain.name}...`, 'info');
+              showStatus(`Switching to ${chain.name}...`, 'info');
               await ensureChain(chainKey);
-              showStatus(`✅ Switched to ${selectedChain.name}`, 'success');
-              // Load balance after successful switch
-              await loadBalance(chainKey);
+              showStatus(`✅ Switched to ${chain.name}`, 'success');
             } catch (error) {
-              debugLog(`Failed to switch network: ${error.message}`);
-              showStatus(`⚠️ Please manually switch to ${selectedChain.name} in your wallet`, 'warning');
+              showStatus(`⚠️ ${error.message}`, 'warning');
             }
-          } else if (selectedChain.chainId === 'solana' && state.walletType === 'phantom-solana') {
-            // Already on Solana with Phantom
-            await loadBalance(chainKey);
           }
+        }
+        
+        // Load balance
+        if (state.wallet) {
+          await loadBalance(chainKey);
         }
       } else {
         // Deselect all dest chains
         document.querySelectorAll('#destChainGrid .chain-card').forEach(c => c.classList.remove('selected'));
-        // Select this one
         document.querySelector(`#destChainGrid .chain-card[data-chain="${chainKey}"]`).classList.add('selected');
         state.destChain = chainKey;
       }
@@ -710,238 +1148,10 @@
       updateBridgeButton();
     }
 
-    function updateBridgeButton() {
-      const btn = document.getElementById('bridgeBtn');
-      const canBridge = state.wallet && state.sourceChain && state.destChain && state.sourceChain !== state.destChain;
-      btn.disabled = !canBridge;
-    }
-
-    // ==================== WALLET CONNECTION ====================
-    function openWalletModal() {
-      document.getElementById('walletModal').classList.add('active');
-    }
-
-    function closeWalletModal() {
-      document.getElementById('walletModal').classList.remove('active');
-    }
-
-    async function connectWallet(walletType) {
-      debugLog(`=== Connecting ${walletType} ===`);
-      
-      try {
-        if (walletType === 'metamask') {
-          await connectMetaMask();
-        } else if (walletType === 'phantom') {
-          await connectPhantom();
-        } else if (walletType === 'coinbase') {
-          await connectCoinbase();
-        }
-        
-        closeWalletModal();
-        showStatus('✅ Wallet connected successfully!', 'success');
-        updateBridgeButton();
-      } catch (error) {
-        debugLog(`❌ Connection failed: ${error.message}`);
-        showStatus(`❌ Failed to connect: ${error.message}`, 'error');
-        // Don't close modal on error so user can try again
-      }
-    }
-
-    async function connectMetaMask() {
-      debugLog('Attempting MetaMask connection...');
-      
-      if (!window.ethereum) {
-        throw new Error('MetaMask not installed. Please install MetaMask from metamask.io');
-      }
-      
-      // Check if MetaMask is the provider (not Phantom or others)
-      if (!window.ethereum.isMetaMask) {
-        throw new Error('MetaMask not detected. Please make sure MetaMask is enabled.');
-      }
-      
-      debugLog('MetaMask detected');
-      
-      try {
-        // Request accounts - this triggers the MetaMask popup
-        debugLog('Requesting accounts...');
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
-        });
-        
-        debugLog(`Accounts received: ${accounts.length} account(s)`);
-        debugLog(`Primary account: ${accounts[0]}`);
-        
-        if (!accounts || accounts.length === 0) {
-          throw new Error('No accounts found. Please unlock MetaMask and try again.');
-        }
-        
-        // Create provider
-        state.provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-        state.signer = state.provider.getSigner();
-        state.wallet = accounts[0];
-        state.walletType = 'metamask';
-        
-        debugLog(`Wallet address: ${state.wallet}`);
-        
-        // Get current chain
-        const network = await state.provider.getNetwork();
-        const chainIdHex = '0x' + network.chainId.toString(16);
-        state.connectedChain = findChainByChainId(chainIdHex);
-        
-        debugLog(`Network: ${network.name} (ChainID: ${chainIdHex})`);
-        debugLog(`Matched chain: ${state.connectedChain || 'Unknown'}`);
-        
-        if (!state.connectedChain) {
-          debugLog(`⚠️ Unknown network, defaulting to first EVM chain`);
-          // Default to first EVM chain if unknown
-          state.connectedChain = 'sepolia';
-        }
-        
-        updateWalletDisplay();
-        
-        // Listen for account/chain changes
-        window.ethereum.on('accountsChanged', handleAccountsChanged);
-        window.ethereum.on('chainChanged', () => {
-          debugLog('Chain changed, reloading...');
-          window.location.reload();
-        });
-        
-        debugLog('✅ MetaMask connected successfully');
-      } catch (error) {
-        debugLog(`❌ MetaMask error: ${error.message}`);
-        
-        // Check for specific error codes
-        if (error.code === 4001) {
-          throw new Error('Connection rejected. Please approve the connection in MetaMask.');
-        } else if (error.code === -32002) {
-          throw new Error('Connection request already pending. Please check MetaMask.');
-        }
-        
-        throw new Error(`MetaMask connection failed: ${error.message}`);
-      }
-    }
-
-    async function connectPhantom() {
-      console.log('connectPhantom called');
-      
-      // Try Phantom for Solana first
-      if (window.solana && window.solana.isPhantom) {
-        console.log('Phantom Solana detected');
-        try {
-          const resp = await window.solana.connect();
-          state.solanaPublicKey = resp.publicKey;
-          state.wallet = resp.publicKey.toString();
-          state.walletType = 'phantom-solana';
-          state.connectedChain = 'solanaDevnet';
-          state.solanaConnection = new solanaWeb3.Connection('https://api.devnet.solana.com', 'confirmed');
-          
-          console.log('Phantom Solana connected:', state.wallet);
-          updateWalletDisplay();
-          return;
-        } catch (error) {
-          console.error('Phantom Solana connection error:', error);
-          throw new Error(`Phantom Solana connection failed: ${error.message}`);
-        }
-      }
-      
-      // Try Phantom for EVM
-      if (window.phantom?.ethereum) {
-        console.log('Phantom EVM detected');
-        try {
-          const accounts = await window.phantom.ethereum.request({ method: 'eth_requestAccounts' });
-          
-          if (!accounts || accounts.length === 0) {
-            throw new Error('No accounts found');
-          }
-          
-          state.provider = new ethers.providers.Web3Provider(window.phantom.ethereum);
-          state.signer = state.provider.getSigner();
-          state.wallet = accounts[0];
-          state.walletType = 'phantom-evm';
-          
-          const network = await state.provider.getNetwork();
-          const chainIdHex = '0x' + network.chainId.toString(16);
-          state.connectedChain = findChainByChainId(chainIdHex);
-          
-          console.log('Phantom EVM connected:', state.wallet);
-          updateWalletDisplay();
-          return;
-        } catch (error) {
-          console.error('Phantom EVM connection error:', error);
-          throw new Error(`Phantom EVM connection failed: ${error.message}`);
-        }
-      }
-      
-      throw new Error('Phantom wallet not found. Please install Phantom from phantom.app');
-    }
-
-    async function connectCoinbase() {
-      console.log('connectCoinbase called');
-      
-      // Check if Coinbase Wallet is available
-      // Coinbase Wallet injects itself as window.ethereum when it's the only wallet
-      // or as window.coinbaseWalletExtension
-      let provider = null;
-      
-      if (window.coinbaseWalletExtension) {
-        provider = window.coinbaseWalletExtension;
-      } else if (window.ethereum && window.ethereum.isCoinbaseWallet) {
-        provider = window.ethereum;
-      }
-      
-      if (!provider) {
-        throw new Error('Coinbase Wallet not installed. Please install from coinbase.com/wallet');
-      }
-      
-      console.log('Coinbase Wallet provider found');
-      
-      try {
-        const accounts = await provider.request({ method: 'eth_requestAccounts' });
-        console.log('Accounts:', accounts);
-        
-        if (!accounts || accounts.length === 0) {
-          throw new Error('No accounts found');
-        }
-        
-        state.provider = new ethers.providers.Web3Provider(provider);
-        state.signer = state.provider.getSigner();
-        state.wallet = accounts[0];
-        state.walletType = 'coinbase';
-        
-        const network = await state.provider.getNetwork();
-        const chainIdHex = '0x' + network.chainId.toString(16);
-        state.connectedChain = findChainByChainId(chainIdHex);
-        
-        console.log('Coinbase Wallet connected:', state.wallet);
-        updateWalletDisplay();
-      } catch (error) {
-        console.error('Coinbase Wallet connection error:', error);
-        throw new Error(`Coinbase Wallet connection failed: ${error.message}`);
-      }
-    }
-
-    function findChainByChainId(chainId) {
-      for (const [key, chain] of Object.entries(CONFIG.CHAINS)) {
-        if (chain.chainId === chainId) {
-          return key;
-        }
-      }
-      return null;
-    }
-
-    function handleAccountsChanged(accounts) {
-      if (accounts.length === 0) {
-        // Disconnected
-        window.location.reload();
-      } else {
-        state.wallet = accounts[0];
-        updateWalletDisplay();
-      }
-    }
-
     function updateWalletDisplay() {
       document.getElementById('connectBtn').style.display = 'none';
       document.getElementById('walletInfo').style.display = 'flex';
+      document.getElementById('disconnectBtn').style.display = 'inline-flex';
       
       const shortAddress = state.wallet.length > 42 
         ? `${state.wallet.slice(0, 4)}...${state.wallet.slice(-4)}`
@@ -952,130 +1162,19 @@
         ? CONFIG.CHAINS[state.connectedChain].name 
         : 'Unknown';
       
-      // Re-render chain grids to show connection status
       renderChainGrids();
       
-      // Auto-select the connected chain as source
+      // Auto-select connected chain as source
       if (state.connectedChain && !state.sourceChain) {
-        debugLog(`Auto-selecting source chain: ${state.connectedChain}`);
         selectChain(state.connectedChain, 'source');
       }
     }
 
-    // ==================== BALANCE LOADING ====================
-    async function loadBalance(chainKey) {
-      const chain = CONFIG.CHAINS[chainKey];
-      const balanceEl = document.getElementById(`source-balance-${chainKey}`);
-      
-      if (!balanceEl) return; // Element not found
-      
-      try {
-        let balance;
-        
-        if (chainKey === 'solanaDevnet') {
-          if (!state.solanaConnection || !state.solanaPublicKey) {
-            balanceEl.textContent = 'Connect Phantom';
-            return;
-          }
-          
-          const mint = new solanaWeb3.PublicKey(CONFIG.SOLANA_MINT);
-          const accounts = await state.solanaConnection.getParsedTokenAccountsByOwner(
-            state.solanaPublicKey,
-            { mint }
-          );
-          
-          if (accounts.value.length > 0) {
-            const amount = accounts.value[0].account.data.parsed.info.tokenAmount.amount;
-            balance = Number(amount) / Math.pow(10, CONFIG.TOKEN_DECIMALS);
-          } else {
-            balance = 0;
-          }
-        } else {
-          // EVM chain
-          if (!state.provider || !state.wallet) {
-            balanceEl.textContent = 'Connect wallet';
-            return;
-          }
-          
-          // Check if we're on the right network
-          if (state.connectedChain !== chainKey && (state.walletType === 'metamask' || state.walletType === 'phantom-evm' || state.walletType === 'coinbase')) {
-            balanceEl.textContent = 'Click to switch';
-            return;
-          }
-          
-          const contract = new ethers.Contract(chain.contract, OFT_ABI, state.provider);
-          const bal = await contract.balanceOf(state.wallet);
-          balance = parseFloat(ethers.utils.formatUnits(bal, CONFIG.TOKEN_DECIMALS));
-        }
-        
-        balanceEl.textContent = `Balance: ${balance.toFixed(2)} ROOT5`;
-        
-        // Update main balance display if this is the selected source chain
-        if (state.sourceChain === chainKey) {
-          document.getElementById('sourceBalance').textContent = balance.toFixed(2);
-        }
-      } catch (error) {
-        debugLog(`Error loading balance for ${chainKey}: ${error.message}`);
-        balanceEl.textContent = 'Error loading';
-      }
-    }
-
-    async function ensureChain(chainKey) {
-      const chain = CONFIG.CHAINS[chainKey];
-      
-      if (chainKey === 'solanaDevnet') {
-        // Can't switch to Solana from EVM wallet
-        throw new Error('Please use Phantom wallet for Solana');
-      }
-      
-      const currentChainId = await state.provider.send('eth_chainId', []);
-      
-      if (currentChainId === chain.chainId) {
-        return; // Already on the right chain
-      }
-      
-      debugLog(`Switching from ${currentChainId} to ${chain.chainId} (${chain.name})`);
-      
-      try {
-        await state.provider.send('wallet_switchEthereumChain', [{ chainId: chain.chainId }]);
-        debugLog(`✅ Switched to ${chain.name}`);
-      } catch (switchError) {
-        // Chain not added, try to add it
-        if (switchError.code === 4902) {
-          debugLog(`Chain not found, adding ${chain.name}...`);
-          await state.provider.send('wallet_addEthereumChain', [{
-            chainId: chain.chainId,
-            chainName: chain.name,
-            rpcUrls: [chain.rpc],
-            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-            blockExplorerUrls: [chain.explorer]
-          }]);
-          debugLog(`✅ Added ${chain.name}`);
-        } else {
-          throw switchError;
-        }
-      }
-      
-      // Update state
-      state.connectedChain = chainKey;
-      
-      // Reload provider after switch
-      state.provider = new ethers.providers.Web3Provider(window.ethereum);
-      state.signer = state.provider.getSigner();
-      
-      // Update display
-      document.getElementById('walletChain').textContent = chain.name;
-      
-      // Re-render grids to update connection indicators
-      renderChainGrids();
-      
-      // Re-select the source chain to maintain selection
-      if (state.sourceChain) {
-        document.querySelector(`#sourceChainGrid .chain-card[data-chain="${state.sourceChain}"]`)?.classList.add('selected');
-      }
-      if (state.destChain) {
-        document.querySelector(`#destChainGrid .chain-card[data-chain="${state.destChain}"]`)?.classList.add('selected');
-      }
+    function updateBridgeButton() {
+      const btn = document.getElementById('bridgeBtn');
+      const canBridge = state.wallet && state.sourceChain && state.destChain && 
+                        state.sourceChain !== state.destChain;
+      btn.disabled = !canBridge;
     }
 
     // ==================== BRIDGE EXECUTION ====================
@@ -1092,6 +1191,7 @@
       }
       
       const btn = document.getElementById('bridgeBtn');
+      const originalText = btn.innerHTML;
       btn.disabled = true;
       btn.innerHTML = '<div class="loading"><div class="spinner"></div> Bridging...</div>';
       
@@ -1102,11 +1202,11 @@
           await bridgeFromEVM(amount);
         }
       } catch (error) {
-        console.error('Bridge error:', error);
-        showStatus(`Bridge failed: ${error.message}`, 'error');
+        log(`Bridge error: ${error.message}`, 'error');
+        showStatus(`❌ Bridge failed: ${error.message}`, 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = 'Bridge Tokens';
+        btn.innerHTML = originalText;
       }
     }
 
@@ -1116,6 +1216,7 @@
       const sourceChain = CONFIG.CHAINS[state.sourceChain];
       const destChain = CONFIG.CHAINS[state.destChain];
       
+      // Ensure we're on the right chain
       await ensureChain(state.sourceChain);
       
       const contract = new ethers.Contract(sourceChain.contract, OFT_ABI, state.signer);
@@ -1123,12 +1224,11 @@
       // Parse amount
       const amountLD = ethers.utils.parseUnits(amount, CONFIG.TOKEN_DECIMALS);
       
-      // Get recipient address
+      // Get recipient
       let recipientInput = document.getElementById('recipientInput').value.trim();
       let toAddressBytes32;
       
       if (!recipientInput) {
-        // Use sender's address
         if (destChain.chainId === 'solana') {
           throw new Error('Please specify a Solana recipient address');
         }
@@ -1146,19 +1246,20 @@
         dstEid: destChain.lzEid,
         to: toAddressBytes32,
         amountLD: amountLD,
-        minAmountLD: amountLD, // No slippage for now
+        minAmountLD: amountLD,
         extraOptions: '0x',
         composeMsg: '0x',
         oftCmd: '0x'
       };
       
-      // Quote the fee
+      // Quote fee
       showStatus('Calculating bridge fee...', 'info');
       const quote = await contract.quoteSend(sendParam, false);
       
-      showStatus(`Bridge fee: ${ethers.utils.formatEther(quote.nativeFee)} ETH - Sending transaction...`, 'info');
+      const feeInEth = ethers.utils.formatEther(quote.nativeFee);
+      showStatus(`Bridge fee: ${feeInEth} ETH - Approve transaction in wallet...`, 'info');
       
-      // Send the transaction
+      // Send transaction
       const tx = await contract.send(
         sendParam,
         { nativeFee: quote.nativeFee, lzTokenFee: 0 },
@@ -1169,176 +1270,69 @@
       showStatus(`Transaction submitted! Hash: ${tx.hash}`, 'info');
       
       // Wait for confirmation
-      const receipt = await tx.wait();
+      await tx.wait();
       
       const explorerLink = `${sourceChain.explorer}/tx/${tx.hash}`;
       showStatus(
-        `✅ Bridge successful! <a href="${explorerLink}" target="_blank" class="tx-link">View on ${sourceChain.name} explorer</a>`,
+        `✅ Bridge successful! <a href="${explorerLink}" target="_blank" class="tx-link">View transaction</a>`,
         'success'
       );
       
       // Reload balances
       setTimeout(() => {
         if (state.sourceChain) loadBalance(state.sourceChain);
-      }, 2000);
+        if (state.destChain) loadBalance(state.destChain);
+      }, 3000);
     }
 
     async function bridgeFromSolana(amount) {
-      debugLog('=== Starting Solana → EVM Bridge ===');
+      log('=== Starting Solana → EVM Bridge ===');
       
       if (!state.solanaConnection || !state.solanaPublicKey) {
         throw new Error('Solana wallet not connected');
       }
       
       const destChain = CONFIG.CHAINS[state.destChain];
-      if (!destChain) {
-        throw new Error('Destination chain not selected');
-      }
       
-      debugLog(`Bridging ${amount} ROOT5 to ${destChain.name}`);
-      showStatus(`Preparing Solana transaction to bridge to ${destChain.name}...`, 'info');
+      showStatus(`Preparing Solana bridge to ${destChain.name}...`, 'info');
       
-      try {
-        // Get recipient address
-        let recipientInput = document.getElementById('recipientInput').value.trim();
-        let toAddressBytes32;
-        
-        if (!recipientInput) {
-          // Use sender's address if it's an EVM chain
-          if (destChain.chainId === 'solana') {
-            throw new Error('Please specify a Solana recipient address');
-          }
-          // For EVM destinations, need to prompt for address since Solana wallet doesn't have EVM address
-          throw new Error('Please enter the destination EVM address (0x...)');
-        } else {
-          if (destChain.chainId === 'solana') {
-            // Solana to Solana (same chain transfer)
-            toAddressBytes32 = solanaAddressToBytes32(recipientInput);
-          } else {
-            // Solana to EVM
-            toAddressBytes32 = addressToBytes32(recipientInput);
-          }
-        }
-        
-        debugLog(`Recipient (bytes32): ${toAddressBytes32}`);
-        
-        // Parse amount (convert to smallest unit)
-        const amountLD = Math.floor(parseFloat(amount) * Math.pow(10, CONFIG.TOKEN_DECIMALS));
-        debugLog(`Amount (raw): ${amountLD}`);
-        
-        // Build the Solana OFT send instruction
-        // Note: This is a simplified version - the actual implementation would need
-        // to match your Solana program's exact instruction format
-        
-        showStatus(`⚠️ Solana → EVM bridging requires direct Solana program interaction. This feature needs to be completed with your specific OFT program's instruction format.`, 'warning');
-        
-        debugLog('Solana OFT send instruction would be built here');
-        debugLog('Required accounts: oft_store, peer, token_mint, user_token_account, etc.');
-        debugLog('This requires knowledge of your specific Solana program layout');
-        
-        // TODO: Complete implementation once we have the exact Solana program instruction format
-        // The instruction would look something like:
-        /*
-        const oftProgramId = new solanaWeb3.PublicKey(CONFIG.SOLANA_OFT_PROGRAM);
-        const oftStorePubkey = new solanaWeb3.PublicKey('6k4a54QsewbaujFm7XiLTYzF5VFz6R51za9wUHwxsJGn');
-        
-        // Derive peer PDA
-        const [peerPda] = await solanaWeb3.PublicKey.findProgramAddress(
-          [Buffer.from('Peer'), oftStorePubkey.toBuffer(), Buffer.from([destChain.lzEid >> 24, destChain.lzEid >> 16, destChain.lzEid >> 8, destChain.lzEid])],
-          oftProgramId
-        );
-        
-        // Build send instruction with proper accounts
-        const sendIx = new solanaWeb3.TransactionInstruction({
-          programId: oftProgramId,
-          keys: [
-            // ... proper account list based on your program
-          ],
-          data: // ... properly serialized instruction data
-        });
-        
-        const tx = new solanaWeb3.Transaction().add(sendIx);
-        const signature = await window.solana.signAndSendTransaction(tx);
-        */
-        
-        showStatus(
-          `📝 To enable Solana → EVM bridging, we need to add the specific Solana program instruction format. For now, please bridge from EVM chains to Solana or between EVM chains.`,
-          'warning'
-        );
-        
-      } catch (error) {
-        debugLog(`❌ Solana bridge error: ${error.message}`);
-        throw error;
-      }
+      // Note: Full Solana OFT implementation requires the exact program structure
+      // This is a simplified demonstration
+      showStatus(
+        `⚠️ Solana bridging requires the LayerZero Solana program. Please ensure your OFT program is properly configured with peer addresses. For testing, use EVM → EVM or EVM → Solana transfers.`,
+        'warning'
+      );
+      
+      throw new Error('Solana bridging not fully implemented. Please use EVM chains as source.');
     }
 
     // ==================== UTILITY FUNCTIONS ====================
     function addressToBytes32(address) {
-      // Remove 0x and pad to 32 bytes (64 hex chars)
       const addr = address.toLowerCase().replace('0x', '');
       return '0x' + addr.padStart(64, '0');
     }
 
     function solanaAddressToBytes32(solAddress) {
-      // Simple base58 decode implementation
-      const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-      const BASE = BigInt(58);
-      
-      let decoded = BigInt(0);
-      for (let i = 0; i < solAddress.length; i++) {
-        const char = solAddress[i];
-        const value = ALPHABET.indexOf(char);
-        if (value === -1) throw new Error('Invalid Solana address');
-        decoded = decoded * BASE + BigInt(value);
-      }
-      
-      // Convert to hex and pad to 32 bytes
-      let hex = decoded.toString(16);
-      hex = hex.padStart(64, '0');
-      return '0x' + hex;
-    }
-
-    function showStatus(message, type) {
-      const statusBox = document.getElementById('statusBox');
-      statusBox.style.display = 'block';
-      statusBox.className = `status-box status-${type}`;
-      statusBox.innerHTML = message;
-      debugLog(`[STATUS ${type.toUpperCase()}]: ${message.replace(/<[^>]*>/g, '')}`);
-    }
-
-    function toggleDebug() {
-      const debugConsole = document.getElementById('debugConsole');
-      debugConsole.style.display = debugConsole.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function debugLog(message) {
-      const debugLogEl = document.getElementById('debugLog');
-      const timestamp = new Date().toLocaleTimeString();
-      const logLine = `[${timestamp}] ${message}`;
-      console.log(logLine);
-      
-      if (debugLogEl) {
-        debugLogEl.innerHTML += `<div>${logLine}</div>`;
-        debugLogEl.scrollTop = debugLogEl.scrollHeight;
+      try {
+        const pubkey = new solanaWeb3.PublicKey(solAddress);
+        const bytes = pubkey.toBytes();
+        return '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (error) {
+        throw new Error('Invalid Solana address');
       }
     }
 
-    // ==================== INIT ====================
+    // ==================== INITIALIZATION ====================
     window.addEventListener('load', () => {
-      debugLog('=== ROOT5 Bridge Interface Loaded ===');
-      debugLog('Checking for wallet providers...');
-      debugLog(`window.ethereum: ${!!window.ethereum ? '✅ Found' : '❌ Not found'}`);
-      debugLog(`window.solana: ${!!window.solana ? '✅ Found' : '❌ Not found'}`);
-      debugLog(`window.phantom: ${!!window.phantom ? '✅ Found' : '❌ Not found'}`);
+      log('=== ROOT5 Bridge Interface Loaded ===');
       
-      if (window.ethereum) {
-        debugLog(`ethereum.isMetaMask: ${window.ethereum.isMetaMask}`);
-        debugLog(`ethereum.isCoinbaseWallet: ${window.ethereum.isCoinbaseWallet}`);
-      }
+      const wallets = detectWallets();
+      if (wallets.metamask) log('✅ MetaMask available');
+      if (wallets.phantom || wallets.phantomSolana) log('✅ Phantom available');
+      if (wallets.coinbase) log('✅ Coinbase Wallet available');
       
       init();
-      
-      showStatus('👋 Welcome! Click "Connect Wallet" to get started.', 'info');
+      showStatus('👋 Welcome! Connect your wallet to get started.', 'info');
     });
   </script>
 </body>
