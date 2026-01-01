@@ -632,16 +632,16 @@
                         
                         <!-- AI ENHANCEMENT -->
                         <div style="margin-top: 32px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <h4 style="color: var(--primary); margin-bottom: 16px; font-size: 1.2rem;">🤖 AI Personalization</h4>
-                            <p style="font-size: 0.9rem; color: #999; margin-bottom: 16px;">Describe what you want to add or change</p>
+                            <h4 style="color: var(--primary); margin-bottom: 16px; font-size: 1.2rem;">🤖 AI Personalization (Beta)</h4>
+                            <p style="font-size: 0.9rem; color: #999; margin-bottom: 16px;">Describe what you want to add or change to your character</p>
                             
-                            <textarea id="ai-prompt" placeholder="Example: Add sunglasses and a cool hat, make it more vibrant, add neon glow effects..." 
-                                style="width: 100%; min-height: 80px; padding: 12px; border-radius: 8px; border: 2px solid rgba(138, 43, 226, 0.3); background: rgba(0,0,0,0.3); color: #f8f8f8; font-size: 0.95rem; resize: vertical; font-family: inherit;"></textarea>
+                            <textarea id="ai-prompt" placeholder="Examples:&#10;• Add cool sunglasses and a snapback hat&#10;• Make the background more vibrant with neon colors&#10;• Add a gold chain necklace&#10;• Give them a stylish jacket" 
+                                style="width: 100%; min-height: 100px; padding: 12px; border-radius: 8px; border: 2px solid rgba(138, 43, 226, 0.3); background: rgba(0,0,0,0.3); color: #f8f8f8; font-size: 0.95rem; resize: vertical; font-family: inherit; line-height: 1.5;"></textarea>
                             
                             <select id="ai-style" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid rgba(138, 43, 226, 0.3); background: rgba(0,0,0,0.3); color: #f8f8f8; font-size: 0.95rem; margin-top: 12px; cursor: pointer;">
                                 <option value="Photo-to-Anime">Anime Style</option>
                                 <option value="Light-Restoration">Enhance Lighting</option>
-                                <option value="Upscale2K">Upscale Quality</option>
+                                <option value="Upscale2K">Upscale Quality 2K</option>
                                 <option value="Edit-Skin">Enhance Colors</option>
                                 <option value="Relight">Dramatic Lighting</option>
                             </select>
@@ -650,7 +650,11 @@
                                 <i class="fas fa-magic"></i> <span id="enhance-text">Enhance with AI</span>
                             </button>
                             
-                            <p style="font-size: 0.85rem; color: #888; margin-top: 12px;">✨ Powered by Hugging Face Qwen</p>
+                            <p style="font-size: 0.8rem; color: #888; margin-top: 12px; line-height: 1.4;">
+                                ✨ Powered by Hugging Face Qwen<br>
+                                💡 Tip: Be specific in your prompt for best results<br>
+                                ⏱️ Processing takes 10-30 seconds
+                            </p>
                         </div>
                     </div>
                     
@@ -860,55 +864,45 @@
             enhanceText.textContent = 'Enhancing... (this may take 10-30 seconds)';
             
             try {
-                // Convert canvas to blob
-                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                // Convert canvas to base64
+                const base64Image = canvas.toDataURL('image/png');
                 
-                // Create form data
-                const formData = new FormData();
-                formData.append('data', blob, 'character.png');
-                
-                // Upload to Hugging Face Space
-                const uploadResponse = await fetch('https://prithivmlmods-qwen-image-edit-2509-loras-fast.hf.space/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (!uploadResponse.ok) {
-                    throw new Error('Failed to upload image');
-                }
-                
-                const uploadData = await uploadResponse.json();
-                const imageUrl = uploadData[0]; // Get uploaded file URL
-                
-                // Call the prediction API
-                const predictResponse = await fetch('https://prithivmlmods-qwen-image-edit-2509-loras-fast.hf.space/api/predict', {
+                // Call Gradio API with base64 image
+                const response = await fetch('https://prithivmlmods-qwen-image-edit-2509-loras-fast.hf.space/api/predict', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         data: [
-                            imageUrl,      // input_image
+                            base64Image,   // input_image as base64
                             prompt,        // prompt
                             style,         // lora_adapter
                             1,             // guidance_scale
                             4,             // steps
-                            0,             // seed
+                            Math.floor(Math.random() * 999999), // random seed
                             true           // randomize_seed
                         ]
                     })
                 });
                 
-                if (!predictResponse.ok) {
-                    throw new Error('API request failed: ' + predictResponse.statusText);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error('API error: ' + (errorText || response.statusText));
                 }
                 
-                const result = await predictResponse.json();
-                const enhancedImageUrl = result.data[0]; // Get enhanced image URL
+                const result = await response.json();
+                
+                // Get the enhanced image from response
+                // Gradio returns base64 or URL - handle both
+                let enhancedImageData = result.data[0];
+                
+                if (!enhancedImageData) {
+                    throw new Error('No image returned from API');
+                }
                 
                 // Load enhanced image onto canvas
                 const enhancedImg = new Image();
-                enhancedImg.crossOrigin = 'anonymous';
                 enhancedImg.onload = () => {
                     ctx.clearRect(0, 0, 400, 400);
                     ctx.drawImage(enhancedImg, 0, 0, 400, 400);
@@ -920,11 +914,22 @@
                 enhancedImg.onerror = () => {
                     throw new Error('Failed to load enhanced image');
                 };
-                enhancedImg.src = enhancedImageUrl;
+                
+                // Handle both base64 and URL formats
+                if (enhancedImageData.startsWith('data:')) {
+                    enhancedImg.src = enhancedImageData;
+                } else if (enhancedImageData.startsWith('http')) {
+                    enhancedImg.crossOrigin = 'anonymous';
+                    enhancedImg.src = enhancedImageData;
+                } else {
+                    // Assume it's a relative path from Gradio
+                    enhancedImg.crossOrigin = 'anonymous';
+                    enhancedImg.src = 'https://prithivmlmods-qwen-image-edit-2509-loras-fast.hf.space/file=' + enhancedImageData;
+                }
                 
             } catch (error) {
                 console.error('Enhancement error:', error);
-                alert('⚠️ Enhancement failed: ' + error.message + '\n\nPlease try again or use a different prompt.');
+                alert('⚠️ Enhancement failed: ' + error.message + '\n\nThe AI service might be busy. Please try again in a moment, or try a simpler prompt.');
                 enhanceBtn.disabled = false;
                 enhanceText.textContent = 'Enhance with AI';
             }
