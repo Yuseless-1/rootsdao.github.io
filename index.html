@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ROOT 5 DAO - Community Driven Project</title>
-    <link rel="icon" type="image/png" <img src="/layers/logo.jpg">
+    <link rel="icon" type="image/png" href="/layers/logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -106,16 +106,6 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         
-        .glass-effect-strong {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(30px) saturate(200%);
-            -webkit-backdrop-filter: blur(30px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 
-                0 8px 32px 0 rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-        }
-        
         /* Header Styles */
         header {
             padding: 20px 0;
@@ -148,6 +138,7 @@
             font-weight: bold;
             color: var(--light);
             transition: all 0.3s ease;
+            text-decoration: none;
         }
         
         .logo:hover {
@@ -223,7 +214,7 @@
             box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5);
         }
         
-        /* Hero Section - NEW DESIGN */
+        /* Hero Section */
         .hero {
             padding: 160px 0 100px;
             position: relative;
@@ -263,17 +254,6 @@
             }
         }
         
-        @keyframes fade-in-down {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
         @keyframes fade-in-up {
             from {
                 opacity: 0;
@@ -285,15 +265,16 @@
             }
         }
         
+        /* Updated Hero Title - matches theme better */
         .hero-title {
             font-size: 4.5rem;
             font-weight: 900;
             line-height: 1.1;
             margin-bottom: 32px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, var(--primary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--primary);
+            text-shadow: 
+                0 0 30px rgba(34, 197, 94, 0.5),
+                0 0 60px rgba(34, 197, 94, 0.3);
         }
         
         .hero-features {
@@ -364,7 +345,6 @@
                 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
         
-        /* Feathered edge effect */
         .hero-image-wrapper::before {
             content: '';
             position: absolute;
@@ -384,7 +364,6 @@
             pointer-events: none;
         }
         
-        /* Soft glow around image */
         .hero-image-wrapper::after {
             content: '';
             position: absolute;
@@ -481,6 +460,172 @@
             -webkit-text-fill-color: transparent;
         }
         
+        /* TOKEN SECTION - NOW RIGHT AFTER HERO */
+        .token-section {
+            padding: 100px 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .token-container {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .token-logo-wrapper {
+            margin-bottom: 40px;
+        }
+        
+        .token-logo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            box-shadow: 
+                0 20px 60px rgba(34, 197, 94, 0.3),
+                0 0 100px rgba(34, 197, 94, 0.2);
+            margin: 0 auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        
+        .token-logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .token-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+        
+        .token-subtitle {
+            font-size: 1.3rem;
+            color: #ccc;
+            margin-bottom: 48px;
+        }
+        
+        .chain-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            margin: 0 6px 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+        
+        .addresses-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+        }
+        
+        .address-item {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        
+        .address-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .address-label {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .address-value {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 16px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            color: #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+        }
+        
+        /* Trade Buttons Section */
+        .trade-section {
+            margin-top: 48px;
+        }
+        
+        .trade-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 24px;
+        }
+        
+        .trade-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        
+        .trade-button {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 24px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            display: inline-block;
+        }
+        
+        .trade-button:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 16px 40px rgba(34, 197, 94, 0.3),
+                0 0 0 1px rgba(34, 197, 94, 0.5);
+        }
+        
+        .trade-button img {
+            display: block;
+            height: 60px;
+            width: auto;
+        }
+        
+        .more-to-come {
+            font-size: 1.1rem;
+            color: #888;
+            font-style: italic;
+            margin-top: 24px;
+        }
+        
         /* Enhanced Steps */
         .steps {
             display: grid;
@@ -566,106 +711,6 @@
         .step p {
             color: #ccc;
             line-height: 1.6;
-        }
-        
-        /* Token Details */
-        .token-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-        
-        .token-image {
-            position: relative;
-        }
-        
-        .token-image::before {
-            content: '';
-            position: absolute;
-            inset: -20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 24px;
-            filter: blur(40px);
-            opacity: 0.3;
-            z-index: -1;
-        }
-        
-        .token-image img {
-            width: 100%;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
-        }
-        
-        .token-image:hover img {
-            transform: scale(1.05);
-        }
-        
-        .token-text h2 {
-            font-size: 3rem;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .token-text p {
-            font-size: 1.15rem;
-            line-height: 1.7;
-            color: #ccc;
-            margin-bottom: 24px;
-        }
-        
-        .contract-address {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 16px;
-            margin: 24px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            word-break: break-all;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .contract-address:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-        
-        .copy-btn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-left: 16px;
-            white-space: nowrap;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-        }
-        
-        .copy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
-        }
-        
-        .trading-buttons {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-top: 24px;
-        }
-        
-        .trading-buttons .cta-button {
-            flex: 1;
-            min-width: 200px;
-            text-align: center;
         }
         
         /* Chart Section */
@@ -915,6 +960,15 @@
             .feature-item {
                 font-size: 1.3rem;
             }
+            
+            .trade-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .trade-button img {
+                height: 50px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -934,22 +988,9 @@
                 grid-template-columns: 1fr;
             }
             
-            .token-details {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            
             .hero-buttons {
                 flex-direction: column;
                 align-items: stretch;
-            }
-            
-            .trading-buttons {
-                flex-direction: column;
-            }
-            
-            .trading-buttons .cta-button {
-                width: 100%;
             }
             
             .social-buttons {
@@ -973,6 +1014,18 @@
             
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .addresses-container {
+                padding: 24px;
+            }
+            
+            .address-value {
+                font-size: 0.75rem;
+            }
+            
+            .trade-button img {
+                height: 40px;
             }
         }
         
@@ -1007,15 +1060,15 @@
     <header id="header">
         <div class="container">
             <div class="header-content">
-                <div class="logo">
-                    <img src="/layers/logo.jpg" alt="ROOT 5 DAO logo">
+                <a href="#home" class="logo">
+                    <img src="/layers/logo.png" alt="ROOT 5 DAO Logo">
                     <span>ROOT 5 DAO</span>
-                </div>
+                </a>
                 <nav>
                     <ul>
                         <li><a href="#home">Home</a></li>
-                        <li><a href="#how-it-works">How It Works</a></li>
                         <li><a href="#token">Token</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
                         <li><a href="#features">Features</a></li>
                         <li><a href="https://www.rootsdao.com/whitepaper">Whitepaper</a></li>
                     </ul>
@@ -1051,8 +1104,8 @@
                         </div>
                     </div>
                     <div class="hero-buttons">
-                        <a href="https://www.rootsdao.com/whitepaper" class="cta-button">Read The Whitepaper</a>
-                        <a href="https://t.me/root5portal" target="_blank" class="secondary-button">Join Community</a>
+                        <a href="https://www.rootsdao.com/whitepaper" class="cta-button">Learn More</a>
+                        <a href="https://t.me/+Thjq7FzYysczYWI5" target="_blank" class="secondary-button">Join Community</a>
                     </div>
                 </div>
                 
@@ -1091,7 +1144,85 @@
         </div>
     </section>
 
-    <!-- How It Works Section -->
+    <!-- TOKEN SECTION - NOW RIGHT AFTER HERO -->
+    <section class="token-section" id="token">
+        <div class="container">
+            <div class="token-container">
+                <div class="token-logo-wrapper">
+                    <img src="/layers/logo.png" alt="ROOT 5 DAO Token" class="token-logo">
+                </div>
+                
+                <h2 class="token-title">ROOT 5 DAO Token</h2>
+                <p class="token-subtitle">Cross-Chain • Omnichain Interoperability</p>
+                
+                <div>
+                    <span class="chain-badge">SPL</span>
+                    <span class="chain-badge">ARB</span>
+                    <span class="chain-badge">BSC</span>
+                    <span class="chain-badge">BASE</span>
+                    <span class="chain-badge">ETH</span>
+                </div>
+                
+                <div class="addresses-container">
+                    <div class="address-item">
+                        <div class="address-label">SPL Token Address</div>
+                        <div class="address-value">
+                            <span>AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump</span>
+                            <button class="copy-btn" onclick="copyAddress('AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump')">Copy</button>
+                        </div>
+                    </div>
+                    
+                    <div class="address-item">
+                        <div class="address-label">BSC OFT Address</div>
+                        <div class="address-value">
+                            <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
+                            <button class="copy-btn" onclick="copyAddress('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
+                        </div>
+                    </div>
+                    
+                    <div class="address-item">
+                        <div class="address-label">ETH OFT Address</div>
+                        <div class="address-value">
+                            <span>0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E</span>
+                            <button class="copy-btn" onclick="copyAddress('0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E')">Copy</button>
+                        </div>
+                    </div>
+                    
+                    <div class="address-item">
+                        <div class="address-label">ARB OFT Address</div>
+                        <div class="address-value">
+                            <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
+                            <button class="copy-btn" onclick="copyAddress('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
+                        </div>
+                    </div>
+                    
+                    <div class="address-item">
+                        <div class="address-label">BASE OFT Address</div>
+                        <div class="address-value">
+                            <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
+                            <button class="copy-btn" onclick="copyAddress('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trade Buttons -->
+                <div class="trade-section">
+                    <h3 class="trade-title">Trade At</h3>
+                    <div class="trade-buttons">
+                        <a href="https://pump.fun/coin/AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump" target="_blank" class="trade-button">
+                            <img src="/layers/pumpfunbutton.png" alt="Trade on Pump.fun">
+                        </a>
+                        <a href="https://dexscreener.com/solana/basucpi8m39rs5chbuosta78bptcrjzy2ad6nj2vww6z" target="_blank" class="trade-button">
+                            <img src="/layers/dexscrennerbutton.png" alt="Trade on DexScreener">
+                        </a>
+                    </div>
+                    <p class="more-to-come">More To Come</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section - MOVED DOWN -->
     <section class="section" id="how-it-works">
         <div class="container">
             <h2 class="section-title">How It Works</h2>
@@ -1121,32 +1252,6 @@
                     </div>
                     <h3>Tokenize & Trade</h3>
                     <p>Winning memes are converted into tradeable Solana tokens on Pump.fun.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Token Info Section -->
-    <section class="section" id="token">
-        <div class="container">
-            <div class="token-details">
-                <div class="token-image">
-                    <img src="https://www.backtotheroots.fun/logo.png" alt="ROOT 5 DAO Token">
-                </div>
-                <div class="token-text">
-                    <h2>ROOT 5 DAO Token</h2>
-                    <p>The official token of ROOT 5 DAO, hosted on the Solana blockchain and traded on Pump.fun. Holders can participate in governance decisions and community initiatives.</p>
-                    
-                    <div class="contract-address">
-                        <span style="font-family: monospace; font-size: 0.9rem;">AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump</span>
-                        <button class="copy-btn" onclick="copyContract()">Copy</button>
-                    </div>
-                    
-                    <div class="trading-buttons">
-                        <a href="https://pump.fun/coin/FmJBuuQ5nhsbAZ5mA41fQn7AtAQvTMFtMMYc5mjBpump" target="_blank" class="cta-button">Trade on Pump.fun</a>
-                        <a href="https://gmgn.ai/sol/token/FmJBuuQ5nhsbAZ5mA41fQn7AtAQvTMFtMMYc5mjBpump" target="_blank" class="cta-button">Trade on GMGN.AI</a>
-                        <a href="https://www.meteora.ag/dammv2/5d6GZsbtJrzyUGx83B26RGzWS5VpNoBLQsH2hew5c1ip?referrer=home" target="_blank" class="cta-button">LP on Meteora</a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1218,18 +1323,18 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="logo">
-                        <img src="https://www.backtotheroots.fun/logo.png" alt="ROOT 5 DAO Logo">
+                    <a href="#home" class="logo">
+                        <img src="/layers/logo.png" alt="ROOT 5 DAO Logo">
                         <span>ROOT 5 DAO</span>
-                    </div>
+                    </a>
                     <p>A community-driven project building the future of decentralized collaboration on Solana.</p>
                 </div>
                 <div class="footer-column">
                     <h4>Navigation</h4>
                     <div class="footer-links">
                         <a href="#home">Home</a>
-                        <a href="#how-it-works">How It Works</a>
                         <a href="#token">Token</a>
+                        <a href="#how-it-works">How It Works</a>
                         <a href="#features">Features</a>
                     </div>
                 </div>
@@ -1256,11 +1361,10 @@
     </footer>
 
     <script>
-        // Copy contract address
-        function copyContract() {
-            const contractAddress = "AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump";
-            navigator.clipboard.writeText(contractAddress).then(() => {
-                alert("Contract address copied to clipboard!");
+        // Copy address function
+        function copyAddress(address) {
+            navigator.clipboard.writeText(address).then(() => {
+                alert("Address copied to clipboard!");
             });
         }
         
