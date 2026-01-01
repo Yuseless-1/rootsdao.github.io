@@ -1,21 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROOT 5 DAO</title>
-    <link rel="icon" href="/layers/logo.jpg">
+    <title>ROOT 5 DAO - Community Driven Project</title>
+    <link rel="icon" type="image/jpeg" href="/layers/logo.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        :root {
+            --primary: #22c55e;
+            --primary-light: #4ade80;
+            --primary-dark: #16a34a;
+            --secondary: #8a2be2;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
         body {
             background: #0a0a0a;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(34, 197, 94, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
             color: #f8f8f8;
             overflow-x: hidden;
         }
         
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        /* Background Orbs */
+        .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 8s ease-in-out infinite;
+        }
+        .orb-1 { top: 10%; left: 10%; width: 300px; height: 300px; background: rgba(139, 92, 246, 0.3); }
+        .orb-2 { bottom: 10%; right: 10%; width: 400px; height: 400px; background: rgba(34, 197, 94, 0.3); animation-delay: 2s; }
+        .orb-3 { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 500px; background: rgba(59, 130, 246, 0.2); animation-delay: 4s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-10px) translateX(-10px); }
+            75% { transform: translateY(-30px) translateX(5px); }
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
         
         /* Header */
         header {
@@ -24,72 +57,102 @@
             width: 100%;
             top: 0;
             z-index: 1000;
-            background: rgba(10, 10, 10, 0.95);
+            background: rgba(10, 10, 10, 0.8);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
-        
+        header.scrolled { background: rgba(10, 10, 10, 0.95); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); }
         .header-content { display: flex; justify-content: space-between; align-items: center; }
-        
         .logo { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: bold; color: #f8f8f8; text-decoration: none; }
         .logo img { height: 40px; }
-        
         nav ul { display: flex; list-style: none; gap: 8px; }
-        nav a { color: #f8f8f8; text-decoration: none; font-weight: 600; padding: 10px 20px; border-radius: 12px; }
-        nav a:hover { color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+        nav a { color: #f8f8f8; text-decoration: none; font-weight: 600; padding: 10px 20px; border-radius: 12px; transition: all 0.3s; }
+        nav a:hover { color: var(--primary); background: rgba(34, 197, 94, 0.1); }
         
         .cta-button {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: #000;
             padding: 12px 28px;
             border-radius: 12px;
             font-weight: bold;
             text-decoration: none;
             display: inline-block;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+        }
+        .cta-button:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5); }
+        
+        section { padding: 80px 0; position: relative; }
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
-        /* Sections */
-        section { padding: 100px 0; }
-        .section-title { text-align: center; font-size: 3rem; margin-bottom: 60px; background: linear-gradient(135deg, #22c55e, #8a2be2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
         /* Hero */
-        .hero { padding-top: 160px; }
+        .hero { padding: 160px 0 80px; }
         .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .hero-title { font-size: 4rem; color: #22c55e; margin-bottom: 24px; }
-        .feature-item { font-size: 1.3rem; margin: 12px 0; display: flex; align-items: center; gap: 12px; }
-        .feature-item i { color: #22c55e; }
+        .hero-title { font-size: 4.5rem; font-weight: 900; color: var(--primary); margin-bottom: 32px; }
+        .feature-item { font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+        .feature-item i { color: var(--primary); }
+        .hero-buttons { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 32px; }
+        .secondary-button {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8f8f8;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        .secondary-button:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-3px); }
         
         /* Token */
         .token-section { background: rgba(0, 0, 0, 0.3); }
         .token-grid { display: grid; grid-template-columns: 300px 1fr; gap: 60px; max-width: 1000px; margin: 0 auto; align-items: center; }
-        .token-logo { width: 250px; height: 250px; border-radius: 50%; }
+        .token-logo { width: 250px; height: 250px; border-radius: 50%; box-shadow: 0 20px 60px rgba(34, 197, 94, 0.3); }
+        .token-title { font-size: 2.5rem; font-weight: 900; color: var(--primary); margin-bottom: 8px; }
+        .chain-badges { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+        .chain-badge { padding: 6px 12px; background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 16px; font-weight: 600; font-size: 0.85rem; color: var(--primary); }
         .address-row { margin: 12px 0; }
-        .address-label { font-weight: 700; color: #22c55e; }
+        .address-label { font-weight: 700; color: var(--primary); font-size: 0.9rem; }
         .address-value {
             background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
+            padding: 10px 12px;
             border-radius: 8px;
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
             font-size: 0.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 8px;
+            margin-top: 4px;
         }
         .copy-btn {
-            background: #22c55e;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: #000;
             border: none;
             padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.75rem;
+            transition: all 0.3s;
         }
+        .copy-btn:hover { transform: translateY(-2px); }
         
         /* Platforms */
         .platforms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; max-width: 1000px; margin: 0 auto; }
         .platform-link {
             background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             padding: 24px;
@@ -98,11 +161,13 @@
             justify-content: center;
             min-height: 100px;
             transition: all 0.3s;
+            text-decoration: none;
         }
-        .platform-link:hover { border-color: #22c55e; transform: translateY(-4px); }
+        .platform-link:hover { border-color: var(--primary); transform: translateY(-8px); box-shadow: 0 12px 40px rgba(34, 197, 94, 0.2); }
         .platform-link img { max-height: 50px; object-fit: contain; }
         
         /* Merch */
+        .merch-section { background: rgba(0, 0, 0, 0.3); }
         .merch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 32px; max-width: 1100px; margin: 0 auto 48px; }
         .merch-item {
             background: rgba(255, 255, 255, 0.05);
@@ -111,21 +176,59 @@
             overflow: hidden;
             transition: all 0.4s;
         }
-        .merch-item:hover { transform: translateY(-12px); border-color: #22c55e; }
+        .merch-item:hover { transform: translateY(-12px) scale(1.03); border-color: var(--primary); box-shadow: 0 16px 48px rgba(34, 197, 94, 0.3); }
         .merch-image { width: 100%; height: 300px; object-fit: cover; }
         
         /* Features */
         .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 32px; }
         .feature {
             background: rgba(255, 255, 255, 0.05);
-            padding: 40px;
+            backdrop-filter: blur(20px);
+            padding: 40px 32px;
             border-radius: 24px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s;
         }
-        .feature i { font-size: 3rem; color: #22c55e; margin-bottom: 20px; }
+        .feature:hover { transform: translateY(-12px); border-color: var(--primary); box-shadow: 0 12px 40px rgba(34, 197, 94, 0.2); }
+        .feature i {
+            font-size: 3.5rem;
+            color: var(--primary);
+            background: rgba(34, 197, 94, 0.2);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            border-radius: 16px;
+        }
+        .feature h3 { font-size: 1.5rem; margin-bottom: 16px; }
         
-        /* PFP GENERATOR */
+        /* CTA */
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .cta-section h2 { font-size: 3.5rem; margin-bottom: 24px; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .social-buttons { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 48px; }
+        .social-button {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+        }
+        .social-button:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5); }
+        
+        /* PFP Generator */
         .generator-section { background: rgba(0, 0, 0, 0.3); }
         .generator-content {
             background: rgba(255, 255, 255, 0.05);
@@ -136,7 +239,6 @@
             margin: 0 auto;
         }
         .generator-layout { display: grid; grid-template-columns: 400px 1fr; gap: 48px; }
-        
         .preview-canvas {
             width: 100%;
             height: 400px;
@@ -145,7 +247,6 @@
             border: 2px solid rgba(34, 197, 94, 0.3);
             margin-bottom: 24px;
         }
-        
         .generator-buttons { display: flex; flex-direction: column; gap: 12px; }
         .randomize-btn, .download-btn {
             padding: 16px 32px;
@@ -158,9 +259,12 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            transition: all 0.3s;
         }
-        .randomize-btn { background: #22c55e; color: #000; }
-        .download-btn { background: rgba(255, 255, 255, 0.1); color: #22c55e; border: 2px solid #22c55e; }
+        .randomize-btn { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #000; box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3); }
+        .randomize-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5); }
+        .download-btn { background: rgba(255, 255, 255, 0.1); color: var(--primary); border: 2px solid var(--primary); }
+        .download-btn:hover { background: rgba(34, 197, 94, 0.2); transform: translateY(-3px); }
         
         .layer-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
         .layer-tab {
@@ -171,12 +275,13 @@
             border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
         }
-        .layer-tab.active { background: #22c55e; color: #000; }
+        .layer-tab:hover { background: rgba(255, 255, 255, 0.1); color: #f8f8f8; }
+        .layer-tab.active { background: var(--primary); color: #000; border-color: var(--primary); }
         
         .layer-options { display: none; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 16px; }
         .layer-options.active { display: grid; }
-        
         .layer-option {
             background: rgba(255, 255, 255, 0.05);
             border: 3px solid rgba(255, 255, 255, 0.1);
@@ -184,27 +289,52 @@
             padding: 8px;
             cursor: pointer;
             text-align: center;
+            transition: all 0.3s;
         }
-        .layer-option.selected { border-color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+        .layer-option:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(34, 197, 94, 0.5); }
+        .layer-option.selected { border-color: var(--primary); background: rgba(34, 197, 94, 0.1); box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
         .layer-option img { width: 100%; height: 80px; object-fit: contain; background: rgba(0, 0, 0, 0.3); border-radius: 8px; margin-bottom: 8px; }
-        .layer-option-name { font-size: 0.85rem; color: #ccc; }
-        
-        .loading { text-align: center; padding: 40px; color: #22c55e; font-size: 1.2rem; }
+        .layer-option-name { font-size: 0.85rem; color: #ccc; font-weight: 600; }
+        .loading { text-align: center; padding: 40px; color: var(--primary); font-size: 1.2rem; }
         
         /* Footer */
         footer { background: rgba(0, 0, 0, 0.5); padding: 80px 0 40px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
         .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+        .footer-links { display: flex; flex-direction: column; gap: 12px; }
+        .footer-links a { color: #888; text-decoration: none; transition: all 0.3s; }
+        .footer-links a:hover { color: var(--primary); transform: translateX(4px); }
         .social-icons { display: flex; gap: 16px; }
-        .social-icons a { width: 40px; height: 40px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #888; }
+        .social-icons a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            transition: all 0.3s;
+        }
+        .social-icons a:hover { background: rgba(34, 197, 94, 0.2); border-color: var(--primary); color: var(--primary); transform: translateY(-4px); }
         
         @media (max-width: 968px) {
             .hero-grid, .token-grid, .generator-layout { grid-template-columns: 1fr; }
+            .hero-title { font-size: 3rem; }
+            .section-title { font-size: 2rem; }
             nav ul { display: none; }
+            .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <header>
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <header id="header">
         <div class="container">
             <div class="header-content">
                 <a href="#" class="logo">
@@ -217,6 +347,7 @@
                         <li><a href="#token">Token</a></li>
                         <li><a href="#merch">Merch</a></li>
                         <li><a href="#features">Features</a></li>
+                        <li><a href="#generator">Generator</a></li>
                     </ul>
                 </nav>
                 <a href="https://www.rootsdao.com/whitepaper" class="cta-button">Whitepaper</a>
@@ -224,7 +355,6 @@
         </div>
     </header>
 
-    <!-- Hero -->
     <section class="hero" id="home">
         <div class="container">
             <div class="hero-grid">
@@ -233,19 +363,31 @@
                     <div class="feature-item"><i class="fas fa-check-circle"></i> Community Driven Project</div>
                     <div class="feature-item"><i class="fas fa-check-circle"></i> The Fifth Root TCG</div>
                     <div class="feature-item"><i class="fas fa-check-circle"></i> Meme Tokenization</div>
+                    <div class="feature-item"><i class="fas fa-check-circle"></i> And More</div>
+                    <div class="hero-buttons">
+                        <a href="https://www.rootsdao.com/whitepaper" class="cta-button">Learn More</a>
+                        <a href="https://t.me/+Thjq7FzYysczYWI5" target="_blank" class="secondary-button">Join Community</a>
+                    </div>
                 </div>
                 <div><img src="/layers/banner_compressed.jpg" alt="Banner" style="width:100%; border-radius:24px;"></div>
             </div>
         </div>
     </section>
 
-    <!-- Token -->
     <section class="token-section" id="token">
         <div class="container">
             <div class="token-grid">
                 <div><img src="/layers/logo.jpg" alt="Token" class="token-logo"></div>
                 <div>
-                    <h2 style="font-size:2.5rem; color:#22c55e;">ROOT 5 DAO Token</h2>
+                    <h2 class="token-title">ROOT 5 DAO Token</h2>
+                    <p style="font-size:1.1rem; color:#ccc; margin-bottom:16px;">Cross-Chain • Omnichain Interoperability</p>
+                    <div class="chain-badges">
+                        <span class="chain-badge">SPL</span>
+                        <span class="chain-badge">ARB</span>
+                        <span class="chain-badge">BSC</span>
+                        <span class="chain-badge">BASE</span>
+                        <span class="chain-badge">ETH</span>
+                    </div>
                     <div class="address-row">
                         <div class="address-label">SPL</div>
                         <div class="address-value">
@@ -260,13 +402,19 @@
                             <button class="copy-btn" onclick="copy('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
                         </div>
                     </div>
+                    <div class="address-row">
+                        <div class="address-label">ETH</div>
+                        <div class="address-value">
+                            <span>0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E</span>
+                            <button class="copy-btn" onclick="copy('0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E')">Copy</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Platforms -->
-    <section id="platforms">
+    <section style="background: rgba(255, 255, 255, 0.02);">
         <div class="container">
             <h2 class="section-title">Find Us On</h2>
             <div class="platforms-grid">
@@ -276,12 +424,17 @@
                 <a href="https://www.rugfreecoins.com/coin-details/32452" target="_blank" class="platform-link">
                     <img src="/layers/rugfree-logo.svg" alt="Rugfree">
                 </a>
+                <a href="https://www.freshcoins.io/coins/root5-dao" target="_blank" class="platform-link">
+                    <img src="/layers/freshcoins-logo.png" alt="Fresh Coins">
+                </a>
+                <a href="https://cointoplist.net/coin/Root5-DAO" target="_blank" class="platform-link">
+                    <img src="/layers/cointoplist-logo.png" alt="Coin Top List">
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- Merch -->
-    <section id="merch">
+    <section class="merch-section" id="merch">
         <div class="container">
             <h2 class="section-title">Get Our Merch</h2>
             <div class="merch-grid">
@@ -290,6 +443,12 @@
                 </div>
                 <div class="merch-item">
                     <img src="https://root5merch.com/wp-content/uploads/2025/12/7802597380585955377_1200.jpeg" class="merch-image">
+                </div>
+                <div class="merch-item">
+                    <img src="https://root5merch.com/wp-content/uploads/2025/12/16175717190975090305_2048.jpeg" class="merch-image">
+                </div>
+                <div class="merch-item">
+                    <img src="https://root5merch.com/wp-content/uploads/2025/12/14417628938725685191_2048.jpeg" class="merch-image">
                 </div>
             </div>
             <div style="text-align:center; margin-top:32px;">
@@ -300,7 +459,6 @@
         </div>
     </section>
 
-    <!-- Features -->
     <section id="features">
         <div class="container">
             <h2 class="section-title">Why ROOT 5 DAO?</h2>
@@ -308,27 +466,47 @@
                 <div class="feature">
                     <i class="fas fa-users"></i>
                     <h3>Community Governance</h3>
-                    <p>Every token holder gets voting rights.</p>
+                    <p>Every token holder gets voting rights to decide the direction of the DAO.</p>
                 </div>
                 <div class="feature">
                     <i class="fas fa-gamepad"></i>
                     <h3>The Fifth Root TCG</h3>
-                    <p>Trading card game built by the community.</p>
+                    <p>An innovative trading card game built by and for the community.</p>
                 </div>
                 <div class="feature">
                     <i class="fas fa-coins"></i>
                     <h3>Meme Tokenization</h3>
-                    <p>Transform memes into assets.</p>
+                    <p>Transform viral memes into tangible assets with real economic value.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- PFP GENERATOR -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Join the Movement?</h2>
+            <p style="font-size:1.2rem; color:#ccc;">Be part of a community-driven project that's building the future together.</p>
+            <div class="social-buttons">
+                <a href="https://x.com/root5daocom" target="_blank" class="social-button">
+                    <i class="fab fa-x-twitter"></i> Follow on X
+                </a>
+                <a href="https://t.me/+Thjq7FzYysczYWI5" target="_blank" class="social-button">
+                    <i class="fab fa-telegram"></i> Join Telegram
+                </a>
+                <a href="https://dexscreener.com/solana/bysqk5wcufsec5gomgwbg6acpsyayihgf4vvt2lp48ex" target="_blank" class="social-button">
+                    <i class="fas fa-chart-line"></i> View on DexScreener
+                </a>
+                <a href="https://www.rootsdao.com/whitepaper" class="social-button">
+                    <i class="fas fa-file-alt"></i> Read Whitepaper
+                </a>
+            </div>
+        </div>
+    </section>
+
     <section class="generator-section" id="generator">
         <div class="container">
             <h2 class="section-title">🎨 PFP Generator</h2>
-            <p style="text-align:center; color:#999; margin-bottom:40px;">Create your unique profile picture by combining different layers</p>
+            <p style="text-align:center; color:#999; margin-bottom:40px; font-size:1.2rem;">Create your unique profile picture by combining different layers</p>
             
             <div class="generator-content">
                 <div id="loading" class="loading">
@@ -337,7 +515,7 @@
                 
                 <div id="generator-ui" class="generator-layout" style="display:none;">
                     <div>
-                        <h3 style="margin-bottom:24px;">Preview</h3>
+                        <h3 style="margin-bottom:24px; font-size:1.5rem;">Preview</h3>
                         <canvas id="canvas" class="preview-canvas" width="400" height="400"></canvas>
                         <div class="generator-buttons">
                             <button class="randomize-btn" onclick="randomize()">
@@ -350,7 +528,7 @@
                     </div>
                     
                     <div>
-                        <h3 style="margin-bottom:16px;">Customize Layers</h3>
+                        <h3 style="margin-bottom:16px; font-size:1.5rem;">Customize Layers</h3>
                         <div class="layer-tabs">
                             <button class="layer-tab active" onclick="switchTab('background')">Background</button>
                             <button class="layer-tab" onclick="switchTab('body')">Body</button>
@@ -369,46 +547,57 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-grid">
                 <div>
-                    <a href="#" class="logo"><img src="/layers/logo.jpg" alt="Logo" style="height:40px;"> ROOT 5 DAO</a>
-                    <p style="color:#888; margin-top:24px;">Community-driven project on Solana.</p>
+                    <a href="#" class="logo" style="margin-bottom:24px; display:inline-flex;">
+                        <img src="/layers/logo.jpg" alt="Logo">
+                        <span>ROOT 5 DAO</span>
+                    </a>
+                    <p style="color:#888; line-height:1.7;">A community-driven project building the future of decentralized collaboration on Solana.</p>
                 </div>
                 <div>
-                    <h4>Navigation</h4>
-                    <a href="#home" style="color:#888; display:block; margin:8px 0;">Home</a>
-                    <a href="#token" style="color:#888; display:block; margin:8px 0;">Token</a>
+                    <h4 style="color:#f8f8f8; margin-bottom:20px;">Navigation</h4>
+                    <div class="footer-links">
+                        <a href="#home">Home</a>
+                        <a href="#token">Token</a>
+                        <a href="#merch">Merch</a>
+                        <a href="#features">Features</a>
+                    </div>
                 </div>
                 <div>
-                    <h4>Resources</h4>
-                    <a href="https://www.rootsdao.com/whitepaper" style="color:#888; display:block; margin:8px 0;">Whitepaper</a>
+                    <h4 style="color:#f8f8f8; margin-bottom:20px;">Resources</h4>
+                    <div class="footer-links">
+                        <a href="https://www.rootsdao.com/whitepaper">Whitepaper</a>
+                        <a href="https://www.root5merch.com">Merch Store</a>
+                    </div>
                 </div>
                 <div>
-                    <h4>Community</h4>
+                    <h4 style="color:#f8f8f8; margin-bottom:20px;">Community</h4>
                     <div class="social-icons">
                         <a href="https://x.com/root5daocom" target="_blank"><i class="fab fa-x-twitter"></i></a>
                         <a href="https://t.me/+Thjq7FzYysczYWI5" target="_blank"><i class="fab fa-telegram"></i></a>
+                        <a href="https://dexscreener.com/solana/bysqk5wcufsec5gomgwbg6acpsyayihgf4vvt2lp48ex" target="_blank"><i class="fas fa-chart-line"></i></a>
                     </div>
                 </div>
             </div>
-            <p style="text-align:center; color:#666; border-top:1px solid rgba(255,255,255,0.1); padding-top:32px;">© 2025 ROOT 5 DAO</p>
+            <p style="text-align:center; color:#666; border-top:1px solid rgba(255,255,255,0.1); padding-top:32px;">© 2025 ROOT 5 DAO. All rights reserved. • Built on Solana • Powered by Community</p>
         </div>
     </footer>
 
     <script>
-        // Copy function
-        function copy(text) {
-            navigator.clipboard.writeText(text);
-            alert('Copied!');
-        }
+        function copy(text) { navigator.clipboard.writeText(text); alert('Copied!'); }
+        
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 20) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        });
 
-        // ===== AUTO-DETECTING PFP GENERATOR =====
+        // AUTO-DETECTING PFP GENERATOR
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        
         const folders = {
             background: '/layers/background/',
             body: '/layers/body/',
@@ -416,24 +605,18 @@
             sunglasses: '/layers/sunglasses/',
             hair: '/layers/hair/'
         };
+        let images = {}, selected = {}, cache = {};
         
-        let images = {};
-        let selected = {};
-        let cache = {};
-        
-        // Detect images by trying sequential names
         async function detect(type, folder) {
             const found = [];
             for (let i = 1; i <= 50; i++) {
                 const path = `${folder}${type}${i}.png`;
-                if (await exists(path)) {
-                    found.push({ id: i, path, name: `${type}${i}` });
-                } else break;
+                if (await exists(path)) found.push({ id: i, path, name: `${type}${i}` });
+                else break;
             }
             return found;
         }
         
-        // Test if image exists
         function exists(url) {
             return new Promise(resolve => {
                 const img = new Image();
@@ -443,13 +626,9 @@
             });
         }
         
-        // Load image
         function load(url) {
             return new Promise(resolve => {
-                if (cache[url]) {
-                    resolve(cache[url]);
-                    return;
-                }
+                if (cache[url]) return resolve(cache[url]);
                 const img = new Image();
                 img.onload = () => { cache[url] = img; resolve(img); };
                 img.onerror = () => resolve(null);
@@ -457,7 +636,6 @@
             });
         }
         
-        // Switch tab
         function switchTab(tab) {
             document.querySelectorAll('.layer-tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
@@ -465,7 +643,6 @@
             document.getElementById(tab + '-options').classList.add('active');
         }
         
-        // Select option
         function select(type, id) {
             selected[type] = id;
             const container = document.getElementById(type + '-options');
@@ -475,11 +652,9 @@
             render();
         }
         
-        // Render canvas
         async function render() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const order = ['background', 'body', 'head', 'sunglasses', 'hair'];
-            for (const type of order) {
+            ctx.clearRect(0, 0, 400, 400);
+            for (const type of ['background', 'body', 'head', 'sunglasses', 'hair']) {
                 if (!selected[type]) continue;
                 const item = images[type].find(i => i.id === selected[type]);
                 if (item) {
@@ -489,7 +664,6 @@
             }
         }
         
-        // Randomize
         function randomize() {
             for (const [type, list] of Object.entries(images)) {
                 if (list.length > 0) {
@@ -499,7 +673,6 @@
             }
         }
         
-        // Download
         function download() {
             const link = document.createElement('a');
             link.download = 'root5-pfp.png';
@@ -507,22 +680,20 @@
             link.click();
         }
         
-        // Initialize
         window.addEventListener('load', async () => {
             for (const [type, folder] of Object.entries(folders)) {
                 images[type] = await detect(type, folder);
                 console.log(`Found ${images[type].length} ${type} images`);
                 
-                // Create options
                 const container = document.getElementById(type + '-options');
-                if (type === 'sunglasses' && images[type].length > 0) {
-                    // Add "none" option
-                    container.innerHTML += `<div class="layer-option" data-id="0" onclick="select('${type}', 0)">
+                if (type === 'sunglasses') {
+                    container.innerHTML += `<div class="layer-option selected" data-id="0" onclick="select('${type}', 0)">
                         <div style="width:100%; height:80px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.3); border-radius:8px; font-size:2rem;">
                             <i class="fas fa-ban"></i>
                         </div>
                         <div class="layer-option-name">None</div>
                     </div>`;
+                    selected[type] = 0;
                 }
                 
                 for (const item of images[type]) {
@@ -532,16 +703,13 @@
                     </div>`;
                 }
                 
-                // Select first by default
-                if (images[type].length > 0) {
-                    selected[type] = type === 'sunglasses' ? 0 : images[type][0].id;
+                if (images[type].length > 0 && type !== 'sunglasses') {
+                    selected[type] = images[type][0].id;
                 }
             }
             
             document.getElementById('loading').style.display = 'none';
             document.getElementById('generator-ui').style.display = 'grid';
-            
-            // Render initial
             randomize();
         });
     </script>
