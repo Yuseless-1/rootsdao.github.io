@@ -793,14 +793,22 @@
             box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5);
         }
         
-        /* PROFILE GENERATOR SECTION */
+        /* IMPROVED PROFILE GENERATOR SECTION */
         .generator-section {
             padding: 100px 0;
             background: rgba(0, 0, 0, 0.3);
         }
         
+        .generator-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #999;
+            margin-top: -40px;
+            margin-bottom: 40px;
+        }
+        
         .generator-container {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
         }
         
@@ -814,84 +822,170 @@
         
         .generator-layout {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 400px 1fr;
             gap: 48px;
             align-items: start;
         }
         
-        .canvas-side {
+        .preview-side {
             text-align: center;
+        }
+        
+        .preview-label {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 24px;
         }
         
         .preview-canvas {
             width: 100%;
-            max-width: 350px;
-            height: 350px;
-            background: rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 16px;
             border: 2px solid rgba(34, 197, 94, 0.3);
             margin: 0 auto 24px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
         
-        .download-btn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        .generator-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .randomize-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: #000;
             border: none;
-            padding: 14px 32px;
+            padding: 16px 32px;
             border-radius: 12px;
             font-weight: bold;
             font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
-            width: 100%;
-            max-width: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
-        .download-btn:hover {
+        .randomize-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5);
         }
         
-        .controls-side {
+        .download-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .download-btn:hover {
+            background: rgba(34, 197, 94, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .customize-side {
             display: flex;
             flex-direction: column;
             gap: 24px;
         }
         
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .control-label {
+        .customize-label {
+            font-size: 1.5rem;
             font-weight: 700;
-            color: var(--primary);
-            font-size: 1.1rem;
+            color: var(--light);
+            margin-bottom: 16px;
         }
         
-        .control-select {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--light);
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 1rem;
+        .layer-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        
+        .layer-tab {
+            background: rgba(255, 255, 255, 0.05);
+            color: #999;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
-        .control-select:hover {
-            border-color: var(--primary);
-            background: rgba(0, 0, 0, 0.5);
+        .layer-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
         }
         
-        .control-select:focus {
-            outline: none;
+        .layer-tab.active {
+            background: var(--primary);
+            color: #000;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+        
+        .layer-options {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 16px;
+        }
+        
+        .layer-options.active {
+            display: grid;
+        }
+        
+        .layer-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .layer-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(34, 197, 94, 0.5);
+        }
+        
+        .layer-option.selected {
+            border-color: var(--primary);
+            background: rgba(34, 197, 94, 0.1);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+        
+        .layer-option img {
+            width: 100%;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+        
+        .layer-option-name {
+            font-size: 0.85rem;
+            color: #ccc;
+            font-weight: 600;
         }
         
         /* Footer */
@@ -1022,6 +1116,10 @@
             
             .generator-layout {
                 grid-template-columns: 1fr;
+            }
+            
+            .layer-options {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
             }
         }
         
@@ -1167,7 +1265,7 @@
                         </div>
                     </div>
                     <div class="hero-buttons">
-                        <a href="https://www.rootsdao.com/whitepaper" class="cta-button">Read The Whitepaper</a>
+                        <a href="https://www.rootsdao.com/whitepaper" class="cta-button">Learn More</a>
                         <a href="https://t.me/+Thjq7FzYysczYWI5" target="_blank" class="secondary-button">Join Community</a>
                     </div>
                 </div>
@@ -1368,68 +1466,56 @@
         </div>
     </section>
 
-    <!-- PROFILE GENERATOR SECTION -->
+    <!-- IMPROVED PROFILE GENERATOR SECTION -->
     <section class="generator-section" id="generator">
         <div class="container">
-            <h2 class="section-title">Create Your Profile</h2>
+            <h2 class="section-title">🎨 PFP Generator</h2>
+            <p class="generator-subtitle">Create your unique profile picture by combining different layers</p>
+            
             <div class="generator-container">
                 <div class="generator-content">
                     <div class="generator-layout">
-                        <!-- Canvas Side -->
-                        <div class="canvas-side">
-                            <canvas id="profileCanvas" class="preview-canvas" width="350" height="350"></canvas>
-                            <button class="download-btn" onclick="downloadProfile()">
-                                <i class="fas fa-download"></i> Download Profile
-                            </button>
+                        <!-- Preview Side -->
+                        <div class="preview-side">
+                            <h3 class="preview-label">Preview</h3>
+                            <canvas id="profileCanvas" class="preview-canvas" width="400" height="400"></canvas>
+                            <div class="generator-buttons">
+                                <button class="randomize-btn" onclick="randomizeProfile()">
+                                    <i class="fas fa-random"></i> Randomize
+                                </button>
+                                <button class="download-btn" onclick="downloadProfile()">
+                                    <i class="fas fa-download"></i> Download PFP
+                                </button>
+                            </div>
                         </div>
                         
-                        <!-- Controls Side -->
-                        <div class="controls-side">
-                            <div class="control-group">
-                                <label class="control-label">Background</label>
-                                <select class="control-select" id="background" onchange="updateProfile()">
-                                    <option value="bg1">Background 1</option>
-                                    <option value="bg2">Background 2</option>
-                                    <option value="bg3">Background 3</option>
-                                </select>
+                        <!-- Customize Side -->
+                        <div class="customize-side">
+                            <h3 class="customize-label">Customize Layers</h3>
+                            
+                            <!-- Layer Tabs -->
+                            <div class="layer-tabs">
+                                <button class="layer-tab active" onclick="switchTab('background')">Background</button>
+                                <button class="layer-tab" onclick="switchTab('body')">Body</button>
+                                <button class="layer-tab" onclick="switchTab('head')">Head</button>
+                                <button class="layer-tab" onclick="switchTab('sunglasses')">Sunglasses</button>
+                                <button class="layer-tab" onclick="switchTab('hair')">Hair</button>
                             </div>
                             
-                            <div class="control-group">
-                                <label class="control-label">Body</label>
-                                <select class="control-select" id="body" onchange="updateProfile()">
-                                    <option value="body1">Body 1</option>
-                                    <option value="body2">Body 2</option>
-                                    <option value="body3">Body 3</option>
-                                </select>
-                            </div>
+                            <!-- Background Options -->
+                            <div class="layer-options active" id="background-options"></div>
                             
-                            <div class="control-group">
-                                <label class="control-label">Hair</label>
-                                <select class="control-select" id="hair" onchange="updateProfile()">
-                                    <option value="hair1">Hair 1</option>
-                                    <option value="hair2">Hair 2</option>
-                                    <option value="hair3">Hair 3</option>
-                                </select>
-                            </div>
+                            <!-- Body Options -->
+                            <div class="layer-options" id="body-options"></div>
                             
-                            <div class="control-group">
-                                <label class="control-label">Eyes</label>
-                                <select class="control-select" id="eyes" onchange="updateProfile()">
-                                    <option value="eyes1">Eyes 1</option>
-                                    <option value="eyes2">Eyes 2</option>
-                                    <option value="eyes3">Eyes 3</option>
-                                </select>
-                            </div>
+                            <!-- Head Options -->
+                            <div class="layer-options" id="head-options"></div>
                             
-                            <div class="control-group">
-                                <label class="control-label">Accessories</label>
-                                <select class="control-select" id="accessories" onchange="updateProfile()">
-                                    <option value="none">None</option>
-                                    <option value="acc1">Accessory 1</option>
-                                    <option value="acc2">Accessory 2</option>
-                                    <option value="acc3">Accessory 3</option>
-                                </select>
-                            </div>
+                            <!-- Sunglasses Options -->
+                            <div class="layer-options" id="sunglasses-options"></div>
+                            
+                            <!-- Hair Options -->
+                            <div class="layer-options" id="hair-options"></div>
                         </div>
                     </div>
                 </div>
@@ -1520,105 +1606,176 @@
             });
         });
         
-        // Profile Generator
+        // ===== PROFILE GENERATOR =====
+        
         const canvas = document.getElementById('profileCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Store loaded images
-        const images = {};
-        
-        // Image paths configuration
-        const imagePaths = {
-            background: {
-                bg1: '/layers/character/backgrounds/bg1.png',
-                bg2: '/layers/character/backgrounds/bg2.png',
-                bg3: '/layers/character/backgrounds/bg3.png'
-            },
-            body: {
-                body1: '/layers/character/bodies/body1.png',
-                body2: '/layers/character/bodies/body2.png',
-                body3: '/layers/character/bodies/body3.png'
-            },
-            hair: {
-                hair1: '/layers/character/hair/hair1.png',
-                hair2: '/layers/character/hair/hair2.png',
-                hair3: '/layers/character/hair/hair3.png'
-            },
-            eyes: {
-                eyes1: '/layers/character/eyes/eyes1.png',
-                eyes2: '/layers/character/eyes/eyes2.png',
-                eyes3: '/layers/character/eyes/eyes3.png'
-            },
-            accessories: {
-                none: null,
-                acc1: '/layers/character/accessories/acc1.png',
-                acc2: '/layers/character/accessories/acc2.png',
-                acc3: '/layers/character/accessories/acc3.png'
-            }
+        // Layer configuration - UPDATED to match your actual folder structure
+        const layerConfig = {
+            background: { count: 10, path: '/layers/character/backgrounds/', name: 'Background' },
+            body: { count: 10, path: '/layers/character/bodies/', name: 'Body' },
+            head: { count: 10, path: '/layers/character/heads/', name: 'Head' },
+            sunglasses: { count: 11, path: '/layers/character/sunglasses/', name: 'Sunglasses' }, // Including "none"
+            hair: { count: 10, path: '/layers/character/hair/', name: 'Hair' }
         };
         
-        // Load an image
+        // Current selections
+        const selections = {
+            background: 1,
+            body: 1,
+            head: 1,
+            sunglasses: 0, // 0 = none
+            hair: 1
+        };
+        
+        // Loaded images cache
+        const imageCache = {};
+        
+        // Load an image with caching
         function loadImage(src) {
             return new Promise((resolve, reject) => {
-                if (!src) {
+                if (!src || src.includes('none')) {
                     resolve(null);
                     return;
                 }
-                if (images[src]) {
-                    resolve(images[src]);
+                if (imageCache[src]) {
+                    resolve(imageCache[src]);
                     return;
                 }
                 const img = new Image();
+                img.crossOrigin = 'anonymous';
                 img.onload = () => {
-                    images[src] = img;
+                    imageCache[src] = img;
                     resolve(img);
                 };
                 img.onerror = () => {
-                    console.error('Failed to load image:', src);
+                    console.error('Failed to load:', src);
                     resolve(null);
                 };
                 img.src = src;
             });
         }
         
-        // Update the profile canvas
-        async function updateProfile() {
-            const bgValue = document.getElementById('background').value;
-            const bodyValue = document.getElementById('body').value;
-            const hairValue = document.getElementById('hair').value;
-            const eyesValue = document.getElementById('eyes').value;
-            const accValue = document.getElementById('accessories').value;
+        // Generate layer options UI
+        async function generateLayerOptions() {
+            for (const [layerType, config] of Object.entries(layerConfig)) {
+                const container = document.getElementById(`${layerType}-options`);
+                container.innerHTML = '';
+                
+                // Add "None" option for sunglasses
+                if (layerType === 'sunglasses') {
+                    const noneOption = document.createElement('div');
+                    noneOption.className = 'layer-option selected';
+                    noneOption.onclick = () => selectLayer(layerType, 0);
+                    noneOption.innerHTML = `
+                        <div style="width: 100%; height: 80px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 8px; font-size: 2rem;">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="layer-option-name">None</div>
+                    `;
+                    container.appendChild(noneOption);
+                }
+                
+                // Generate numbered options
+                for (let i = 1; i <= config.count; i++) {
+                    const imagePath = `${config.path}${layerType}${i}.png`;
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'layer-option';
+                    if (selections[layerType] === i) {
+                        optionDiv.classList.add('selected');
+                    }
+                    optionDiv.onclick = () => selectLayer(layerType, i);
+                    
+                    optionDiv.innerHTML = `
+                        <img src="${imagePath}" alt="${config.name} ${i}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3C/svg%3E'">
+                        <div class="layer-option-name">${layerType}${i}</div>
+                    `;
+                    
+                    container.appendChild(optionDiv);
+                }
+            }
+        }
+        
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.layer-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
             
-            // Clear canvas
+            // Update options visibility
+            document.querySelectorAll('.layer-options').forEach(opt => opt.classList.remove('active'));
+            document.getElementById(`${tabName}-options`).classList.add('active');
+        }
+        
+        // Select a layer option
+        function selectLayer(layerType, index) {
+            selections[layerType] = index;
+            
+            // Update selected visual feedback
+            const container = document.getElementById(`${layerType}-options`);
+            container.querySelectorAll('.layer-option').forEach((opt, idx) => {
+                if (layerType === 'sunglasses' && idx === index) {
+                    opt.classList.add('selected');
+                } else if (idx === index - (layerType === 'sunglasses' ? 0 : 1)) {
+                    opt.classList.add('selected');
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
+            
+            updateCanvas();
+        }
+        
+        // Update canvas with current selections
+        async function updateCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Load and draw layers in order
-            const layers = [
-                imagePaths.background[bgValue],
-                imagePaths.body[bodyValue],
-                imagePaths.eyes[eyesValue],
-                imagePaths.hair[hairValue],
-                imagePaths.accessories[accValue]
-            ];
+            // Draw layers in order
+            const layerOrder = ['background', 'body', 'head', 'sunglasses', 'hair'];
             
-            for (const layerPath of layers) {
-                const img = await loadImage(layerPath);
+            for (const layerType of layerOrder) {
+                const index = selections[layerType];
+                if (index === 0) continue; // Skip if "none" selected
+                
+                const imagePath = `${layerConfig[layerType].path}${layerType}${index}.png`;
+                const img = await loadImage(imagePath);
+                
                 if (img) {
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 }
             }
         }
         
-        // Download profile
+        // Randomize all selections
+        function randomizeProfile() {
+            for (const [layerType, config] of Object.entries(layerConfig)) {
+                if (layerType === 'sunglasses') {
+                    // 50% chance of no sunglasses
+                    selections[layerType] = Math.random() > 0.5 ? 0 : Math.floor(Math.random() * config.count) + 1;
+                } else {
+                    selections[layerType] = Math.floor(Math.random() * config.count) + 1;
+                }
+            }
+            
+            // Update all visual selections
+            generateLayerOptions();
+            updateCanvas();
+        }
+        
+        // Download the profile
         function downloadProfile() {
             const link = document.createElement('a');
-            link.download = 'root5-profile.png';
-            link.href = canvas.toDataURL();
+            link.download = 'root5-pfp.png';
+            link.href = canvas.toDataURL('image/png');
             link.click();
         }
         
-        // Initialize on load
-        window.addEventListener('load', updateProfile);
+        // Initialize on page load
+        window.addEventListener('load', async () => {
+            await generateLayerOptions();
+            await updateCanvas();
+        });
     </script>
 </body>
 </html>
