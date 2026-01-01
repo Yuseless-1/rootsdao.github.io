@@ -693,47 +693,6 @@
             box-shadow: 0 12px 32px rgba(34, 197, 94, 0.6);
         }
         
-        /* Chart Section */
-        .chart-section {
-            padding: 80px 0;
-            background: rgba(255, 255, 255, 0.02);
-        }
-        
-        .chart-wrapper {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        #dexscreener-embed {
-            position: relative;
-            width: 100%;
-            padding-bottom: 125%;
-            margin-bottom: 30px;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-        
-        @media(min-width:1400px) {
-            #dexscreener-embed {
-                padding-bottom: 65%;
-            }
-        }
-        
-        #dexscreener-embed iframe {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            border: 0;
-        }
-        
-        .chart-button-container {
-            text-align: center;
-            margin-top: 32px;
-        }
-        
         /* Features Grid */
         .feature-grid {
             display: grid;
@@ -786,6 +745,7 @@
             padding: 100px 0;
             text-align: center;
             position: relative;
+            background: rgba(255, 255, 255, 0.02);
         }
         
         .cta-section::before {
@@ -831,6 +791,107 @@
         .social-button:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5);
+        }
+        
+        /* PROFILE GENERATOR SECTION */
+        .generator-section {
+            padding: 100px 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .generator-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .generator-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px;
+        }
+        
+        .generator-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+        
+        .canvas-side {
+            text-align: center;
+        }
+        
+        .preview-canvas {
+            width: 100%;
+            max-width: 350px;
+            height: 350px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #000;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5);
+        }
+        
+        .controls-side {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .control-label {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .control-select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--light);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .control-select:hover {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .control-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
         }
         
         /* Footer */
@@ -958,6 +1019,10 @@
             .merch-grid {
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             }
+            
+            .generator-layout {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 768px) {
@@ -1015,6 +1080,14 @@
             
             .merch-image {
                 height: 250px;
+            }
+            
+            .generator-content {
+                padding: 24px;
+            }
+            
+            .preview-canvas {
+                height: 300px;
             }
         }
         
@@ -1094,7 +1167,7 @@
                         </div>
                     </div>
                     <div class="hero-buttons">
-                        <a href="https://www.rootsdao.com/whitepaper" class="cta-button">Learn More</a>
+                        <a href="https://www.rootsdao.com/whitepaper" class="cta-button">Read The Whitepaper</a>
                         <a href="https://t.me/+Thjq7FzYysczYWI5" target="_blank" class="secondary-button">Join Community</a>
                     </div>
                 </div>
@@ -1249,21 +1322,6 @@
         </div>
     </section>
 
-    <!-- Chart Section -->
-    <section class="chart-section">
-        <div class="container">
-            <h2 class="section-title">Live Trading Chart</h2>
-            <div class="chart-wrapper">
-                <div id="dexscreener-embed">
-                    <iframe src="https://dexscreener.com/solana/BYsQK5wCuFSec5goMgwbG6ACpSYayiHGF4vvT2Lp48EX?embed=1&loadChartSettings=0&trades=0&chartLeftToolbar=0&chartTimeframesToolbar=0&chartTheme=dark&theme=dark&chartStyle=2&chartType=usd&interval=15"></iframe>
-                </div>
-                <div class="chart-button-container">
-                    <a href="https://dexscreener.com/solana/bysqk5wcufsec5gomgwbg6acpsyayihgf4vvt2lp48ex" target="_blank" class="cta-button">View on DexScreener</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Features Section -->
     <section class="section" id="features">
         <div class="container">
@@ -1306,6 +1364,75 @@
                 <a href="https://www.rootsdao.com/whitepaper" class="social-button">
                     <i class="fas fa-file-alt"></i> Read Whitepaper
                 </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROFILE GENERATOR SECTION -->
+    <section class="generator-section" id="generator">
+        <div class="container">
+            <h2 class="section-title">Create Your Profile</h2>
+            <div class="generator-container">
+                <div class="generator-content">
+                    <div class="generator-layout">
+                        <!-- Canvas Side -->
+                        <div class="canvas-side">
+                            <canvas id="profileCanvas" class="preview-canvas" width="350" height="350"></canvas>
+                            <button class="download-btn" onclick="downloadProfile()">
+                                <i class="fas fa-download"></i> Download Profile
+                            </button>
+                        </div>
+                        
+                        <!-- Controls Side -->
+                        <div class="controls-side">
+                            <div class="control-group">
+                                <label class="control-label">Background</label>
+                                <select class="control-select" id="background" onchange="updateProfile()">
+                                    <option value="bg1">Background 1</option>
+                                    <option value="bg2">Background 2</option>
+                                    <option value="bg3">Background 3</option>
+                                </select>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label class="control-label">Body</label>
+                                <select class="control-select" id="body" onchange="updateProfile()">
+                                    <option value="body1">Body 1</option>
+                                    <option value="body2">Body 2</option>
+                                    <option value="body3">Body 3</option>
+                                </select>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label class="control-label">Hair</label>
+                                <select class="control-select" id="hair" onchange="updateProfile()">
+                                    <option value="hair1">Hair 1</option>
+                                    <option value="hair2">Hair 2</option>
+                                    <option value="hair3">Hair 3</option>
+                                </select>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label class="control-label">Eyes</label>
+                                <select class="control-select" id="eyes" onchange="updateProfile()">
+                                    <option value="eyes1">Eyes 1</option>
+                                    <option value="eyes2">Eyes 2</option>
+                                    <option value="eyes3">Eyes 3</option>
+                                </select>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label class="control-label">Accessories</label>
+                                <select class="control-select" id="accessories" onchange="updateProfile()">
+                                    <option value="none">None</option>
+                                    <option value="acc1">Accessory 1</option>
+                                    <option value="acc2">Accessory 2</option>
+                                    <option value="acc3">Accessory 3</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1392,6 +1519,106 @@
                 }
             });
         });
+        
+        // Profile Generator
+        const canvas = document.getElementById('profileCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Store loaded images
+        const images = {};
+        
+        // Image paths configuration
+        const imagePaths = {
+            background: {
+                bg1: '/layers/character/backgrounds/bg1.png',
+                bg2: '/layers/character/backgrounds/bg2.png',
+                bg3: '/layers/character/backgrounds/bg3.png'
+            },
+            body: {
+                body1: '/layers/character/bodies/body1.png',
+                body2: '/layers/character/bodies/body2.png',
+                body3: '/layers/character/bodies/body3.png'
+            },
+            hair: {
+                hair1: '/layers/character/hair/hair1.png',
+                hair2: '/layers/character/hair/hair2.png',
+                hair3: '/layers/character/hair/hair3.png'
+            },
+            eyes: {
+                eyes1: '/layers/character/eyes/eyes1.png',
+                eyes2: '/layers/character/eyes/eyes2.png',
+                eyes3: '/layers/character/eyes/eyes3.png'
+            },
+            accessories: {
+                none: null,
+                acc1: '/layers/character/accessories/acc1.png',
+                acc2: '/layers/character/accessories/acc2.png',
+                acc3: '/layers/character/accessories/acc3.png'
+            }
+        };
+        
+        // Load an image
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                if (!src) {
+                    resolve(null);
+                    return;
+                }
+                if (images[src]) {
+                    resolve(images[src]);
+                    return;
+                }
+                const img = new Image();
+                img.onload = () => {
+                    images[src] = img;
+                    resolve(img);
+                };
+                img.onerror = () => {
+                    console.error('Failed to load image:', src);
+                    resolve(null);
+                };
+                img.src = src;
+            });
+        }
+        
+        // Update the profile canvas
+        async function updateProfile() {
+            const bgValue = document.getElementById('background').value;
+            const bodyValue = document.getElementById('body').value;
+            const hairValue = document.getElementById('hair').value;
+            const eyesValue = document.getElementById('eyes').value;
+            const accValue = document.getElementById('accessories').value;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Load and draw layers in order
+            const layers = [
+                imagePaths.background[bgValue],
+                imagePaths.body[bodyValue],
+                imagePaths.eyes[eyesValue],
+                imagePaths.hair[hairValue],
+                imagePaths.accessories[accValue]
+            ];
+            
+            for (const layerPath of layers) {
+                const img = await loadImage(layerPath);
+                if (img) {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                }
+            }
+        }
+        
+        // Download profile
+        function downloadProfile() {
+            const link = document.createElement('a');
+            link.download = 'root5-profile.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', updateProfile);
     </script>
 </body>
 </html>
