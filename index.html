@@ -610,10 +610,93 @@
             object-fit: contain;
         }
         
+        /* MERCH SECTION */
+        .merch-section {
+            padding: 80px 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .merch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+            max-width: 1100px;
+            margin: 0 auto 48px;
+        }
+        
+        .merch-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        
+        .merch-item:hover {
+            transform: translateY(-12px) scale(1.03);
+            border-color: var(--primary);
+            box-shadow: 0 16px 48px rgba(34, 197, 94, 0.3);
+        }
+        
+        .merch-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .merch-item:hover .merch-image {
+            transform: scale(1.1);
+        }
+        
+        .merch-buy-button {
+            text-align: center;
+            margin-top: 32px;
+        }
+        
+        .buy-now-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #000;
+            border: none;
+            padding: 18px 48px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
+        }
+        
+        .buy-now-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .buy-now-btn:hover::before {
+            left: 100%;
+        }
+        
+        .buy-now-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(34, 197, 94, 0.6);
+        }
+        
         /* Chart Section */
         .chart-section {
             padding: 80px 0;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.02);
         }
         
         .chart-wrapper {
@@ -871,6 +954,10 @@
             .platforms-grid {
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
+            
+            .merch-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
         }
         
         @media (max-width: 768px) {
@@ -921,6 +1008,14 @@
             .token-title {
                 font-size: 2rem;
             }
+            
+            .merch-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .merch-image {
+                height: 250px;
+            }
         }
         
         /* Custom Scrollbar */
@@ -963,6 +1058,7 @@
                         <li><a href="#home">Home</a></li>
                         <li><a href="#token">Token</a></li>
                         <li><a href="#find-us">Find Us</a></li>
+                        <li><a href="#merch">Merch</a></li>
                         <li><a href="#features">Features</a></li>
                         <li><a href="https://www.rootsdao.com/whitepaper">Whitepaper</a></li>
                     </ul>
@@ -1103,10 +1199,10 @@
             <h2 class="section-title">Find Us On</h2>
             <div class="platforms-grid">
                 <a href="https://airdrops.io/root5-dao/" target="_blank" class="platform-link">
-                    <img src="/layers/airdrops-logo.jpg" alt="Airdrops.io">
+                    <img src="/layers/airdropsio-logo.jpg" alt="Airdrops.io">
                 </a>
                 <a href="https://www.rugfreecoins.com/coin-details/32452" target="_blank" class="platform-link">
-                    <img src="/layers/rugfree_logo.svg" alt="Rugfree Coins">
+                    <img src="/layers/rugfree-logo.svg" alt="Rugfree Coins">
                 </a>
                 <a href="https://www.freshcoins.io/coins/root5-dao" target="_blank" class="platform-link">
                     <img src="/layers/freshcoins-logo.png" alt="Fresh Coins">
@@ -1122,6 +1218,32 @@
                 </a>
                 <a href="https://bitcointalk.org/index.php?topic=5565567.msg66053550#msg66053550" target="_blank" class="platform-link">
                     <img src="/layers/bitcointalk-logo.png" alt="BitcoinTalk">
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- GET OUR MERCH SECTION -->
+    <section class="merch-section" id="merch">
+        <div class="container">
+            <h2 class="section-title">Get Our Merch</h2>
+            <div class="merch-grid">
+                <div class="merch-item">
+                    <img src="https://root5merch.com/wp-content/uploads/2025/12/8116768096294962781_1200.jpeg" alt="ROOT 5 DAO Merch" class="merch-image">
+                </div>
+                <div class="merch-item">
+                    <img src="https://root5merch.com/wp-content/uploads/2025/12/7802597380585955377_1200.jpeg" alt="ROOT 5 DAO Merch" class="merch-image">
+                </div>
+                <div class="merch-item">
+                    <img src="https://root5merch.com/wp-content/uploads/2025/12/16175717190975090305_2048.jpeg" alt="ROOT 5 DAO Merch" class="merch-image">
+                </div>
+                <div class="merch-item">
+                    <img src="https://root5merch.com/wp-content/uploads/2025/12/14417628938725685191_2048.jpeg" alt="ROOT 5 DAO Merch" class="merch-image">
+                </div>
+            </div>
+            <div class="merch-buy-button">
+                <a href="https://www.root5merch.com" target="_blank" class="buy-now-btn">
+                    <i class="fas fa-shopping-cart"></i> Buy Now
                 </a>
             </div>
         </div>
@@ -1205,6 +1327,7 @@
                         <a href="#home">Home</a>
                         <a href="#token">Token</a>
                         <a href="#find-us">Find Us</a>
+                        <a href="#merch">Merch</a>
                         <a href="#features">Features</a>
                     </div>
                 </div>
@@ -1213,6 +1336,7 @@
                     <div class="footer-links">
                         <a href="https://www.rootsdao.com/whitepaper">Whitepaper</a>
                         <a href="https://dexscreener.com/solana/bysqk5wcufsec5gomgwbg6acpsyayihgf4vvt2lp48ex" target="_blank">DexScreener</a>
+                        <a href="https://www.root5merch.com" target="_blank">Merch Store</a>
                     </div>
                 </div>
                 <div class="footer-column">
