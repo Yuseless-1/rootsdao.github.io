@@ -148,6 +148,28 @@
         }
         .copy-btn:hover { transform: translateY(-2px); }
         
+        /* Trade Buttons */
+        .trade-button-link {
+            transition: all 0.3s ease;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            display: inline-block;
+        }
+        .trade-button-link:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(34, 197, 94, 0.3);
+        }
+        .trade-button-link img {
+            display: block;
+            height: 60px;
+            width: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .trade-button-link img { height: 40px; }
+        }
+        
         /* Platforms */
         .platforms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; max-width: 1000px; margin: 0 auto; }
         .platform-link {
@@ -409,7 +431,35 @@
                             <button class="copy-btn" onclick="copy('0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E')">Copy</button>
                         </div>
                     </div>
+                    <div class="address-row">
+                        <div class="address-label">ARB</div>
+                        <div class="address-value">
+                            <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
+                            <button class="copy-btn" onclick="copy('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="address-row">
+                        <div class="address-label">BASE</div>
+                        <div class="address-value">
+                            <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
+                            <button class="copy-btn" onclick="copy('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            
+            <!-- Trade Buttons - CENTERED -->
+            <div style="margin-top: 40px; text-align: center;">
+                <h3 style="font-size: 2rem; font-weight: 700; color: #f8f8f8; margin-bottom: 24px;">Trade At</h3>
+                <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 16px;">
+                    <a href="https://pump.fun/coin/AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump" target="_blank" class="trade-button-link">
+                        <img src="/layers/pumpfunbutton.png" alt="Trade on Pump.fun">
+                    </a>
+                    <a href="https://dexscreener.com/solana/basucpi8m39rs5chbuosta78bptcrjzy2ad6nj2vww6z" target="_blank" class="trade-button-link">
+                        <img src="/layers/dexscrennerbutton.png" alt="Trade on DexScreener">
+                    </a>
+                </div>
+                <p style="font-size: 1rem; color: #888; font-style: italic; margin-top: 16px;">More To Come</p>
             </div>
         </div>
     </section>
@@ -422,13 +472,22 @@
                     <img src="/layers/airdropsio-logo.jpg" alt="Airdrops.io">
                 </a>
                 <a href="https://www.rugfreecoins.com/coin-details/32452" target="_blank" class="platform-link">
-                    <img src="/layers/rugfree-logo.svg" alt="Rugfree">
+                    <img src="/layers/rugfree-logo.svg" alt="Rugfree Coins">
                 </a>
                 <a href="https://www.freshcoins.io/coins/root5-dao" target="_blank" class="platform-link">
                     <img src="/layers/freshcoins-logo.png" alt="Fresh Coins">
                 </a>
                 <a href="https://cointoplist.net/coin/Root5-DAO" target="_blank" class="platform-link">
                     <img src="/layers/cointoplist-logo.png" alt="Coin Top List">
+                </a>
+                <a href="https://www.coinscope.co/coin/root5" target="_blank" class="platform-link">
+                    <img src="/layers/coinscope-logo.webp" alt="Coin Scope">
+                </a>
+                <a href="https://coincatapult.com/coin/root5-dao-root5" target="_blank" class="platform-link">
+                    <img src="/layers/coincatapult-logo.png" alt="Coin Catapult">
+                </a>
+                <a href="https://bitcointalk.org/index.php?topic=5565567.msg66053550#msg66053550" target="_blank" class="platform-link">
+                    <img src="/layers/bitcointalk-logo.png" alt="BitcoinTalk">
                 </a>
             </div>
         </div>
