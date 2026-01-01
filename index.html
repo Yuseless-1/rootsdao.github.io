@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ROOT 5 DAO - Community Driven Project</title>
-    <link rel="icon" type="image/png" href="/layers/logo.jpg">
+    <link rel="icon" type="image/jpeg" href="/layers/logo.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -93,17 +93,6 @@
             padding: 0 24px;
             position: relative;
             z-index: 1;
-        }
-        
-        /* Enhanced Glassmorphism */
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 
-                0 8px 32px 0 rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         
         /* Header Styles */
@@ -216,7 +205,7 @@
         
         /* Hero Section */
         .hero {
-            padding: 160px 0 100px;
+            padding: 160px 0 80px;
             position: relative;
             overflow: hidden;
         }
@@ -265,7 +254,6 @@
             }
         }
         
-        /* Updated Hero Title - matches theme better */
         .hero-title {
             font-size: 4.5rem;
             font-weight: 900;
@@ -389,64 +377,9 @@
             transform: scale(1.05);
         }
         
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 24px;
-            margin-top: 80px;
-            animation: fade-in-up 0.6s ease-out 0.7s both;
-        }
-        
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 32px 24px;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: var(--primary);
-            box-shadow: 0 12px 40px rgba(34, 197, 94, 0.2);
-        }
-        
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            background: rgba(34, 197, 94, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .stat-card:hover .stat-icon {
-            background: rgba(34, 197, 94, 0.3);
-            transform: scale(1.1);
-        }
-        
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--light);
-            margin-bottom: 8px;
-        }
-        
-        .stat-label {
-            font-size: 0.95rem;
-            color: #888;
-            font-weight: 600;
-        }
-        
         /* Section Styles */
         .section {
-            padding: 100px 0;
+            padding: 80px 0;
             position: relative;
         }
         
@@ -460,31 +393,34 @@
             -webkit-text-fill-color: transparent;
         }
         
-        /* TOKEN SECTION - NOW RIGHT AFTER HERO */
+        /* CONDENSED TOKEN SECTION */
         .token-section {
-            padding: 100px 0;
+            padding: 80px 0;
             background: rgba(0, 0, 0, 0.3);
         }
         
-        .token-container {
-            max-width: 900px;
+        .token-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1000px;
             margin: 0 auto;
+        }
+        
+        .token-logo-side {
             text-align: center;
         }
         
-        .token-logo-wrapper {
-            margin-bottom: 40px;
-        }
-        
         .token-logo {
-            width: 200px;
-            height: 200px;
+            width: 250px;
+            height: 250px;
             border-radius: 50%;
             box-shadow: 
                 0 20px 60px rgba(34, 197, 94, 0.3),
                 0 0 100px rgba(34, 197, 94, 0.2);
-            margin: 0 auto;
             display: block;
+            margin: 0 auto;
             transition: transform 0.3s ease;
         }
         
@@ -492,92 +428,98 @@
             transform: scale(1.1) rotate(5deg);
         }
         
+        .token-info-side {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
         .token-title {
             font-size: 2.5rem;
             font-weight: 900;
-            margin-bottom: 16px;
             color: var(--primary);
+            margin-bottom: 8px;
         }
         
         .token-subtitle {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             color: #ccc;
-            margin-bottom: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .chain-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
         }
         
         .chain-badge {
-            display: inline-block;
-            padding: 8px 16px;
+            padding: 6px 12px;
             background: rgba(34, 197, 94, 0.2);
             border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 20px;
-            margin: 0 6px 12px;
+            border-radius: 16px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--primary);
         }
         
-        .addresses-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px;
-            margin: 40px 0;
+        .addresses-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
         
-        .address-item {
-            margin-bottom: 24px;
-            text-align: left;
-        }
-        
-        .address-item:last-child {
-            margin-bottom: 0;
+        .address-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
         
         .address-label {
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 8px;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
         }
         
         .address-value {
             background: rgba(0, 0, 0, 0.3);
-            padding: 16px;
-            border-radius: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
             font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             word-break: break-all;
             color: #ccc;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
         
         .copy-btn {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: #000;
             border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             white-space: nowrap;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
             flex-shrink: 0;
+            font-size: 0.75rem;
         }
         
         .copy-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.5);
         }
         
-        /* Trade Buttons Section */
+        /* Trade Buttons Section - CENTERED */
         .trade-section {
-            margin-top: 48px;
+            margin-top: 40px;
+            text-align: center;
         }
         
         .trade-title {
@@ -592,7 +534,7 @@
             justify-content: center;
             gap: 24px;
             flex-wrap: wrap;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
         
         .trade-button {
@@ -620,103 +562,58 @@
         }
         
         .more-to-come {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #888;
             font-style: italic;
-            margin-top: 24px;
+            margin-top: 16px;
         }
         
-        /* Enhanced Steps */
-        .steps {
+        /* FIND US ON SECTION */
+        .find-us-section {
+            padding: 80px 0;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .platforms-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
         
-        .step {
-            position: relative;
+        .platform-link {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
-            padding: 40px 32px;
-            border-radius: 24px;
-            text-align: center;
-            transition: all 0.4s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .step::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 24px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: -1;
-            filter: blur(20px);
-        }
-        
-        .step:hover::before {
-            opacity: 0.5;
-        }
-        
-        .step:hover {
-            transform: translateY(-12px) scale(1.02);
-            border-color: var(--primary);
-        }
-        
-        .step-number {
-            position: absolute;
-            top: -16px;
-            left: -16px;
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: #000;
-            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
-        }
-        
-        .step-icon {
-            font-size: 4rem;
-            margin-bottom: 24px;
-            background: rgba(34, 197, 94, 0.2);
-            width: 80px;
-            height: 80px;
             border-radius: 16px;
+            padding: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-left: auto;
-            margin-right: auto;
             transition: all 0.3s ease;
+            text-decoration: none;
+            min-height: 100px;
         }
         
-        .step:hover .step-icon {
-            transform: scale(1.1) rotate(5deg);
-            background: rgba(34, 197, 94, 0.3);
+        .platform-link:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 40px rgba(34, 197, 94, 0.2);
         }
         
-        .step h3 {
-            font-size: 1.75rem;
-            margin-bottom: 16px;
-            color: var(--light);
-        }
-        
-        .step p {
-            color: #ccc;
-            line-height: 1.6;
+        .platform-link img {
+            max-width: 100%;
+            max-height: 50px;
+            height: auto;
+            width: auto;
+            object-fit: contain;
         }
         
         /* Chart Section */
         .chart-section {
-            padding: 100px 0;
-            background: rgba(255, 255, 255, 0.02);
+            padding: 80px 0;
+            background: rgba(0, 0, 0, 0.3);
         }
         
         .chart-wrapper {
@@ -803,7 +700,7 @@
         
         /* CTA Section */
         .cta-section {
-            padding: 120px 0;
+            padding: 100px 0;
             text-align: center;
             position: relative;
         }
@@ -961,13 +858,18 @@
                 font-size: 1.3rem;
             }
             
-            .trade-buttons {
-                flex-direction: column;
-                align-items: center;
+            .token-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
             }
             
-            .trade-button img {
-                height: 50px;
+            .token-logo {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .platforms-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
         }
         
@@ -982,10 +884,6 @@
             
             .section-title {
                 font-size: 2rem;
-            }
-            
-            .steps {
-                grid-template-columns: 1fr;
             }
             
             .hero-buttons {
@@ -1012,20 +910,16 @@
                 display: none;
             }
             
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .addresses-container {
-                padding: 24px;
-            }
-            
             .address-value {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
             }
             
             .trade-button img {
                 height: 40px;
+            }
+            
+            .token-title {
+                font-size: 2rem;
             }
         }
         
@@ -1068,7 +962,7 @@
                     <ul>
                         <li><a href="#home">Home</a></li>
                         <li><a href="#token">Token</a></li>
-                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#find-us">Find Us</a></li>
                         <li><a href="#features">Features</a></li>
                         <li><a href="https://www.rootsdao.com/whitepaper">Whitepaper</a></li>
                     </ul>
@@ -1116,143 +1010,119 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users" style="color: var(--primary); font-size: 1.5rem;"></i>
-                    </div>
-                    <div class="stat-value">1,500+</div>
-                    <div class="stat-label">Active Members</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-file-alt" style="color: var(--primary); font-size: 1.5rem;"></i>
-                    </div>
-                    <div class="stat-value">69+</div>
-                    <div class="stat-label">Proposals</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line" style="color: var(--primary); font-size: 1.5rem;"></i>
-                    </div>
-                    <div class="stat-value">$1.3M+</div>
-                    <div class="stat-label">Total Volume</div>
-                </div>
-            </div>
         </div>
     </section>
 
-    <!-- TOKEN SECTION - NOW RIGHT AFTER HERO -->
+    <!-- CONDENSED TOKEN SECTION -->
     <section class="token-section" id="token">
         <div class="container">
-            <div class="token-container">
-                <div class="token-logo-wrapper">
+            <div class="token-grid">
+                <!-- Logo Side -->
+                <div class="token-logo-side">
                     <img src="/layers/logo.jpg" alt="ROOT 5 DAO Token" class="token-logo">
                 </div>
                 
-                <h2 class="token-title">ROOT 5 DAO Token</h2>
-                <p class="token-subtitle">Cross-Chain • Omnichain Interoperability</p>
-                
-                <div>
-                    <span class="chain-badge">SPL</span>
-                    <span class="chain-badge">ARB</span>
-                    <span class="chain-badge">BSC</span>
-                    <span class="chain-badge">BASE</span>
-                    <span class="chain-badge">ETH</span>
+                <!-- Info Side -->
+                <div class="token-info-side">
+                    <div>
+                        <h2 class="token-title">ROOT 5 DAO Token</h2>
+                        <p class="token-subtitle">Cross-Chain • Omnichain Interoperability</p>
+                        
+                        <div class="chain-badges">
+                            <span class="chain-badge">SPL</span>
+                            <span class="chain-badge">ARB</span>
+                            <span class="chain-badge">BSC</span>
+                            <span class="chain-badge">BASE</span>
+                            <span class="chain-badge">ETH</span>
+                        </div>
+                    </div>
+                    
+                    <div class="addresses-compact">
+                        <div class="address-row">
+                            <div class="address-label">SPL</div>
+                            <div class="address-value">
+                                <span>AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump</span>
+                                <button class="copy-btn" onclick="copyAddress('AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump')">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="address-row">
+                            <div class="address-label">BSC</div>
+                            <div class="address-value">
+                                <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
+                                <button class="copy-btn" onclick="copyAddress('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="address-row">
+                            <div class="address-label">ETH</div>
+                            <div class="address-value">
+                                <span>0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E</span>
+                                <button class="copy-btn" onclick="copyAddress('0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E')">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="address-row">
+                            <div class="address-label">ARB</div>
+                            <div class="address-value">
+                                <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
+                                <button class="copy-btn" onclick="copyAddress('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="address-row">
+                            <div class="address-label">BASE</div>
+                            <div class="address-value">
+                                <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
+                                <button class="copy-btn" onclick="copyAddress('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="addresses-container">
-                    <div class="address-item">
-                        <div class="address-label">SPL Token Address</div>
-                        <div class="address-value">
-                            <span>AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump</span>
-                            <button class="copy-btn" onclick="copyAddress('AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump')">Copy</button>
-                        </div>
-                    </div>
-                    
-                    <div class="address-item">
-                        <div class="address-label">BSC OFT Address</div>
-                        <div class="address-value">
-                            <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
-                            <button class="copy-btn" onclick="copyAddress('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
-                        </div>
-                    </div>
-                    
-                    <div class="address-item">
-                        <div class="address-label">ETH OFT Address</div>
-                        <div class="address-value">
-                            <span>0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E</span>
-                            <button class="copy-btn" onclick="copyAddress('0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E')">Copy</button>
-                        </div>
-                    </div>
-                    
-                    <div class="address-item">
-                        <div class="address-label">ARB OFT Address</div>
-                        <div class="address-value">
-                            <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
-                            <button class="copy-btn" onclick="copyAddress('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
-                        </div>
-                    </div>
-                    
-                    <div class="address-item">
-                        <div class="address-label">BASE OFT Address</div>
-                        <div class="address-value">
-                            <span>0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</span>
-                            <button class="copy-btn" onclick="copyAddress('0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e')">Copy</button>
-                        </div>
-                    </div>
+            </div>
+            
+            <!-- Trade Buttons - CENTERED -->
+            <div class="trade-section">
+                <h3 class="trade-title">Trade At</h3>
+                <div class="trade-buttons">
+                    <a href="https://pump.fun/coin/AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump" target="_blank" class="trade-button">
+                        <img src="/layers/pumpfunbutton.png" alt="Trade on Pump.fun">
+                    </a>
+                    <a href="https://dexscreener.com/solana/basucpi8m39rs5chbuosta78bptcrjzy2ad6nj2vww6z" target="_blank" class="trade-button">
+                        <img src="/layers/dexscrennerbutton.png" alt="Trade on DexScreener">
+                    </a>
                 </div>
-                
-                <!-- Trade Buttons -->
-                <div class="trade-section">
-                    <h3 class="trade-title">Trade At</h3>
-                    <div class="trade-buttons">
-                        <a href="https://pump.fun/coin/AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump" target="_blank" class="trade-button">
-                            <img src="/layers/pumpfunbutton.png" alt="Trade on Pump.fun">
-                        </a>
-                        <a href="https://dexscreener.com/solana/basucpi8m39rs5chbuosta78bptcrjzy2ad6nj2vww6z" target="_blank" class="trade-button">
-                            <img src="/layers/dexscrennerbutton.png" alt="Trade on DexScreener">
-                        </a>
-                    </div>
-                    <p class="more-to-come">More To Come</p>
-                </div>
+                <p class="more-to-come">More To Come</p>
             </div>
         </div>
     </section>
 
-    <!-- How It Works Section - MOVED DOWN -->
-    <section class="section" id="how-it-works">
+    <!-- FIND US ON SECTION -->
+    <section class="find-us-section" id="find-us">
         <div class="container">
-            <h2 class="section-title">How It Works</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-icon">
-                        <i class="fas fa-upload" style="color: var(--primary);"></i>
-                    </div>
-                    <h3>Submit Memes</h3>
-                    <p>Community members submit their favorite memes to the DAO for consideration.</p>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-icon">
-                        <i class="fas fa-vote-yea" style="color: var(--primary);"></i>
-                    </div>
-                    <h3>Vote & Decide</h3>
-                    <p>DAO members vote on which memes should be converted into tokens.</p>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-icon">
-                        <i class="fas fa-coins" style="color: var(--primary);"></i>
-                    </div>
-                    <h3>Tokenize & Trade</h3>
-                    <p>Winning memes are converted into tradeable Solana tokens on Pump.fun.</p>
-                </div>
+            <h2 class="section-title">Find Us On</h2>
+            <div class="platforms-grid">
+                <a href="https://airdrops.io/root5-dao/" target="_blank" class="platform-link">
+                    <img src="/layers/airdropsio-logo.jpg" alt="Airdrops.io">
+                </a>
+                <a href="https://www.rugfreecoins.com/coin-details/32452" target="_blank" class="platform-link">
+                    <img src="/layers/rugfree-logo.svg" alt="Rugfree Coins">
+                </a>
+                <a href="https://www.freshcoins.io/coins/root5-dao" target="_blank" class="platform-link">
+                    <img src="/layers/freshcoins-logo.png" alt="Fresh Coins">
+                </a>
+                <a href="https://cointoplist.net/coin/Root5-DAO" target="_blank" class="platform-link">
+                    <img src="/layers/cointoplist-logo.png" alt="Coin Top List">
+                </a>
+                <a href="https://www.coinscope.co/coin/root5" target="_blank" class="platform-link">
+                    <img src="/layers/coinscope-logo.webp" alt="Coin Scope">
+                </a>
+                <a href="https://coincatapult.com/coin/root5-dao-root5" target="_blank" class="platform-link">
+                    <img src="/layers/coincatapult-logo.png" alt="Coin Catapult">
+                </a>
+                <a href="https://bitcointalk.org/index.php?topic=5565567.msg66053550#msg66053550" target="_blank" class="platform-link">
+                    <img src="/layers/bitcointalk-logo.png" alt="BitcoinTalk">
+                </a>
             </div>
         </div>
     </section>
@@ -1324,7 +1194,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="#home" class="logo">
-                        <img src="/layers/logo.png" alt="ROOT 5 DAO Logo">
+                        <img src="/layers/logo.jpg" alt="ROOT 5 DAO Logo">
                         <span>ROOT 5 DAO</span>
                     </a>
                     <p>A community-driven project building the future of decentralized collaboration on Solana.</p>
@@ -1334,7 +1204,7 @@
                     <div class="footer-links">
                         <a href="#home">Home</a>
                         <a href="#token">Token</a>
-                        <a href="#how-it-works">How It Works</a>
+                        <a href="#find-us">Find Us</a>
                         <a href="#features">Features</a>
                     </div>
                 </div>
