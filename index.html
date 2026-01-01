@@ -300,6 +300,36 @@
         .download-btn { background: rgba(255, 255, 255, 0.1); color: var(--primary); border: 2px solid var(--primary); }
         .download-btn:hover { background: rgba(34, 197, 94, 0.2); transform: translateY(-3px); }
         
+        .ai-enhance-btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(135deg, #8a2be2, #9d4edd);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(138, 43, 226, 0.3);
+        }
+        .ai-enhance-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(138, 43, 226, 0.5);
+        }
+        .ai-enhance-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #ai-prompt:focus, #ai-style:focus {
+            outline: none;
+            border-color: rgba(138, 43, 226, 0.6);
+        }
+        
         .layer-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
         .layer-tab {
             background: rgba(255, 255, 255, 0.05);
@@ -599,6 +629,29 @@
                                 <i class="fas fa-download"></i> Download PFP
                             </button>
                         </div>
+                        
+                        <!-- AI ENHANCEMENT -->
+                        <div style="margin-top: 32px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <h4 style="color: var(--primary); margin-bottom: 16px; font-size: 1.2rem;">🤖 AI Personalization</h4>
+                            <p style="font-size: 0.9rem; color: #999; margin-bottom: 16px;">Describe what you want to add or change</p>
+                            
+                            <textarea id="ai-prompt" placeholder="Example: Add sunglasses and a cool hat, make it more vibrant, add neon glow effects..." 
+                                style="width: 100%; min-height: 80px; padding: 12px; border-radius: 8px; border: 2px solid rgba(138, 43, 226, 0.3); background: rgba(0,0,0,0.3); color: #f8f8f8; font-size: 0.95rem; resize: vertical; font-family: inherit;"></textarea>
+                            
+                            <select id="ai-style" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid rgba(138, 43, 226, 0.3); background: rgba(0,0,0,0.3); color: #f8f8f8; font-size: 0.95rem; margin-top: 12px; cursor: pointer;">
+                                <option value="Photo-to-Anime">Anime Style</option>
+                                <option value="Light-Restoration">Enhance Lighting</option>
+                                <option value="Upscale2K">Upscale Quality</option>
+                                <option value="Edit-Skin">Enhance Colors</option>
+                                <option value="Relight">Dramatic Lighting</option>
+                            </select>
+                            
+                            <button class="ai-enhance-btn" onclick="enhanceWithAI()" id="enhance-btn" style="width: 100%; margin-top: 12px;">
+                                <i class="fas fa-magic"></i> <span id="enhance-text">Enhance with AI</span>
+                            </button>
+                            
+                            <p style="font-size: 0.85rem; color: #888; margin-top: 12px;">✨ Powered by Hugging Face Qwen</p>
+                        </div>
                     </div>
                     
                     <div>
@@ -786,6 +839,96 @@
             document.getElementById('generator-ui').style.display = 'grid';
             randomize();
         });
+        
+        // AI ENHANCEMENT FUNCTION
+        async function enhanceWithAI() {
+            const promptInput = document.getElementById('ai-prompt');
+            const styleSelect = document.getElementById('ai-style');
+            const enhanceBtn = document.getElementById('enhance-btn');
+            const enhanceText = document.getElementById('enhance-text');
+            
+            const prompt = promptInput.value.trim();
+            const style = styleSelect.value;
+            
+            if (!prompt) {
+                alert('Please describe what you want to add or change!');
+                return;
+            }
+            
+            // Disable button and show loading
+            enhanceBtn.disabled = true;
+            enhanceText.textContent = 'Enhancing... (this may take 10-30 seconds)';
+            
+            try {
+                // Convert canvas to blob
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                
+                // Create form data
+                const formData = new FormData();
+                formData.append('data', blob, 'character.png');
+                
+                // Upload to Hugging Face Space
+                const uploadResponse = await fetch('https://prithivmlmods-qwen-image-edit-2509-loras-fast.hf.space/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!uploadResponse.ok) {
+                    throw new Error('Failed to upload image');
+                }
+                
+                const uploadData = await uploadResponse.json();
+                const imageUrl = uploadData[0]; // Get uploaded file URL
+                
+                // Call the prediction API
+                const predictResponse = await fetch('https://prithivmlmods-qwen-image-edit-2509-loras-fast.hf.space/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        data: [
+                            imageUrl,      // input_image
+                            prompt,        // prompt
+                            style,         // lora_adapter
+                            1,             // guidance_scale
+                            4,             // steps
+                            0,             // seed
+                            true           // randomize_seed
+                        ]
+                    })
+                });
+                
+                if (!predictResponse.ok) {
+                    throw new Error('API request failed: ' + predictResponse.statusText);
+                }
+                
+                const result = await predictResponse.json();
+                const enhancedImageUrl = result.data[0]; // Get enhanced image URL
+                
+                // Load enhanced image onto canvas
+                const enhancedImg = new Image();
+                enhancedImg.crossOrigin = 'anonymous';
+                enhancedImg.onload = () => {
+                    ctx.clearRect(0, 0, 400, 400);
+                    ctx.drawImage(enhancedImg, 0, 0, 400, 400);
+                    
+                    enhanceBtn.disabled = false;
+                    enhanceText.textContent = 'Enhance with AI';
+                    alert('✨ Enhancement complete! You can now download your personalized PFP.');
+                };
+                enhancedImg.onerror = () => {
+                    throw new Error('Failed to load enhanced image');
+                };
+                enhancedImg.src = enhancedImageUrl;
+                
+            } catch (error) {
+                console.error('Enhancement error:', error);
+                alert('⚠️ Enhancement failed: ' + error.message + '\n\nPlease try again or use a different prompt.');
+                enhanceBtn.disabled = false;
+                enhanceText.textContent = 'Enhance with AI';
+            }
+        }
     </script>
 </body>
 </html>
