@@ -108,6 +108,29 @@
             50% { opacity: 0.5; transform: scale(1.1); }
         }
 
+        /* Mobile optimizations - Fix flickering */
+        @media (max-width: 768px) {
+            body {
+                /* Remove fixed attachment on mobile - major cause of flickering */
+                background-attachment: scroll;
+                /* Simplify background on mobile */
+                background-image: 
+                    radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+                    radial-gradient(at 50% 100%, rgba(34, 197, 94, 0.1) 0px, transparent 50%);
+            }
+            
+            /* Completely disable orb animations and reduce complexity */
+            .bg-orbs {
+                display: none;
+            }
+            
+            .orb {
+                animation: none !important;
+                opacity: 0;
+                display: none;
+            }
+        }
+
         .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
         
         /* Header */
