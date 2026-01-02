@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOT5 Token Development — Omnichain Bridge Architecture</title>
+    <meta name="description" content="ROOT5 token deployment across 6 blockchains: 1B on Solana for governance, 500M across EVM chains via LayerZero V2">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #252525;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-tertiary: #707070;
+            --accent: #00ff88;
+            --accent-dim: #00cc6a;
+            --border: #333333;
+            --card-bg: #1a1a1a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        .hero {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem 2rem;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.03em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 900px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .stat {
+            text-align: left;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .chain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .chain-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .chain-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .chain-card.live {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(26, 26, 26, 1) 100%);
+        }
+
+        .chain-card.pending {
+            border-color: #ffaa00;
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.05) 0%, rgba(26, 26, 26, 1) 100%);
+        }
+
+        .chain-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .chain-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-live {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--accent);
+        }
+
+        .status-pending {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+
+        .chain-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .chain-details {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .chain-detail {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chain-detail::before {
+            content: '•';
+            color: var(--accent);
+        }
+
+        .roadmap {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .roadmap::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent) 0%, var(--border) 100%);
+        }
+
+        .roadmap-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-left: 1rem;
+        }
+
+        .roadmap-item::before {
+            content: '';
+            position: absolute;
+            left: -1.75rem;
+            top: 1.75rem;
+            width: 14px;
+            height: 14px;
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+        }
+
+        .roadmap-item.completed::before {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .roadmap-item.current::before {
+            background: #ffaa00;
+            border-color: #ffaa00;
+            box-shadow: 0 0 12px rgba(255, 170, 0, 0.5);
+        }
+
+        .roadmap-phase {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .roadmap-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .roadmap-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .roadmap-desc ul {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .roadmap-desc li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        th {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cost {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .contract-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .contract-label {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .contract-value {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: var(--bg-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--accent-dim);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .alert {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .alert strong {
+            color: #ffaa00;
+        }
+
+        .bridge-diagram {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .bridge-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .bridge-step {
+            background: var(--bg-secondary);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            min-width: 150px;
+        }
+
+        .bridge-arrow {
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .chain-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav a {
+                margin-left: 1rem;
+                font-size: 0.85rem;
+            }
+
+            .roadmap {
+                padding-left: 1.5rem;
+            }
+
+            .bridge-flow {
+                flex-direction: column;
+            }
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            background: var(--bg-secondary);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="https://root5dao.com" class="logo">ROOT5 DAO</a>
+            <nav>
+                <a href="https://root5dao.com">Home</a>
+                <a href="https://bounty.root5dao.com">Bounty</a>
+                <a href="#overview">Token</a>
+                <a href="#bridges">Bridges</a>
+                <a href="#roadmap">Roadmap</a>
+                <a href="https://merch.root5dao.com">Merch</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1>ROOT5 Token Development</h1>
+        <p class="subtitle">Deflationary dual token system: 1 billion ROOT5 on Solana for governance, 500 million across 4 EVM chains (125M each) for trading. Strategic burn mechanisms targeting 800M final supply through 50% bridge burns, buybacks, and in-app burning.</p>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">1.5B → 800M</div>
+                <div class="stat-label">Supply Reduction</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Blockchains</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Live Chains</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">80%</div>
+                <div class="stat-label">Complete</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        
+        <!-- Token Overview -->
+        <section class="section" id="overview">
+            <h2>Token Overview</h2>
+            <p>ROOT5 exists as two separate token systems serving different purposes within the ecosystem. The Solana SPL token (1 billion supply) powers DAO governance and voting, while the omnichain OFT (500 million total, distributed as 125M per chain across 4 EVM chains) enables cross-chain trading and liquidity.</p>
+
+            <div class="alert">
+                <strong>Supply Reduction Plan:</strong> Current supply of 1.5B will be reduced to 800M through strategic burning mechanisms including 50% burn on Solana→EVM swaps, buybacks, and in-app burning features.
+            </div>
+
+            <h3>Token Distribution</h3>
+            <div class="contract-box">
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin: 0.75rem 0; font-size: 1.1rem;"><strong>☀️ Solana SPL: 1,000,000,000 ROOT5</strong></li>
+                    <li style="margin: 0.5rem 0 0.75rem 1.5rem; color: var(--text-secondary);">Purpose: DAO governance, meme voting, ecosystem decisions</li>
+                    <li style="margin: 0.5rem 0 0.75rem 1.5rem; color: var(--text-secondary);">Reduction target: 500M (50% burn through mechanisms below)</li>
+                    
+                    <li style="margin: 1.5rem 0 0.75rem 0; font-size: 1.1rem;"><strong>⛓️ Omnichain OFT: 500,000,000 ROOT5</strong></li>
+                    <li style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-secondary);">🟡 BSC: 125,000,000 ROOT5</li>
+                    <li style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-secondary);">🔷 Ethereum: 125,000,000 ROOT5</li>
+                    <li style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-secondary);">🔵 Arbitrum: 125,000,000 ROOT5</li>
+                    <li style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-secondary);">🟦 Base: 125,000,000 ROOT5</li>
+                    <li style="margin: 0.75rem 0 0 1.5rem; color: var(--text-secondary);">Purpose: Cross-chain trading, DeFi, liquidity pools</li>
+                    <li style="margin: 0.5rem 0 0 1.5rem; color: var(--text-secondary);">Reduction target: 300M (40% reduction through buybacks & burns)</li>
+                    
+                    <li style="margin: 1.5rem 0 0.75rem 0; font-size: 1.1rem;"><strong>💎 TON: Shared from EVM Pool</strong></li>
+                    <li style="margin: 0.5rem 0 0 1.5rem; color: var(--text-secondary);">Bridge pending Q1 2025 (LayerZero tooling)</li>
+                </ul>
+            </div>
+
+            <div class="alert">
+                <strong>Important:</strong> The Solana and EVM tokens are separate and serve different purposes. They are not directly exchangeable 1:1. A future OFT Store will enable cross-ecosystem bridging with defined exchange mechanisms.
+            </div>
+
+            <h3>Supply Reduction Strategy</h3>
+            <div class="contract-box">
+                <p style="margin-bottom: 1rem;"><strong>Goal: Reduce from 1.5B to 800M total supply</strong></p>
+                
+                <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; margin: 1rem 0;">
+                    <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">Target: 800,000,000 ROOT5</div>
+                    <div style="color: var(--text-secondary);">↓ 46.7% reduction from current supply</div>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">Solana: 1B → 500M (50% burn)</div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem;">EVM: 500M → 300M (40% burn)</div>
+                    </div>
+                </div>
+
+                <p style="margin: 1.5rem 0 1rem;"><strong>Burning Mechanisms:</strong></p>
+                
+                <div style="margin: 1rem 0; padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent); border-radius: 4px;">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">🔥 1. Solana → EVM Centralized Swap V1 (50% Burn)</div>
+                    <ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                        <li>Users send Solana ROOT5 to centralized swap address</li>
+                        <li>System automatically burns 50% of deposited tokens</li>
+                        <li>Remaining 50% swapped 1:1 to EVM ROOT5 on chosen chain</li>
+                        <li>Example: Deposit 1000 Solana ROOT5 → 500 burned → Receive 1000 EVM ROOT5</li>
+                        <li>Reverse (EVM → Solana): Standard 1:1 swap until Solana pool depleted</li>
+                        <li>Centralized control ensures supply management and prevents abuse</li>
+                        <li>All burns publicly verifiable on Solana explorer</li>
+                    </ul>
+                    <div style="margin-top: 0.75rem; padding: 0.75rem; background: var(--bg-tertiary); border-radius: 4px; font-size: 0.85rem;">
+                        <strong>How it reduces supply:</strong> Burns 50% of Solana tokens while maintaining 1:1 EVM swap, reducing available Solana pool for reverse swaps and lowering total supply.
+                    </div>
+                </div>
+
+                <div style="margin: 1rem 0; padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent); border-radius: 4px;">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">💰 2. Token Buybacks</div>
+                    <ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                        <li>Treasury uses DAO revenue to buy tokens from market</li>
+                        <li>Purchased tokens sent to burn address</li>
+                        <li>Regular buyback events announced to community</li>
+                        <li>Transparent on-chain transactions</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 1rem 0; padding: 1rem; background: var(--bg-secondary); border-left: 3px solid var(--accent); border-radius: 4px;">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">🎮 3. In-App Burning Mechanisms</div>
+                    <ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                        <li>Burn tokens to vote on proposals (already implemented)</li>
+                        <li>Burn tokens for premium features (AI PFP generator)</li>
+                        <li>Burn tokens to boost proposal visibility</li>
+                        <li>Burn tokens for exclusive DAO benefits</li>
+                        <li>Future: Burn for NFT minting, special governance powers</li>
+                    </ul>
+                </div>
+
+                <p style="margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                    <strong>Timeline:</strong> Supply reduction will occur organically over 12-24 months as mechanisms are adopted by the community. All burns are permanent and verifiable on-chain.
+                </p>
+            </div>
+
+            <h3>Key Features</h3>
+            <div class="contract-box">
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin: 0.75rem 0;">🔒 <strong>Fixed Maximum:</strong> No new tokens can be minted on any chain</li>
+                    <li style="margin: 0.75rem 0;">🔥 <strong>Deflationary:</strong> Supply actively reducing to 800M target</li>
+                    <li style="margin: 0.75rem 0;">⛓️ <strong>Dual System:</strong> Separate tokens for governance (Solana) and trading (EVM)</li>
+                    <li style="margin: 0.75rem 0;">🔄 <strong>EVM Bridging:</strong> LayerZero V2 burn-and-mint mechanism (live)</li>
+                    <li style="margin: 0.75rem 0;">🛡️ <strong>Security:</strong> Multi-DVN validation, no centralized control</li>
+                    <li style="margin: 0.75rem 0;">🌉 <strong>Future Bridge:</strong> OFT Store for Solana ↔ EVM with 50% burn</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Deployed Chains -->
+        <section class="section">
+            <h2>Deployed Chains</h2>
+            
+            <div class="chain-grid">
+                <div class="chain-card live">
+                    <div class="chain-header">
+                        <div>
+                            <div class="chain-name">☀️ Solana</div>
+                            <div class="chain-info">SPL Token • Governance</div>
+                        </div>
+                        <span class="status-badge status-live">LIVE</span>
+                    </div>
+                    <div class="chain-details">
+                        <div class="chain-detail">1,000,000,000 supply</div>
+                        <div class="chain-detail">DAO governance & voting</div>
+                        <div class="chain-detail">Trading on Pump.fun</div>
+                        <div class="chain-detail">Separate ecosystem</div>
+                    </div>
+                </div>
+
+                <div class="chain-card live">
+                    <div class="chain-header">
+                        <div>
+                            <div class="chain-name">🟡 BSC</div>
+                            <div class="chain-info">LayerZero V2 OFT</div>
+                        </div>
+                        <span class="status-badge status-live">LIVE</span>
+                    </div>
+                    <div class="chain-details">
+                        <div class="chain-detail">125,000,000 supply</div>
+                        <div class="chain-detail">Primary EVM chain</div>
+                        <div class="chain-detail">Lowest bridge fees</div>
+                        <div class="chain-detail">EID: 30102</div>
+                    </div>
+                </div>
+
+                <div class="chain-card live">
+                    <div class="chain-header">
+                        <div>
+                            <div class="chain-name">🔷 Ethereum</div>
+                            <div class="chain-info">LayerZero V2 OFT</div>
+                        </div>
+                        <span class="status-badge status-live">LIVE</span>
+                    </div>
+                    <div class="chain-details">
+                        <div class="chain-detail">125,000,000 supply</div>
+                        <div class="chain-detail">Highest visibility</div>
+                        <div class="chain-detail">Full bridge operational</div>
+                        <div class="chain-detail">EID: 30101</div>
+                    </div>
+                </div>
+
+                <div class="chain-card live">
+                    <div class="chain-header">
+                        <div>
+                            <div class="chain-name">🔵 Arbitrum</div>
+                            <div class="chain-info">LayerZero V2 OFT • L2</div>
+                        </div>
+                        <span class="status-badge status-live">LIVE</span>
+                    </div>
+                    <div class="chain-details">
+                        <div class="chain-detail">125,000,000 supply</div>
+                        <div class="chain-detail">L2 scaling benefits</div>
+                        <div class="chain-detail">Low bridge costs</div>
+                        <div class="chain-detail">EID: 30110</div>
+                    </div>
+                </div>
+
+                <div class="chain-card live">
+                    <div class="chain-header">
+                        <div>
+                            <div class="chain-name">🟦 Base</div>
+                            <div class="chain-info">LayerZero V2 OFT • Coinbase L2</div>
+                        </div>
+                        <span class="status-badge status-live">LIVE</span>
+                    </div>
+                    <div class="chain-details">
+                        <div class="chain-detail">125,000,000 supply</div>
+                        <div class="chain-detail">Growing ecosystem</div>
+                        <div class="chain-detail">Backed by Coinbase</div>
+                        <div class="chain-detail">EID: 30184</div>
+                    </div>
+                </div>
+
+                <div class="chain-card pending">
+                    <div class="chain-header">
+                        <div>
+                            <div class="chain-name">💎 TON</div>
+                            <div class="chain-info">LayerZero V2 OFT • FunC</div>
+                        </div>
+                        <span class="status-badge status-pending">PENDING Q1 2025</span>
+                    </div>
+                    <div class="chain-details">
+                        <div class="chain-detail">Shares from EVM pool</div>
+                        <div class="chain-detail">Contract deployed ✓</div>
+                        <div class="chain-detail">Awaiting LayerZero tooling</div>
+                        <div class="chain-detail">EID: 30343</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bridge Mechanics -->
+        <section class="section" id="bridges">
+            <h2>Bridge Mechanics</h2>
+            <p>ROOT5 uses different bridging mechanisms depending on the ecosystem. Understanding how tokens move between chains is crucial to address concerns about "minting" functions.</p>
+
+            <h3>EVM ↔ EVM Bridges (Currently Live)</h3>
+            <div class="contract-box">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);"><strong>How it works:</strong> LayerZero V2 Omnichain Fungible Token (OFT) standard</p>
+                
+                <div class="bridge-diagram">
+                    <div class="bridge-flow">
+                        <div class="bridge-step">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">1. User Initiates</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Send 100 ROOT5 from BSC to Ethereum</div>
+                        </div>
+                        <div class="bridge-arrow">→</div>
+                        <div class="bridge-step">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">2. Burn on Source</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">100 ROOT5 burned on BSC</div>
+                        </div>
+                        <div class="bridge-arrow">→</div>
+                        <div class="bridge-step">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">3. DVN Verification</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Multiple verifiers confirm burn</div>
+                        </div>
+                        <div class="bridge-arrow">→</div>
+                        <div class="bridge-step">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">4. Mint on Destination</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">100 ROOT5 minted on Ethereum</div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="margin-top: 1.5rem;"><strong>Why minting is secure:</strong></p>
+                <ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                    <li style="margin: 0.5rem 0;">Tokens can ONLY be minted when an equal amount is burned on another chain</li>
+                    <li style="margin: 0.5rem 0;">Multiple independent DVNs (Decentralized Verifier Networks) verify every burn</li>
+                    <li style="margin: 0.5rem 0;">Total supply across ALL chains always remains 500M</li>
+                    <li style="margin: 0.5rem 0;">No single entity can mint without burning - it's mathematically enforced</li>
+                    <li style="margin: 0.5rem 0;">LayerZero V2 is battle-tested with billions in TVL</li>
+                </ul>
+
+                <p style="margin-top: 1rem; color: var(--text-secondary);"><strong>Cost:</strong> $1-10 per bridge depending on destination chain gas fees</p>
+            </div>
+
+            <h3>Solana ↔ EVM Bridge (V1 - Centralized Swap with Burn)</h3>
+            <div class="contract-box">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);"><strong>Status:</strong> In development - planned for Q1-Q2 2025</p>
+                
+                <div class="alert">
+                    <strong>V1 Approach:</strong> Centralized swap system for easy supply control and security. Burns 50% of Solana deposits while maintaining 1:1 swap ratio to EVM. Future V2 may be fully decentralized.
+                </div>
+
+                <p style="margin-top: 1.5rem;"><strong>Centralized Swap Mechanism (V1):</strong></p>
+                <ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                    <li style="margin: 0.5rem 0;"><strong>Centralized Control:</strong> Trusted swap operated by ROOT5 DAO team</li>
+                    <li style="margin: 0.5rem 0;"><strong>Solana → EVM:</strong> Burn 50% of deposited Solana tokens, swap remaining 1:1 to EVM</li>
+                    <li style="margin: 0.5rem 0;"><strong>EVM → Solana:</strong> Standard 1:1 swap from EVM pool until depleted</li>
+                    <li style="margin: 0.5rem 0;"><strong>Automatic Processing:</strong> Deposits processed automatically within 24 hours</li>
+                    <li style="margin: 0.5rem 0;"><strong>Supply Management:</strong> Centralized control prevents abuse and ensures proper burning</li>
+                    <li style="margin: 0.5rem 0;"><strong>Transparency:</strong> All burns publicly verifiable on Solana explorer</li>
+                    <li style="margin: 0.5rem 0;"><strong>Multi-sig Security:</strong> Team multi-signature wallet controls swap operations</li>
+                </ul>
+
+                <div style="margin: 1.5rem 0; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                    <div style="font-weight: 600; margin-bottom: 0.75rem;">Solana → EVM Example:</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        <div style="margin: 0.5rem 0;">1. User deposits 10,000 Solana ROOT5 to swap address</div>
+                        <div style="margin: 0.5rem 0;">2. System burns 5,000 Solana ROOT5 (50% deflationary burn)</div>
+                        <div style="margin: 0.5rem 0;">3. Remaining 5,000 held in reserve pool</div>
+                        <div style="margin: 0.5rem 0;">4. User receives 10,000 EVM ROOT5 on chosen chain (1:1 swap rate)</div>
+                        <div style="margin: 0.5rem 0;">5. <strong>Net effect:</strong> -5K Solana supply, +10K EVM supply, total supply reduced by 5K</div>
+                    </div>
+                </div>
+
+                <div style="margin: 1.5rem 0; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                    <div style="font-weight: 600; margin-bottom: 0.75rem;">EVM → Solana Example:</div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        <div style="margin: 0.5rem 0;">1. User deposits 10,000 EVM ROOT5 to swap address</div>
+                        <div style="margin: 0.5rem 0;">2. EVM tokens held in reserve pool</div>
+                        <div style="margin: 0.5rem 0;">3. User receives 10,000 Solana ROOT5 from reserve (1:1 swap rate)</div>
+                        <div style="margin: 0.5rem 0;">4. <strong>Limitation:</strong> Only available while Solana reserve pool has tokens</div>
+                        <div style="margin: 0.5rem 0;">5. <strong>Net effect:</strong> Reserve pool gradually depletes as more users swap to Solana</div>
+                    </div>
+                </div>
+
+                <p style="margin-top: 1rem;"><strong>Why Centralized V1:</strong></p>
+                <ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                    <li>Faster development and lower cost than fully decentralized solution</li>
+                    <li>Easy supply control and burn verification</li>
+                    <li>Prevents smart contract risks during initial phase</li>
+                    <li>Can adjust parameters based on community feedback</li>
+                    <li>Team accountability and transparent operations</li>
+                    <li>Future V2 can migrate to decentralized bridge if needed</li>
+                </ul>
+
+                <p style="margin-top: 1rem;"><strong>Estimated Development Cost:</strong></p>
+                <ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                    <li>Solana PDA/smart contract: ~7 SOL ($1,400 at $200/SOL)</li>
+                    <li>EVM smart contract development: $3,000-5,000</li>
+                    <li>Backend automation system: $2,000-3,000</li>
+                    <li>Security review: $2,000-5,000</li>
+                    <li><strong>Total estimated:</strong> $8,400-14,400</li>
+                </ul>
+
+                <p style="margin-top: 1rem; color: var(--text-secondary);"><strong>Swap Processing Fee:</strong> $2-5 per transaction (covers gas + operations, fee burned)</p>
+            </div>
+
+            <h3>EVM ↔ TON Bridge (Pending LayerZero Q1 2025)</h3>
+            <div class="contract-box">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);"><strong>Status:</strong> Contract deployed, awaiting LayerZero tooling update</p>
+                
+                <p><strong>Current Situation:</strong></p>
+                <ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                    <li style="margin: 0.5rem 0;">TON OFT contract is deployed and ready on TON Mainnet</li>
+                    <li style="margin: 0.5rem 0;">Peers are configured between BSC and TON</li>
+                    <li style="margin: 0.5rem 0;">LayerZero confirmed they don't have necessary tooling yet</li>
+                    <li style="margin: 0.5rem 0;">Expected release: Q1 2025 (confirmed by LayerZero team)</li>
+                </ul>
+
+                <p style="margin-top: 1.5rem;"><strong>How TON Bridge Will Work:</strong></p>
+                <ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                    <li style="margin: 0.5rem 0;">Same burn-and-mint mechanism as EVM chains</li>
+                    <li style="margin: 0.5rem 0;">Tokens share from the existing 500M EVM pool</li>
+                    <li style="margin: 0.5rem 0;">Custom FunC contract with source validation (only accepts from BSC)</li>
+                    <li style="margin: 0.5rem 0;">64-byte message format for EVM compatibility</li>
+                    <li style="margin: 0.5rem 0;">When someone bridges TO to TON, tokens are burned on source EVM chain and minted on TON</li>
+                    <li style="margin: 0.5rem 0;">When someone bridges FROM TON, tokens are burned on TON and minted on destination EVM chain</li>
+                </ul>
+
+                <p style="margin-top: 1rem; color: var(--text-secondary);"><strong>Configuration Cost (when available):</strong> ~$50-100 in gas fees</p>
+                <p style="color: var(--text-secondary);"><strong>Bridge Fee (estimated):</strong> $0.50-2 per transaction (TON has very low fees)</p>
+            </div>
+
+            <h3>Why Bridge Mechanisms Matter</h3>
+            <div class="contract-box">
+                <p style="color: var(--text-secondary);">Many people see "mint" functions in smart contracts and assume it means unlimited inflation. Here's why ROOT5's minting is different:</p>
+                
+                <ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">
+                    <li style="margin: 0.75rem 0;"><strong>Controlled Minting:</strong> Tokens can ONLY be minted when equal amounts are burned elsewhere</li>
+                    <li style="margin: 0.75rem 0;"><strong>Verified Burning:</strong> Multiple independent parties (DVNs) must verify burns before minting</li>
+                    <li style="margin: 0.75rem 0;"><strong>Mathematical Guarantee:</strong> Total supply (1.5B) is mathematically enforced across all chains</li>
+                    <li style="margin: 0.75rem 0;"><strong>No Owner Privilege:</strong> Even the contract owner cannot mint without a corresponding burn</li>
+                    <li style="margin: 0.75rem 0;"><strong>Transparent:</strong> All bridge transactions visible on LayerZero Scan and chain explorers</li>
+                </ul>
+
+                <div class="alert" style="margin-top: 1.5rem;">
+                    <strong>For Skeptics:</strong> You can verify that total supply remains constant by checking all contract addresses on their respective explorers. The sum will always equal 1.5 billion tokens (1B Solana + 500M EVM).
+                </div>
+            </div>
+        </section>
+
+        <!-- Roadmap -->
+        <section class="section" id="roadmap">
+            <h2>Development Roadmap</h2>
+            
+            <div class="roadmap">
+                <div class="roadmap-item completed">
+                    <div class="roadmap-phase">Q3-Q4 2024 • Phase 1</div>
+                    <div class="roadmap-title">✅ Solana Launch</div>
+                    <div class="roadmap-desc">
+                        <ul>
+                            <li>Deploy ROOT5 SPL token (1B supply)</li>
+                            <li>Launch on Pump.fun</li>
+                            <li>DAO governance system</li>
+                            <li>Meme voting platform</li>
+                            <li>Community building (1,500+ members)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="roadmap-item completed">
+                    <div class="roadmap-phase">Q4 2024 • Phase 2</div>
+                    <div class="roadmap-title">✅ EVM Omnichain Deployment</div>
+                    <div class="roadmap-desc">
+                        <ul>
+                            <li>Deploy OFT on BSC (125M), Ethereum (125M), Arbitrum (125M), Base (125M)</li>
+                            <li>Configure LayerZero V2 pathways</li>
+                            <li>Set all cross-chain peers</li>
+                            <li>Test and verify EVM bridging (fully operational)</li>
+                            <li><strong>Cost:</strong> ~$60-180 in deployment fees</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="roadmap-item completed">
+                    <div class="roadmap-phase">Q4 2024 • Phase 3</div>
+                    <div class="roadmap-title">✅ TON Contract Deployment</div>
+                    <div class="roadmap-desc">
+                        <ul>
+                            <li>Develop custom FunC OFT V2 implementation</li>
+                            <li>Deploy to TON Mainnet</li>
+                            <li>Set BSC ↔ TON peers</li>
+                            <li>Implement source validation security</li>
+                            <li><strong>Cost:</strong> ~$1-3 in TON deployment fees</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="roadmap-item current">
+                    <div class="roadmap-phase">Q4 2024 - Q1 2025 • Phase 4</div>
+                    <div class="roadmap-title">🔄 Contract Verification & Documentation</div>
+                    <div class="roadmap-desc">
+                        <ul>
+                            <li>Verify all EVM contracts on block explorers</li>
+                            <li>Complete technical documentation</li>
+                            <li>Create bridge usage guides</li>
+                            <li>Submit to CoinGecko and CoinMarketCap</li>
+                            <li><strong>Cost:</strong> Free (community effort)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q1 2025 • Phase 5</div>
+                    <div class="roadmap-title">⏳ TON Bridge Activation</div>
+                    <div class="roadmap-desc">
+                        <ul>
+                            <li>Await LayerZero TON tooling release (confirmed Q1 2025)</li>
+                            <li>Configure TON receive ULN settings</li>
+                            <li>Test BSC ↔ TON bridging</li>
+                            <li>Complete 6-chain omnichain launch</li>
+                            <li><strong>Cost:</strong> ~$50-100 in configuration fees</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q1-Q2 2025 • Phase 6</div>
+                    <div class="roadmap-title">🌉 Solana-EVM Swap Development</div>
+                    <div class="roadmap-desc">
+                        <ul>
+                            <li>Design centralized swap V1 with 50% burn mechanism</li>
+                            <li>Develop Solana PDA smart contract (~7 SOL)</li>
+                            <li>Build EVM smart contract for swap operations</li>
+                            <li>Backend automation for swap processing</li>
+                            <li>Security review and testing</li>
+                            <li>Deploy and launch Solana ↔ EVM swaps</li>
+                            <li><strong>Estimated Cost:</strong> $8,400-14,400</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q2+ 2025 • Phase 7</div>
+                    <div class="roadmap-title">📈 Ecosystem Growth</div>
+                    <div class="roadmap-desc">
+                        <ul>
+                            <li>Multi-chain marketing campaigns</li>
+                            <li>CEX listing exploration</li>
+                            <li>Enhanced DAO governance features</li>
+                            <li>Strategic partnerships</li>
+                            <li>Community treasury management</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contract Details -->
+        <section class="section">
+            <h2>Contract Details</h2>
+
+            <h3>Solana SPL Token</h3>
+            <div class="contract-box">
+                <div class="contract-label">Token Address</div>
+                <div class="contract-value">AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Supply</div>
+                <div class="contract-value">1,000,000,000 ROOT5</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Purpose</div>
+                <div class="contract-value" style="font-family: inherit;">DAO governance, meme voting, community decisions</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Trading</div>
+                <div class="contract-value" style="font-family: inherit;">
+                    <a href="https://pump.fun" target="_blank" style="color: var(--accent);">Pump.fun</a> • 
+                    <a href="https://dexscreener.com/solana/basucpi8m39rs5chbuosta78bptcrjzy2ad6nj2vww6z" target="_blank" style="color: var(--accent);">DexScreener</a> • 
+                    <a href="https://gmgn.ai/sol/token/AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump" target="_blank" style="color: var(--accent);">GMGN.ai</a>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2.5rem;">BSC Omnichain OFT</h3>
+            <div class="contract-box">
+                <div class="contract-label">Contract Address</div>
+                <div class="contract-value">0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Supply on BSC</div>
+                <div class="contract-value">125,000,000 ROOT5</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Explorer</div>
+                <div class="contract-value">
+                    <a href="https://bscscan.com/address/0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e" target="_blank" style="color: var(--accent);">View on BscScan →</a>
+                </div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">LayerZero EID</div>
+                <div class="contract-value">30102</div>
+            </div>
+
+            <h3 style="margin-top: 2.5rem;">Ethereum Omnichain OFT</h3>
+            <div class="contract-box">
+                <div class="contract-label">Contract Address</div>
+                <div class="contract-value">0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E</div>
+                <div style="margin-top: 0.5rem;">
+                    <a href="https://etherscan.io/address/0xC1b958dDf560AB592831b65dFC6a7f63b2EFe07E" target="_blank" style="color: var(--accent); text-decoration: none;">View on Etherscan →</a>
+                </div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Supply on Ethereum</div>
+                <div class="contract-value">125,000,000 ROOT5</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">LayerZero EID</div>
+                <div class="contract-value">30101</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Status</div>
+                <div class="contract-value" style="font-family: inherit;">Fully operational, bridging to/from BSC, Arbitrum, Base</div>
+            </div>
+
+            <h3 style="margin-top: 2.5rem;">Arbitrum Omnichain OFT</h3>
+            <div class="contract-box">
+                <div class="contract-label">Contract Address</div>
+                <div class="contract-value">0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</div>
+                <div style="margin-top: 0.5rem;">
+                    <a href="https://arbiscan.io/address/0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e" target="_blank" style="color: var(--accent); text-decoration: none;">View on Arbiscan →</a>
+                </div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Supply on Arbitrum</div>
+                <div class="contract-value">125,000,000 ROOT5</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">LayerZero EID</div>
+                <div class="contract-value">30110</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Status</div>
+                <div class="contract-value" style="font-family: inherit;">Fully operational, L2 benefits with low fees</div>
+            </div>
+
+            <h3 style="margin-top: 2.5rem;">Base Omnichain OFT</h3>
+            <div class="contract-box">
+                <div class="contract-label">Contract Address</div>
+                <div class="contract-value">0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e</div>
+                <div style="margin-top: 0.5rem;">
+                    <a href="https://basescan.org/address/0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e" target="_blank" style="color: var(--accent); text-decoration: none;">View on Basescan →</a>
+                </div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Supply on Base</div>
+                <div class="contract-value">125,000,000 ROOT5</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">LayerZero EID</div>
+                <div class="contract-value">30184</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Status</div>
+                <div class="contract-value" style="font-family: inherit;">Fully operational, Coinbase L2 ecosystem</div>
+            </div>
+
+            <h3 style="margin-top: 2.5rem;">LayerZero Configuration</h3>
+            <div class="contract-box">
+                <div class="contract-label">Owner/Delegate</div>
+                <div class="contract-value">0x4b5de5b202123CE3510EFc51D43ffB5b9D4e67A3</div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">DVNs (Decentralized Verifier Networks)</div>
+                <div class="contract-value" style="font-family: inherit;">
+                    <div style="margin: 0.5rem 0;">LayerZero DVN: <code style="font-size: 0.75rem;">0xD56e4eAb23cb81f43168F9F45211Eb027b9aC7cc</code></div>
+                    <div style="margin: 0.5rem 0;">Google Cloud DVN: <code style="font-size: 0.75rem;">0xfD6865c841c2d64565562fCc7e05e619A30615f0</code></div>
+                </div>
+            </div>
+            <div class="contract-box">
+                <div class="contract-label">Executor</div>
+                <div class="contract-value">0x3ebD570ed38B1b3b4BC886999fcF507e9D584859</div>
+            </div>
+        </section>
+
+        <!-- Development Costs -->
+        <section class="section">
+            <h2>Development Costs</h2>
+
+            <h3>Future Development Costs</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Details</th>
+                        <th>Estimated Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>TON Bridge Config</td>
+                        <td>When LayerZero releases tooling (Q1 2025)</td>
+                        <td class="cost">$50-100</td>
+                    </tr>
+                    <tr>
+                        <td>Solana PDA Contract</td>
+                        <td>~7 SOL for Solana program deployment</td>
+                        <td class="cost">~$1,400</td>
+                    </tr>
+                    <tr>
+                        <td>EVM Swap Contract</td>
+                        <td>Smart contract development</td>
+                        <td class="cost">$3,000-5,000</td>
+                    </tr>
+                    <tr>
+                        <td>Backend Automation</td>
+                        <td>Automated swap processing system</td>
+                        <td class="cost">$2,000-3,000</td>
+                    </tr>
+                    <tr>
+                        <td>Security Review</td>
+                        <td>Code audit and security testing</td>
+                        <td class="cost">$2,000-5,000</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><strong>Total Future Investment</strong></td>
+                        <td class="cost"><strong>~$8,450-14,500</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 2rem;">Per-Transaction Costs (User Fees)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bridge Type</th>
+                        <th>Fee Range</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>EVM ↔ EVM (LayerZero)</td>
+                        <td class="cost">$1-10</td>
+                        <td>Varies by destination chain gas</td>
+                    </tr>
+                    <tr>
+                        <td>EVM ↔ TON (Future)</td>
+                        <td class="cost">$0.50-2</td>
+                        <td>TON has very low fees</td>
+                    </tr>
+                    <tr>
+                        <td>Solana ↔ EVM (OFT Store)</td>
+                        <td class="cost">$2-5</td>
+                        <td>Estimated, includes wrapping fee</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Current Status -->
+        <section class="section">
+            <h2>Current Status & Next Steps</h2>
+
+            <div class="contract-box">
+                <h3 style="margin-top: 0;">✅ Completed (80%)</h3>
+                <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                    <li>Solana SPL token live and trading (1B supply)</li>
+                    <li>All EVM contracts deployed (500M total, 125M per chain)</li>
+                    <li>EVM bridging fully operational (4 chains)</li>
+                    <li>TON contract deployed and ready</li>
+                    <li>All peers configured</li>
+                    <li>Security validations implemented</li>
+                    <li>Complete documentation</li>
+                </ul>
+            </div>
+
+            <div class="contract-box">
+                <h3 style="margin-top: 0;">🔄 In Progress</h3>
+                <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                    <li>Contract verification on all block explorers</li>
+                    <li>CoinGecko and CoinMarketCap submissions</li>
+                    <li>Community education on bridge mechanics</li>
+                    <li>Documentation website updates</li>
+                </ul>
+            </div>
+
+            <div class="contract-box">
+                <h3 style="margin-top: 0;">⏳ Pending (Q1-Q2 2025)</h3>
+                <ul style="color: var(--text-secondary); margin-left: 1.5rem;">
+                    <li>TON bridge configuration (awaiting LayerZero Q1 2025 update)</li>
+                    <li>OFT Store development for Solana ↔ EVM bridging</li>
+                    <li>Security audits for cross-ecosystem bridge</li>
+                    <li>Complete 6-chain ecosystem launch</li>
+                </ul>
+            </div>
+
+            <div class="btn-group">
+                <a href="https://root5dao.com" class="btn">Back to Root5DAO</a>
+                <a href="https://bounty.root5dao.com" class="btn">Join Bounty Program</a>
+                <a href="https://bscscan.com/address/0xb062C2505b5a9d80B5718845BdA75fa3c267ce0e" class="btn btn-secondary" target="_blank">View BSC Contract</a>
+                <a href="https://pump.fun" class="btn btn-secondary" target="_blank">Trade on Solana</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">ROOT5 DAO</p>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            Omnichain Token Development • LayerZero V2 + Solana SPL
+        </p>
+        <p style="color: var(--text-tertiary); font-size: 0.9rem;">
+            <a href="https://root5dao.com">Home</a> • 
+            <a href="https://bounty.root5dao.com">Bounty</a> • 
+            <a href="https://merch.root5dao.com">Merch</a> • 
+            <a href="https://docs.layerzero.network/" target="_blank">LayerZero</a>
+        </p>
+        <p style="margin-top: 1.5rem; color: var(--text-tertiary); font-size: 0.85rem;">
+            1.5B Total Supply: 1B Solana SPL + 500M EVM OFT (125M per chain)
+        </p>
+        <p style="margin-top: 0.5rem; color: var(--text-tertiary); font-size: 0.85rem;">
+            Built with LayerZero V2 • Powered by Community • © 2024 Root5DAO
+        </p>
+    </footer>
+</body>
+</html>
