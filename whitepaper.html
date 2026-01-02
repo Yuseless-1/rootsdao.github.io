@@ -128,7 +128,7 @@
         .logo { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: bold; color: #f8f8f8; text-decoration: none; }
         .logo img { height: 40px; }
         nav ul { display: flex; list-style: none; gap: 8px; }
-        nav a { color: #f8f8f8; text-decoration: none; font-weight: 600; padding: 10px 20px; border-radius: 12px; transition: all 0.3s; }
+        nav a { color: #f8f8f8; text-decoration: none; font-weight: 600; padding: 8px 16px; border-radius: 12px; transition: all 0.3s; font-size: 0.9rem; }
         nav a:hover { color: var(--primary); background: rgba(34, 197, 94, 0.1); }
         
         /* Mobile Menu */
@@ -434,9 +434,21 @@
             
             <div class="card">
                 <h3>Token Specifications</h3>
-                <p><strong>Blockchain:</strong> Solana</p>
-                <p><strong>Total Supply:</strong> 1,000,000,000 ROOT5</p>
+                <p><strong>Blockchain:</strong> Solana (Primary) + Multi-Chain</p>
+                <p><strong>Total Supply:</strong> 1,000,000,000 ROOT5 (Solana SPL)</p>
                 <p><strong>Launch Mechanism:</strong> Fair launch bonding curve via Pump.fun</p>
+                
+                <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(34, 197, 94, 0.05); border-left: 4px solid var(--primary); border-radius: 8px;">
+                    <h4 style="margin-top: 0;">Cross-Chain Token Architecture</h4>
+                    <p>ROOT5 operates as a dual-system token across multiple blockchains:</p>
+                    <ul style="margin-top: 1rem;">
+                        <li><strong>Solana SPL (1B supply):</strong> Primary governance token for DAO voting and community decisions</li>
+                        <li><strong>EVM Chains (500M total):</strong> Cross-chain trading tokens deployed via LayerZero V2 on BSC, Ethereum, Arbitrum, and Base (125M each)</li>
+                        <li><strong>TON (Pending):</strong> Additional chain integration in Q1 2025</li>
+                    </ul>
+                    <p style="margin-top: 1rem;"><strong>Important:</strong> These are separate token systems serving different purposes. The Solana token powers governance while the omnichain tokens enable cross-chain liquidity and trading.</p>
+                    <p style="margin-top: 1rem;">📖 <a href="/development" style="color: var(--primary); text-decoration: none; font-weight: 600;">Visit the Development page for complete technical details →</a></p>
+                </div>
             </div>
 
             <div class="card">
@@ -616,36 +628,46 @@
             <div class="card">
                 <h3>Development Roadmap</h3>
                 
-                <h4>Week 1-2 (November 2025) - Genesis Launch</h4>
+                <h4>Week 1-2 (November 2024) - Genesis Launch</h4>
                 <ul>
                     <li>ROOT5 fair launch on Pump.fun</li>
                     <li>Community airdrop execution</li>
-                    <li>Token locking contract deployment</li>
                     <li>Governance website launch</li>
+                    <li>Community building & engagement</li>
                 </ul>
 
-                <h4>Month 2-3 (Dec 2025 - Jan 2026) - Governance Activation</h4>
+                <h4>Month 2-3 (December 2024 - January 2025) - Infrastructure Development</h4>
                 <ul>
-                    <li>Full voting dApp launch</li>
-                    <li>First governance proposals</li>
-                    <li>Security audit completion</li>
+                    <li>Cross-chain token deployment (EVM)</li>
+                    <li>LayerZero V2 bridge implementation</li>
                     <li>Community growth campaigns</li>
+                    <li>Technical documentation</li>
                 </ul>
 
-                <h4>Month 4-6 (Feb - Apr 2026) - Credit Union Expansion</h4>
+                <h4>Month 4 (February 2025) - Governance Activation</h4>
                 <ul>
-                    <li>First community-approved meme launches</li>
-                    <li>Revenue generation begins</li>
-                    <li>Reputation system deployment</li>
-                    <li>PDA treasury transition start</li>
+                    <li>Governance MVP launch with voting functionality</li>
+                    <li>Token locking contract deployment</li>
+                    <li>First community governance proposals</li>
+                    <li>DAO decision-making begins</li>
                 </ul>
 
-                <h4>Month 7+ (May 2026+) - Full Decentralization</h4>
+                <h4>Month 7-10 (May - August 2025) - Credit Union Launch</h4>
+                <ul>
+                    <li>Asset pooling mechanism deployment</li>
+                    <li>Community-approved meme launches begin</li>
+                    <li>Revenue generation from Pump.fun creator fees</li>
+                    <li>Treasury management systems</li>
+                    <li>First community investment decisions</li>
+                </ul>
+
+                <h4>Month 10+ (September 2025+) - Full Ecosystem Expansion</h4>
                 <ul>
                     <li>Complete PDA treasury control</li>
                     <li>Advanced governance features</li>
-                    <li>Multi-chain exploration</li>
-                    <li>Root5DAO Launchpad development</li>
+                    <li>Reputation system implementation</li>
+                    <li>Root5DAO Launchpad platform</li>
+                    <li>Multi-chain expansion completion</li>
                 </ul>
             </div>
         </div>
@@ -653,7 +675,61 @@
 
     <section class="alt">
         <div class="container">
-            <h2>7. Risk Disclosures</h2>
+            <h2>7. Community Development & DAO Asset Building</h2>
+            
+            <div class="card">
+                <h3>Community-Driven Innovation</h3>
+                <p>Root5DAO is more than a credit union for meme tokens—it's a platform for community-driven development. As the DAO scales, members will have the power to propose, vote on, and build digital assets that serve the entire ecosystem.</p>
+            </div>
+
+            <div class="card">
+                <h3>Development Proposal System</h3>
+                <p><strong>How It Works:</strong></p>
+                <ul>
+                    <li><strong>Proposal Submission:</strong> Community members can submit proposals for new tools, platforms, or assets that benefit the DAO</li>
+                    <li><strong>Community Review:</strong> Proposals undergo community discussion and refinement period</li>
+                    <li><strong>Governance Vote:</strong> Token holders vote on which projects receive DAO funding and support</li>
+                    <li><strong>Development Funding:</strong> Approved projects receive treasury allocation for development</li>
+                    <li><strong>Community Ownership:</strong> Built assets are owned by the DAO and benefit all members</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Example Development Projects</h3>
+                <div class="grid-2">
+                    <div>
+                        <h4>Platform Tools</h4>
+                        <ul>
+                            <li>Advanced analytics dashboards</li>
+                            <li>Automated trading bots</li>
+                            <li>Portfolio management systems</li>
+                            <li>NFT minting platforms</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Community Assets</h4>
+                        <ul>
+                            <li>Educational content platforms</li>
+                            <li>Marketing automation tools</li>
+                            <li>Social media integrations</li>
+                            <li>Custom blockchain applications</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Scaling with the Community</h3>
+                <p>As Root5DAO grows, the scope and ambition of community development projects will expand. Early proposals may focus on small tools and utilities, while mature DAO operations could fund complex platforms and applications that generate revenue and provide value to the entire Solana ecosystem.</p>
+                
+                <p style="margin-top: 1.5rem;"><strong style="color: var(--primary);">The future of Root5DAO is limited only by the creativity and initiative of its members.</strong> Every token holder has the opportunity to contribute ideas, build solutions, and shape the direction of the DAO's technical infrastructure.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2>8. Risk Disclosures</h2>
             
             <div class="alert">
                 <p><strong>⚠️ Important Notice:</strong> Participation in Root5DAO involves significant risks. Only participate with funds you can afford to lose entirely.</p>
@@ -674,7 +750,7 @@
 
     <section>
         <div class="container">
-            <h2>8. Conclusion: Building the Democratized Meme Credit Union</h2>
+            <h2>9. Conclusion: Building the Democratized Meme Credit Union</h2>
             
             <div class="card">
                 <p>Root5DAO represents a paradigm shift in how meme tokens are created, curated, and sustained. By combining deflationary tokenomics with democratic governance and sustainable revenue generation, we've built a credit union where creativity meets collective accountability.</p>
