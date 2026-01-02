@@ -3,239 +3,479 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RootsDAO - The Democratized Meme Credit Union</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <title>Whitepaper | ROOT5 DAO</title>
+    <meta name="description" content="Read the Root5DAO whitepaper - The Democratized Meme Credit Union on Solana. Learn about governance, tokenomics, and our vision for community-driven meme tokenization.">
+    <link rel="icon" type="image/jpeg" href="/layers/logo.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #22c55e;
+            --primary-light: #4ade80;
+            --primary-dark: #16a34a;
+            --secondary: #8a2be2;
+        }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(34, 197, 94, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #f8f8f8;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
             line-height: 1.6;
-            color: #1f2937;
-            background: #ffffff;
+        }
+
+        /* Background Orbs */
+        .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 8s ease-in-out infinite;
+        }
+        .orb-1 { 
+            top: 10%; 
+            left: 10%; 
+            width: 300px; 
+            height: 300px; 
+            background: rgba(139, 92, 246, 0.4);
+            animation: float 10s ease-in-out infinite, pulse 4s ease-in-out infinite;
+        }
+        .orb-2 { 
+            bottom: 10%; 
+            right: 10%; 
+            width: 400px; 
+            height: 400px; 
+            background: rgba(34, 197, 94, 0.4); 
+            animation: float 12s ease-in-out infinite reverse, pulse 5s ease-in-out infinite; 
+            animation-delay: 2s; 
+        }
+        .orb-3 { 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 500px; 
+            height: 500px; 
+            background: rgba(59, 130, 246, 0.3); 
+            animation: float 15s ease-in-out infinite, pulse 6s ease-in-out infinite; 
+            animation-delay: 4s; 
+        }
+        .orb-4 {
+            top: 30%;
+            right: 20%;
+            width: 350px;
+            height: 350px;
+            background: rgba(236, 72, 153, 0.3);
+            animation: float 11s ease-in-out infinite, pulse 5s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+        .orb-5 {
+            bottom: 30%;
+            left: 20%;
+            width: 280px;
+            height: 280px;
+            background: rgba(251, 191, 36, 0.25);
+            animation: float 13s ease-in-out infinite reverse, pulse 4.5s ease-in-out infinite;
+            animation-delay: 3s;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(30px, -40px) rotate(5deg); }
+            50% { transform: translate(-20px, -30px) rotate(-3deg); }
+            75% { transform: translate(-40px, 20px) rotate(4deg); }
         }
         
-        /* Hero Section */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+        
+        /* Header */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        header.scrolled { background: rgba(10, 10, 10, 0.95); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: bold; color: #f8f8f8; text-decoration: none; }
+        .logo img { height: 40px; }
+        nav ul { display: flex; list-style: none; gap: 8px; }
+        nav a { color: #f8f8f8; text-decoration: none; font-weight: 600; padding: 10px 20px; border-radius: 12px; transition: all 0.3s; }
+        nav a:hover { color: var(--primary); background: rgba(34, 197, 94, 0.1); }
+        
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #f8f8f8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+        }
+        
+        @media (max-width: 1200px) {
+            nav ul { gap: 4px; }
+            nav a { padding: 8px 12px; font-size: 0.9rem; }
+        }
+        
+        @media (max-width: 968px) {
+            .mobile-menu-btn { display: block; }
+            nav { position: fixed; top: 80px; left: 0; right: 0; background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(20px); padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); transform: translateY(-100%); opacity: 0; transition: all 0.3s; pointer-events: none; }
+            nav.active { transform: translateY(0); opacity: 1; pointer-events: all; }
+            nav ul { flex-direction: column; gap: 8px; }
+            nav a { display: block; padding: 12px 20px; }
+        }
+
+        /* Hero */
         .hero {
-            background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%);
-            padding: 80px 0;
+            padding: 140px 0 60px;
             text-align: center;
         }
-        
+
         .badge {
             display: inline-block;
-            padding: 8px 24px;
-            background: #f3e8ff;
-            border: 1px solid #c084fc;
-            border-radius: 9999px;
-            color: #6b21a8;
+            padding: 8px 20px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 24px;
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-bottom: 24px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
         }
-        
+
         h1 {
-            font-size: 72px;
-            font-weight: 800;
-            background: linear-gradient(to right, #9333ea, #ec4899, #3b82f6);
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 24px;
         }
-        
+
         .subtitle {
-            font-size: 28px;
-            color: #4b5563;
-            margin-bottom: 32px;
+            font-size: 1.5rem;
+            color: #a0a0a0;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
         }
-        
+
+        /* Content Sections */
         section {
-            padding: 64px 0;
+            padding: 60px 0;
+            position: relative;
         }
-        
+
         section.alt {
-            background: #f9fafb;
+            background: rgba(255, 255, 255, 0.02);
         }
-        
+
         h2 {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 32px;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        
+
         h3 {
-            font-size: 24px;
+            font-size: 1.75rem;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin: 2rem 0 1rem;
+            letter-spacing: -0.01em;
+            color: var(--primary);
         }
-        
+
         h4 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            margin-top: 24px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 1.5rem 0 1rem;
+            color: var(--primary-light);
         }
-        
+
         p {
-            margin-bottom: 16px;
-            font-size: 16px;
+            color: #a0a0a0;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
         }
-        
-        ul {
-            margin: 16px 0;
-            padding-left: 24px;
-        }
-        
-        li {
-            margin-bottom: 8px;
-        }
-        
+
+        /* Cards */
         .card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 32px;
-            margin-bottom: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            transition: all 0.3s;
         }
-        
+
+        .card:hover {
+            border-color: rgba(34, 197, 94, 0.5);
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.15);
+        }
+
+        /* Lists */
+        ul {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+            color: #a0a0a0;
+            line-height: 1.8;
+        }
+
+        ul li {
+            margin: 1rem 0;
+        }
+
+        ul li strong {
+            color: var(--primary);
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        th {
+            background: rgba(34, 197, 94, 0.1);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #a0a0a0;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        /* Grid */
         .grid-2 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
+            gap: 2rem;
+            margin: 2rem 0;
         }
-        
+
+        /* Chart Container */
         .chart-container {
-            position: relative;
-            height: 400px;
-            margin: 32px 0;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
         }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 24px 0;
+
+        /* Alert/Warning Box */
+        .alert {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
         }
-        
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
+
+        .alert p {
+            color: #f8f8f8;
         }
-        
-        th {
-            background: #f9fafb;
-            font-weight: 600;
+
+        .alert strong {
+            color: #ffaa00;
         }
-        
-        .warning-box {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 16px;
-            margin: 24px 0;
-            border-radius: 4px;
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 3rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4rem;
+            text-align: center;
         }
-        
+
+        footer .card {
+            max-width: 900px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            h1 { font-size: 48px; }
-            .subtitle { font-size: 20px; }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            h3 { font-size: 1.5rem; }
+            .hero { padding: 120px 0 40px; }
+            .subtitle { font-size: 1.25rem; }
+            .grid-2 { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Hero -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+        <div class="orb orb-5"></div>
+    </div>
+
+    <header id="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <img src="/layers/logo.jpg" alt="ROOT 5 DAO">
+                    <span>ROOT 5 DAO</span>
+                </a>
+                <button class="mobile-menu-btn" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav id="nav">
+                    <ul>
+                        <li><a href="/#token">Token</a></li>
+                        <li><a href="/#socials">Socials</a></li>
+                        <li><a href="/#generator">PFP Gen</a></li>
+                        <li><a href="https://www.root5merch.com" target="_blank">Merch</a></li>
+                        <li><a href="/whitepaper">Whitepaper</a></li>
+                        <li><a href="/development">Development</a></li>
+                        <li><a href="https://bounty.root5dao.com" target="_blank">Bounty</a></li>
+                        <li><a href="https://bounty.root5dao.com/bounty-calendar" target="_blank">Calendar</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
     <div class="hero">
         <div class="container">
             <div class="badge">The Democratized Meme Credit Union • Whitepaper v1.0</div>
-            <h1>RootsDAO</h1>
+            <h1>ROOT5 DAO</h1>
             <p class="subtitle">The First Democratized Meme Credit Union on Solana</p>
         </div>
     </div>
 
-    <!-- Abstract -->
     <section>
         <div class="container">
             <h2>Abstract</h2>
             <div class="card">
-                <p>RootsDAO is a decentralized autonomous organization designed to become the premier democratized meme credit union for community-driven meme tokens on Solana. By leveraging a unique two-tiered governance model—token locking for access rights and token burning for voting power—RootsDAO creates a deflationary ecosystem where value accrues to holders through supply reduction and revenue generation.</p>
+                <p>Root5DAO is a decentralized autonomous organization designed to become the premier democratized meme credit union for community-driven meme tokens on Solana. By leveraging a unique two-tiered governance model—token locking for access rights and token burning for voting power—Root5DAO creates a deflationary ecosystem where value accrues to holders through supply reduction and revenue generation.</p>
             </div>
         </div>
     </section>
 
-    <!-- Section 1 -->
     <section class="alt">
         <div class="container">
             <h2>1. The Meme Ecosystem Problem</h2>
             <p>The meme coin space represents one of crypto's most vibrant yet problematic sectors. While meme tokens have created billions in market value and passionate communities, they suffer from fundamental structural issues including centralized control, lack of sustainability, and zero formal incubation.</p>
-            <p><strong>RootsDAO solves this by creating a transparent, democratic, and economically sustainable credit union where the community itself makes collective investment decisions.</strong></p>
+            <p><strong style="color: var(--primary);">Root5DAO solves this by creating a transparent, democratic, and economically sustainable credit union where the community itself makes collective investment decisions.</strong></p>
         </div>
     </section>
 
-    <!-- Section 2 -->
     <section>
         <div class="container">
-            <h2>2. The ROOTS Token & Governance</h2>
+            <h2>2. The ROOT5 Token & Governance</h2>
             
             <div class="card">
                 <h3>Token Specifications</h3>
                 <p><strong>Blockchain:</strong> Solana</p>
-                <p><strong>Total Supply:</strong> 1,000,000,000 ROOTS</p>
-                <p><strong>Re-Launch Mechanism:</strong> Fair re-launch via Pump.fun with DAO treasury acquisition</p>
+                <p><strong>Total Supply:</strong> 1,000,000,000 ROOT5</p>
+                <p><strong>Launch Mechanism:</strong> Fair launch bonding curve via Pump.fun</p>
             </div>
-            
+
             <div class="card">
                 <h3>Token Distribution</h3>
-                <p><strong>Current Structure:</strong> RootsDAO is re-launching with a community-first approach. The DAO will acquire 100M tokens (10%) for the treasury:</p>
+                <p><strong>Initial Structure:</strong> 1 billion ROOT5 tokens minted in Pump.fun liquidity pool. DAO purchases 200M tokens (20%) at launch:</p>
                 <div class="chart-container">
                     <canvas id="distributionChart"></canvas>
                 </div>
                 <ul>
-                    <li><strong>55% (550M)</strong> - Pump.fun Public Liquidity Pool</li>
-                    <li><strong>35% (350M)</strong> - Community Holders</li>
+                    <li><strong>80% (800M)</strong> - Pump.fun Public Liquidity Pool</li>
                     <li><strong>10% (100M)</strong> - DAO Treasury</li>
-                </ul>
-                
-                <h4>Development Team Allocation</h4>
-                <p>To facilitate platform creation, the development team will receive <strong>10% of treasury holdings (10M ROOTS)</strong> distributed over 9 months in 3 separate transactions:</p>
-                <ul>
-                    <li><strong>Month 3:</strong> 3.33M ROOTS (33.3% of development allocation)</li>
-                    <li><strong>Month 6:</strong> 3.33M ROOTS (33.3% of development allocation)</li>
-                    <li><strong>Month 9:</strong> 3.34M ROOTS (33.4% of development allocation)</li>
+                    <li><strong>8% (80M)</strong> - Community Airdrop to ROOTS holders</li>
+                    <li><strong>2% (20M)</strong> - Development Team</li>
                 </ul>
             </div>
-            
+
             <div class="card">
                 <h3>Two-Tiered Governance Model</h3>
+                
                 <h4>Tier 1: Access Rights (Locking)</h4>
                 <p>Lock tokens to gain governance access. Locked tokens remain in your ownership.</p>
                 <ul>
-                    <li><strong>Vote on Proposals:</strong> Lock 5,000 ROOTS for at least 1 week before vote and for more than 30 days</li>
-                    <li><strong>Submit Proposals:</strong> Lock 10,000 ROOTS for at least 1 week before submission and for more than 30 days</li>
+                    <li><strong>Vote on Proposals:</strong> Lock 5,000 ROOT5 for at least 1 week before vote and for more than 30 days</li>
+                    <li><strong>Submit Proposals:</strong> Lock 10,000 ROOT5 for at least 1 week before submission and for more than 30 days</li>
                 </ul>
-                
+
                 <h4>Tier 2: Voting Power (Burning)</h4>
-                <p><strong>1 ROOTS = 1 Vote</strong> - Burned tokens are permanently removed from circulation.</p>
+                <p><strong>1 ROOT5 = 1 Vote</strong> - Burned tokens are permanently removed from circulation.</p>
             </div>
         </div>
     </section>
 
-    <!-- Section 3 -->
     <section class="alt">
         <div class="container">
             <h2>3. Tokenomics & Revenue Model</h2>
             
             <div class="card">
                 <h3>Pump.fun Dynamic Creator Fees</h3>
-                <p>RootsDAO captures creator fees from launched tokens based on market capitalization:</p>
+                <p>Root5DAO captures creator fees from launched tokens:</p>
                 <ul>
                     <li><strong>0.95%</strong> - Early Stage (Market cap < $300K)</li>
                     <li><strong>0.5-0.7%</strong> - Growth Stage ($300K - $1M)</li>
@@ -244,31 +484,29 @@
                     <li><strong>0.5 SOL</strong> - Graduation bonus per token</li>
                 </ul>
             </div>
-            
+
             <div class="card">
-                <h3>Fee Allocation Strategy</h3>
-                <p>Revenue from creator fees is allocated to support the DAO ecosystem:</p>
+                <h3>Fee Allocation by Phase</h3>
                 <div class="chart-container">
                     <canvas id="feeChart"></canvas>
                 </div>
-                <ul>
-                    <li><strong>50% Treasury:</strong> Funds DAO operations and community initiatives</li>
-                    <li><strong>30% Buyback:</strong> Market support and liquidity enhancement</li>
-                    <li><strong>20% Staking Rewards:</strong> Distribution to token holders</li>
-                </ul>
+                <p><strong>Phase 1 (launch-Bonding):</strong> 50% Buyback to add liquidity, 50% Development</p>
+                <p><strong>Phase 2 (Bonding to Platform Launch):</strong> 40% liquidity, 50% Development, 10% Marketing</p>
+                <p><strong>Phase 3 (Post Platform):</strong> 50% Treasury, 50% "Staking" For holders</p>
             </div>
         </div>
     </section>
 
-    <!-- Section 4 -->
     <section>
         <div class="container">
             <h2>4. Economic Security & Attack Mitigation</h2>
             
             <div class="card">
                 <h3>Attack Vector: Whale Domination</h3>
-                <h4>Progressive Vote Decay</h4>
-                <p>Voting power diminishes with concentration:</p>
+                <p><strong>Progressive Vote Decay</strong> - Voting power diminishes with concentration:</p>
+                <div class="chart-container">
+                    <canvas id="decayChart"></canvas>
+                </div>
                 <ul>
                     <li>First 10K tokens: 1.0x multiplier</li>
                     <li>10K-50K: 0.8x multiplier</li>
@@ -276,21 +514,17 @@
                     <li>200K-500K: 0.4x multiplier</li>
                     <li>500K+: 0.2x multiplier</li>
                 </ul>
-                <p><em>Example: Burning 1M tokens yields only 352K effective votes (35% efficiency)</em></p>
-                
-                <div class="chart-container">
-                    <canvas id="decayChart"></canvas>
-                </div>
+                <p><em style="color: #a0a0a0;">Example: Burning 1M tokens yields only 352K effective votes (35% efficiency)</em></p>
             </div>
-            
+
             <div class="card">
                 <h3>Attack Vector: Sybil Attacks</h3>
-                <p>Multiple wallets are economically irrational due to per-wallet locking requirements (50 wallets = 250,000 ROOTS locked vs 5,000 for single wallet)</p>
+                <p>Multiple wallets are economically irrational due to per-wallet locking requirements (50 wallets = 250,000 ROOT5 locked vs 5,000 for single wallet)</p>
             </div>
-            
+
             <div class="card">
                 <h3>Attack Vector: Meme Virality Verification</h3>
-                <h4>Three-Phase Approach:</h4>
+                <p><strong>Three-Phase Approach:</strong></p>
                 <ul>
                     <li><strong>Phase 1 (Mo 1-6):</strong> Community curation and Platform Development</li>
                     <li><strong>Phase 2 (Mo 7-12):</strong> Reputation-weighted voting</li>
@@ -300,27 +534,55 @@
         </div>
     </section>
 
-    <!-- Section 5 -->
     <section class="alt">
         <div class="container">
-            <h2>5. The Re-Launch: Rising from the Roots</h2>
+            <h2>5. Community Airdrop: The ROOTS Migration</h2>
             
             <div class="card">
                 <h3>The Story</h3>
-                <p>RootsDAO represents the rebirth of the Roots community. When the original developer departed, the community refused to let the project die. This re-launch transforms Roots into a true democratized meme credit union where the community—not a single developer—controls the future.</p>
-                
-                <h3>Why Re-Launch?</h3>
+                <p>Root5DAO emerges from the community of "Roots," a previous project that was discontinued when its original developer departed. The airdrop rewards those who stayed loyal, making them founding members of this democratized meme credit union.</p>
+            </div>
+
+            <div class="card">
+                <h3>Airdrop Details</h3>
                 <ul>
-                    <li><strong>Community Ownership:</strong> Transfer control from individual to collective</li>
-                    <li><strong>Sustainable Model:</strong> Revenue generation through meme token launches</li>
-                    <li><strong>True Decentralization:</strong> Democratic governance with anti-whale protections</li>
-                    <li><strong>Proven Community:</strong> Loyal holders who stayed through adversity</li>
+                    <li><strong>Snapshot Date:</strong> October 29, 2025 (00:00 UTC)</li>
+                    <li><strong>Allocation Formula:</strong> ROOT5 = ROOTS × 0.5</li>
+                    <li><strong>Total Allocation:</strong> 80,000,000 ROOT5</li>
                 </ul>
+
+                <h4>Example Calculations</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ROOTS Holdings</th>
+                            <th>ROOT5 Airdrop</th>
+                            <th>% of Supply</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>100,000</td>
+                            <td><strong style="color: var(--primary);">50,000</strong></td>
+                            <td>0.005%</td>
+                        </tr>
+                        <tr>
+                            <td>1,000,000</td>
+                            <td><strong style="color: var(--primary);">500,000</strong></td>
+                            <td>0.05%</td>
+                        </tr>
+                        <tr>
+                            <td>10,000,000</td>
+                            <td><strong style="color: var(--primary);">5,000,000</strong></td>
+                            <td>0.5%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><strong style="color: var(--primary);">Important:</strong> This is NOT a token swap. ROOTS tokens remain unchanged. ROOT5 is distributed IN ADDITION to existing ROOTS holdings.</p>
             </div>
         </div>
     </section>
 
-    <!-- Section 6 -->
     <section>
         <div class="container">
             <h2>6. Technology & Roadmap</h2>
@@ -331,7 +593,7 @@
                     <div>
                         <h4>Smart Contracts</h4>
                         <ul>
-                            <li>ROOTS SPL Token (via Pump.fun)</li>
+                            <li>ROOT5 SPL Token (via Pump.fun)</li>
                             <li>Token Locking Contract</li>
                             <li>Voting & Proposal System</li>
                             <li>PDA Treasury Management</li>
@@ -350,60 +612,51 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="card">
                 <h3>Development Roadmap</h3>
                 
-                <h4>Week 1-2 (November 2025) - Re-Launch & Foundation</h4>
+                <h4>Week 1-2 (November 2025) - Genesis Launch</h4>
                 <ul>
-                    <li>ROOTS re-launch announcement</li>
-                    <li>DAO treasury acquisition (100M ROOTS)</li>
+                    <li>ROOT5 fair launch on Pump.fun</li>
+                    <li>Community airdrop execution</li>
                     <li>Token locking contract deployment</li>
                     <li>Governance website launch</li>
                 </ul>
-                
+
                 <h4>Month 2-3 (Dec 2025 - Jan 2026) - Governance Activation</h4>
                 <ul>
                     <li>Full voting dApp launch</li>
                     <li>First governance proposals</li>
                     <li>Security audit completion</li>
-                    <li>First development team distribution (3.33M ROOTS)</li>
+                    <li>Community growth campaigns</li>
                 </ul>
-                
+
                 <h4>Month 4-6 (Feb - Apr 2026) - Credit Union Expansion</h4>
                 <ul>
                     <li>First community-approved meme launches</li>
                     <li>Revenue generation begins</li>
                     <li>Reputation system deployment</li>
-                    <li>Second development team distribution (3.33M ROOTS)</li>
+                    <li>PDA treasury transition start</li>
                 </ul>
-                
-                <h4>Month 7-9 (May - Jul 2026) - Full Decentralization</h4>
+
+                <h4>Month 7+ (May 2026+) - Full Decentralization</h4>
                 <ul>
                     <li>Complete PDA treasury control</li>
                     <li>Advanced governance features</li>
-                    <li>Final development team distribution (3.34M ROOTS)</li>
-                </ul>
-                
-                <h4>Month 10+ (Aug 2026+) - Ecosystem Growth</h4>
-                <ul>
                     <li>Multi-chain exploration</li>
-                    <li>RootsDAO Launchpad development</li>
-                    <li>Strategic partnerships</li>
+                    <li>Root5DAO Launchpad development</li>
                 </ul>
             </div>
         </div>
     </section>
 
-    <!-- Section 7 -->
     <section class="alt">
         <div class="container">
             <h2>7. Risk Disclosures</h2>
             
-            <div class="card">
-                <div class="warning-box">
-                    <p><strong>⚠️ Important Notice:</strong> Participation in RootsDAO involves significant risks. Only participate with funds you can afford to lose entirely.</p>
-                </div>
+            <div class="alert">
+                <p><strong>⚠️ Important Notice:</strong> Participation in Root5DAO involves significant risks. Only participate with funds you can afford to lose entirely.</p>
                 
                 <h4>Key Risks Include:</h4>
                 <ul>
@@ -419,184 +672,159 @@
         </div>
     </section>
 
-    <!-- Section 8 -->
     <section>
         <div class="container">
             <h2>8. Conclusion: Building the Democratized Meme Credit Union</h2>
             
             <div class="card">
-                <p>RootsDAO represents a paradigm shift in how meme tokens are created, curated, and sustained. By combining deflationary tokenomics with democratic governance and sustainable revenue generation, we've built a credit union where creativity meets collective accountability.</p>
+                <p>Root5DAO represents a paradigm shift in how meme tokens are created, curated, and sustained. By combining deflationary tokenomics with democratic governance and sustainable revenue generation, we've built a credit union where creativity meets collective accountability.</p>
                 
-                <p><strong>We are not launching another meme coin—we are re-launching a community-owned democratized credit union where members collectively invest in meme culture.</strong></p>
-                
+                <p><strong style="color: var(--primary); font-size: 1.2rem;">We are not launching another meme coin—we are building a democratized credit union where members collectively invest in meme culture.</strong></p>
+
                 <h3>Key Features:</h3>
                 <ul>
                     <li><strong>Economic Sustainability:</strong> Continuous revenue funding treasury and buybacks</li>
                     <li><strong>True Decentralization:</strong> Anti-whale protections and fair governance</li>
-                    <li><strong>Community First:</strong> Built by the community, for the community</li>
+                    <li><strong>Members First:</strong> Airdrop rewards founding members</li>
                     <li><strong>Aligned Incentives:</strong> Success benefits all token holders</li>
                 </ul>
-                
-                <p style="text-align: center; font-size: 20px; margin-top: 32px;">
-                    <strong>You stayed when others left. You believed in the community when the developer didn't.</strong><br>
-                    This is your DAO. Let's root for the future together.
-                </p>
+
+                <p style="text-align: center; font-size: 1.3rem; margin-top: 3rem; line-height: 1.8;"><strong style="color: var(--primary);">You stayed when others left. You believed in the community when the developer didn't.</strong><br/>This is your DAO. Let's root for the future together.</p>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer style="background: #f9fafb; padding: 48px 0; text-align: center; border-top: 2px solid #e5e7eb;">
+    <footer>
         <div class="container">
             <div class="card">
                 <h3>Legal Disclaimer</h3>
-                <p style="font-size: 14px;">This whitepaper is for informational purposes only and does not constitute financial, investment, legal, or tax advice. ROOTS tokens are utility tokens for governance purposes. Participation involves significant risks including potential loss of all invested capital. Users should conduct their own research and consult with professionals. RootsDAO operates as an unincorporated association without formal legal entity status.</p>
+                <p style="font-size: 0.95rem;">This whitepaper is for informational purposes only and does not constitute financial, investment, legal, or tax advice. ROOT5 tokens are utility tokens for governance purposes. Participation involves significant risks including potential loss of all invested capital. Users should conduct their own research and consult with professionals. Root5DAO operates as an unincorporated association without formal legal entity status.</p>
             </div>
-            
-            <p><strong>RootsDAO</strong></p>
-            <p>The Democratized Meme Credit Union • Whitepaper v1.0</p>
-            <p>Built on Solana • Powered by Members</p>
-            <p style="margin-top: 16px;">
-                <a href="https://www.rootsdao.com" style="color: #6b7280; text-decoration: none;">Website</a> | 
-                <a href="#" style="color: #6b7280; text-decoration: none;">Twitter</a> | 
-                <a href="#" style="color: #6b7280; text-decoration: none;">Discord</a> | 
-                <a href="#" style="color: #6b7280; text-decoration: none;">Telegram</a>
-            </p>
+            <p style="font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem;">ROOT5 DAO</p>
+            <p style="color: #a0a0a0;">The Democratized Meme Credit Union • Whitepaper v1.0</p>
+            <p style="color: #707070; margin-top: 1rem;">Built on Solana • Powered by Members</p>
         </div>
     </footer>
 
     <script>
-        // Distribution Chart - Updated for re-launch
-        new Chart(document.getElementById('distributionChart'), {
-            type: 'pie',
-            data: {
-                labels: ['Pump.fun Liquidity (55%)', 'Community Holders (35%)', 'DAO Treasury (10%)'],
-                datasets: [{
-                    data: [55, 35, 10],
-                    backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { 
-                    legend: { 
-                        position: 'bottom',
-                        labels: {
-                            font: { size: 14 },
-                            padding: 15
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                const amounts = ['550M ROOTS', '350M ROOTS', '100M ROOTS'];
-                                label += amounts[context.dataIndex];
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
+        function toggleMenu() {
+            const nav = document.getElementById('nav');
+            nav.classList.toggle('active');
+        }
+        
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                const nav = document.getElementById('nav');
+                nav.classList.remove('active');
+            });
+        });
+        
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 20) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
         });
 
-        // Fee Allocation Chart - Simplified
-        new Chart(document.getElementById('feeChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Treasury', 'Buyback', 'Staking Rewards'],
-                datasets: [{
-                    label: 'Allocation %',
-                    data: [50, 30, 20],
-                    backgroundColor: ['#10b981', '#ef4444', '#f59e0b']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.parsed.y + '% of Revenue';
-                            }
-                        }
-                    }
-                },
-                scales: { 
-                    y: { 
-                        beginAtZero: true, 
-                        max: 60,
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    } 
-                }
-            }
-        });
-
-        // Progressive Vote Decay Chart
-        new Chart(document.getElementById('decayChart'), {
-            type: 'line',
-            data: {
-                labels: ['10K', '50K', '100K', '200K', '500K', '1M'],
-                datasets: [{
-                    label: 'Tokens Burned',
-                    data: [10, 50, 100, 200, 500, 1000],
-                    borderColor: '#06b6d4',
-                    borderDash: [5, 5],
-                    borderWidth: 2,
-                    pointRadius: 0
-                }, {
-                    label: 'Effective Votes (with decay)',
-                    data: [10, 42, 72, 132, 252, 352],
-                    borderColor: '#ef4444',
-                    borderWidth: 3,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#ef4444'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            font: { size: 14 },
-                            padding: 15
-                        }
+        // Charts
+        window.addEventListener('load', () => {
+            // Distribution Chart
+            const distCtx = document.getElementById('distributionChart');
+            if (distCtx) {
+                new Chart(distCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Public Pool (800M)', 'Treasury (100M)', 'Airdrop (80M)', 'Team (20M)'],
+                        datasets: [{
+                            data: [800, 100, 80, 20],
+                            backgroundColor: ['#22c55e', '#8a2be2', '#3b82f6', '#ec4899']
+                        }]
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.dataset.label || '';
-                                const value = context.parsed.y + 'K';
-                                if (context.datasetIndex === 1) {
-                                    const efficiency = Math.round((context.parsed.y / [10, 50, 100, 200, 500, 1000][context.dataIndex]) * 100);
-                                    return label + ': ' + value + ' (' + efficiency + '% efficiency)';
-                                }
-                                return label + ': ' + value;
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#f8f8f8' }
                             }
                         }
                     }
-                },
-                scales: { 
-                    y: { 
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value + 'K';
+                });
+            }
+
+            // Fee Chart
+            const feeCtx = document.getElementById('feeChart');
+            if (feeCtx) {
+                new Chart(feeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Phase 1', 'Phase 2', 'Phase 3'],
+                        datasets: [
+                            {
+                                label: 'Buyback/Treasury',
+                                data: [50, 40, 50],
+                                backgroundColor: '#22c55e'
+                            },
+                            {
+                                label: 'Development',
+                                data: [50, 50, 0],
+                                backgroundColor: '#8a2be2'
+                            },
+                            {
+                                label: 'Marketing',
+                                data: [0, 10, 0],
+                                backgroundColor: '#3b82f6'
+                            },
+                            {
+                                label: 'Staking',
+                                data: [0, 0, 50],
+                                backgroundColor: '#ec4899'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { ticks: { color: '#f8f8f8' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                            y: { ticks: { color: '#f8f8f8' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: '#f8f8f8' }
                             }
                         }
-                    } 
-                }
+                    }
+                });
+            }
+
+            // Decay Chart
+            const decayCtx = document.getElementById('decayChart');
+            if (decayCtx) {
+                new Chart(decayCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['0-10K', '10-50K', '50-200K', '200-500K', '500K+'],
+                        datasets: [{
+                            label: 'Vote Multiplier',
+                            data: [1.0, 0.8, 0.6, 0.4, 0.2],
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { ticks: { color: '#f8f8f8' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                            y: { ticks: { color: '#f8f8f8' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: '#f8f8f8' }
+                            }
+                        }
+                    }
+                });
             }
         });
     </script>
