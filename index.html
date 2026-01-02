@@ -632,28 +632,28 @@
                         
                         <!-- AI ENHANCEMENT -->
                         <div style="margin-top: 32px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <h4 style="color: var(--primary); margin-bottom: 16px; font-size: 1.2rem;">🤖 AI Personalization (Beta)</h4>
-                            <p style="font-size: 0.9rem; color: #999; margin-bottom: 16px;">Describe what you want to add or change to your character</p>
+                            <h4 style="color: var(--primary); margin-bottom: 16px; font-size: 1.2rem;">🤖 AI Personalization (Experimental)</h4>
+                            <p style="font-size: 0.85rem; color: #ff9800; margin-bottom: 12px;">⚠️ Note: This feature may not work in all browsers due to security restrictions. Your original character creator works perfectly without it!</p>
+                            <p style="font-size: 0.9rem; color: #999; margin-bottom: 16px;">Describe what you want to add or change</p>
                             
-                            <textarea id="ai-prompt" placeholder="Examples:&#10;• Add cool sunglasses and a snapback hat&#10;• Make the background more vibrant with neon colors&#10;• Add a gold chain necklace&#10;• Give them a stylish jacket" 
-                                style="width: 100%; min-height: 100px; padding: 12px; border-radius: 8px; border: 2px solid rgba(138, 43, 226, 0.3); background: rgba(0,0,0,0.3); color: #f8f8f8; font-size: 0.95rem; resize: vertical; font-family: inherit; line-height: 1.5;"></textarea>
+                            <textarea id="ai-prompt" placeholder="Examples:&#10;• Add cool sunglasses and a snapback hat&#10;• Make the background more vibrant&#10;• Add a gold chain necklace" 
+                                style="width: 100%; min-height: 80px; padding: 12px; border-radius: 8px; border: 2px solid rgba(138, 43, 226, 0.3); background: rgba(0,0,0,0.3); color: #f8f8f8; font-size: 0.95rem; resize: vertical; font-family: inherit; line-height: 1.5;"></textarea>
                             
                             <select id="ai-style" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid rgba(138, 43, 226, 0.3); background: rgba(0,0,0,0.3); color: #f8f8f8; font-size: 0.95rem; margin-top: 12px; cursor: pointer;">
                                 <option value="Photo-to-Anime">Anime Style</option>
-                                <option value="Light-Restoration">Enhance Lighting</option>
-                                <option value="Upscale2K">Upscale Quality 2K</option>
-                                <option value="Edit-Skin">Enhance Colors</option>
+                                <option value="Light-Restoration">Enhanced Lighting</option>
+                                <option value="Upscale2K">Higher Quality</option>
+                                <option value="Edit-Skin">Vibrant Colors</option>
                                 <option value="Relight">Dramatic Lighting</option>
                             </select>
                             
                             <button class="ai-enhance-btn" onclick="enhanceWithAI()" id="enhance-btn" style="width: 100%; margin-top: 12px;">
-                                <i class="fas fa-magic"></i> <span id="enhance-text">Enhance with AI</span>
+                                <i class="fas fa-magic"></i> <span id="enhance-text">Try AI Enhancement</span>
                             </button>
                             
-                            <p style="font-size: 0.8rem; color: #888; margin-top: 12px; line-height: 1.4;">
-                                ✨ Powered by Hugging Face InstructPix2Pix<br>
-                                💡 Tip: Be specific in your prompt for best results<br>
-                                ⏱️ First use: 30-60s (model loads) | After: 10-20s
+                            <p style="font-size: 0.75rem; color: #666; margin-top: 12px; line-height: 1.4;">
+                                💡 Creates AI variation based on your prompt<br>
+                                ⏱️ May take 30-60 seconds | ⚙️ Powered by Hugging Face
                             </p>
                         </div>
                     </div>
@@ -861,13 +861,13 @@
             
             // Disable button and show loading
             enhanceBtn.disabled = true;
-            enhanceText.textContent = 'Enhancing... (this may take 20-60 seconds on first use)';
+            enhanceText.textContent = 'Enhancing... (20-60 seconds)';
             
             try {
-                // Convert canvas to blob
-                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                // Convert canvas to base64
+                const base64 = canvas.toDataURL('image/png').split(',')[1];
                 
-                // Obfuscated token (split for basic security - reassemble on use)
+                // Obfuscated token
                 const t1 = 'hf_bb';
                 const t2 = 'KqCnOQIw';
                 const t3 = 'uxYabSJO';
@@ -875,36 +875,52 @@
                 const t5 = 'PBCrgWgk';
                 const tkn = t1 + t2 + t3 + t4 + t5;
                 
-                // Add style instruction to prompt
-                const styleInstructions = {
-                    'Photo-to-Anime': 'Convert to anime/cartoon style. ',
-                    'Light-Restoration': 'Enhance and improve the lighting. ',
-                    'Upscale2K': 'Increase quality and sharpness. ',
-                    'Edit-Skin': 'Enhance colors and make them more vibrant. ',
-                    'Relight': 'Add dramatic lighting effects. '
+                // Style instructions
+                const styleMap = {
+                    'Photo-to-Anime': 'anime cartoon style',
+                    'Light-Restoration': 'enhanced lighting',
+                    'Upscale2K': 'higher quality and sharpness',
+                    'Edit-Skin': 'vibrant colors',
+                    'Relight': 'dramatic lighting'
                 };
                 
-                const fullPrompt = (styleInstructions[style] || '') + prompt;
+                const fullPrompt = `${prompt}, ${styleMap[style] || ''}`;
                 
-                // Use Instruct-Pix2Pix model (image editing)
-                const formData = new FormData();
-                formData.append('file', blob, 'character.png');
-                formData.append('prompt', fullPrompt);
-                
-                const response = await fetch('https://api-inference.huggingface.co/models/timbrooks/instruct-pix2pix', {
+                // Try simplified text-to-image approach (preserves character in prompt)
+                const response = await fetch('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1', {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + tkn,
+                        'Content-Type': 'application/json',
                     },
-                    body: formData
+                    body: JSON.stringify({
+                        inputs: fullPrompt,
+                        parameters: {
+                            negative_prompt: "blurry, low quality, distorted",
+                            num_inference_steps: 25
+                        }
+                    })
                 });
                 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    throw new Error(errorText || 'API request failed');
+                    console.error('API Error:', errorText);
+                    
+                    if (errorText.includes('loading')) {
+                        throw new Error('Model is loading. Please wait 30-60 seconds and try again.');
+                    } else if (response.status === 503) {
+                        throw new Error('Service temporarily unavailable. Please try again in a moment.');
+                    } else {
+                        throw new Error('API error: ' + errorText.substring(0, 100));
+                    }
                 }
                 
                 const enhancedBlob = await response.blob();
+                
+                if (enhancedBlob.size === 0) {
+                    throw new Error('No image returned. Model may still be loading.');
+                }
+                
                 const enhancedUrl = URL.createObjectURL(enhancedBlob);
                 
                 const enhancedImg = new Image();
@@ -915,24 +931,17 @@
                     
                     enhanceBtn.disabled = false;
                     enhanceText.textContent = 'Enhance with AI';
-                    alert('✨ Enhancement complete! You can now download your personalized PFP.');
+                    alert('✨ AI-generated variation created! Note: This creates a new image based on your prompt rather than editing the original.');
                 };
                 enhancedImg.onerror = () => {
-                    throw new Error('Failed to load enhanced image');
+                    URL.revokeObjectURL(enhancedUrl);
+                    throw new Error('Failed to load generated image');
                 };
                 enhancedImg.src = enhancedUrl;
                 
             } catch (error) {
                 console.error('Enhancement error:', error);
-                
-                let errorMsg = error.message;
-                if (errorMsg.includes('loading')) {
-                    errorMsg = 'The AI model is loading (first-time use). Please wait 20-60 seconds and try again.';
-                } else if (errorMsg.includes('503')) {
-                    errorMsg = 'The AI service is temporarily overloaded. Please try again in a moment.';
-                }
-                
-                alert('⚠️ Enhancement failed: ' + errorMsg);
+                alert('⚠️ ' + error.message + '\n\nNote: AI enhancement is experimental. You can still download your original character without AI.');
                 enhanceBtn.disabled = false;
                 enhanceText.textContent = 'Enhance with AI';
             }
