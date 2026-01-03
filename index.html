@@ -2045,8 +2045,12 @@
             link.click();
         }
         
+        
+        // ============================================
+        // WINDOW LOAD - INITIALIZE EVERYTHING
+        // ============================================
         window.addEventListener('load', async () => {
-            // Ensure canvas is properly sized
+            // 1. Initialize PFP Generator
             resizeCanvas();
             
             for (const [type, folder] of Object.entries(folders)) {
@@ -2079,6 +2083,34 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('generator-ui').style.display = 'grid';
             randomize();
+            
+            // 2. Initialize Exit-Intent Popup (after 2 second delay)
+            setTimeout(initExitIntent, 2000);
+            
+            // 3. Set up HubSpot branding removal observer
+            try {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        mutation.addedNodes.forEach((node) => {
+                            if (node.nodeType === 1) {
+                                if (node.id === 'hs-form-virality-container' || 
+                                    node.id?.includes('virality') ||
+                                    node.querySelector?.('#hs-form-virality-container')) {
+                                    node.remove();
+                                    console.log('Intercepted and removed HubSpot branding');
+                                }
+                            }
+                        });
+                    });
+                });
+                
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            } catch (error) {
+                console.log('Observer error (safe to ignore):', error);
+            }
         });
         
         // ============================================
@@ -2262,67 +2294,47 @@
             });
         }
         
-        // Initialize on page load
-        window.addEventListener('load', () => {
-            // Wait a bit before initializing (let user engage first)
-            setTimeout(initExitIntent, 2000);
-        });
-        
         // ============================================
         // REMOVE HUBSPOT BRANDING (BELT & SUSPENDERS)
         // ============================================
         
         // Actively remove HubSpot branding elements
         function removeHubSpotBranding() {
-            // Remove virality container
-            const viralityContainer = document.getElementById('hs-form-virality-container');
-            if (viralityContainer) {
-                viralityContainer.remove();
-                console.log('Removed HubSpot branding container');
+            try {
+                // Remove virality container
+                const viralityContainer = document.getElementById('hs-form-virality-container');
+                if (viralityContainer) {
+                    viralityContainer.remove();
+                    console.log('Removed HubSpot branding container');
+                }
+                
+                // Remove any iframes with virality in title
+                document.querySelectorAll('iframe[title*="Virality"], iframe[id*="virality"]').forEach(el => {
+                    el.remove();
+                });
+                
+                // Remove any links to HubSpot free forms
+                document.querySelectorAll('a[href*="hubspot.com/free-forms"]').forEach(el => {
+                    el.remove();
+                });
+            } catch (error) {
+                console.log('Branding removal error (safe to ignore):', error);
             }
-            
-            // Remove any iframes with virality in title
-            document.querySelectorAll('iframe[title*="Virality"], iframe[id*="virality"]').forEach(el => {
-                el.remove();
-            });
-            
-            // Remove any links to HubSpot free forms
-            document.querySelectorAll('a[href*="hubspot.com/free-forms"]').forEach(el => {
-                el.remove();
-            });
         }
         
-        // Run immediately and on DOMContentLoaded
-        removeHubSpotBranding();
-        document.addEventListener('DOMContentLoaded', removeHubSpotBranding);
-        
-        // Also run after a delay (in case HubSpot injects it later)
-        setTimeout(removeHubSpotBranding, 1000);
-        setTimeout(removeHubSpotBranding, 2000);
-        setTimeout(removeHubSpotBranding, 3000);
-        
-        // Set up mutation observer to catch dynamically added branding
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === 1) { // Element node
-                        // Check if it's the branding container
-                        if (node.id === 'hs-form-virality-container' || 
-                            node.id?.includes('virality') ||
-                            node.querySelector?.('#hs-form-virality-container')) {
-                            node.remove();
-                            console.log('Intercepted and removed HubSpot branding');
-                        }
-                    }
-                });
+        // Wait for DOM to be ready before removing branding
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(removeHubSpotBranding, 500);
+                setTimeout(removeHubSpotBranding, 1500);
+                setTimeout(removeHubSpotBranding, 3000);
             });
-        });
-        
-        // Start observing the document
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
+        } else {
+            // DOM already loaded
+            setTimeout(removeHubSpotBranding, 500);
+            setTimeout(removeHubSpotBranding, 1500);
+            setTimeout(removeHubSpotBranding, 3000);
+        }
     </script>
 </body>
 </html>
