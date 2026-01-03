@@ -688,6 +688,122 @@
         }
         .social-icons a:hover { background: rgba(34, 197, 94, 0.2); border-color: var(--primary); color: var(--primary); transform: translateY(-4px); }
         
+        /* Buy Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 30, 0.95));
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 24px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(34, 197, 94, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .modal-close {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:hover {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #f00;
+            transform: rotate(90deg);
+        }
+        .modal-body {
+            padding: 32px;
+        }
+        .wallet-status {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .wallet-status .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .wallet-status .icon.success {
+            color: var(--primary);
+        }
+        .wallet-status .icon.error {
+            color: #f59e0b;
+        }
+        .wallet-status h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #f8f8f8;
+        }
+        .wallet-status p {
+            color: #999;
+            margin-bottom: 24px;
+            font-size: 1.1rem;
+        }
+        .dex-embed-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .dex-embed-container iframe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border: 0;
+        }
+        
         @media (max-width: 968px) {
             .hero-grid, .token-grid, .generator-layout { grid-template-columns: 1fr; }
             .hero-title { font-size: 3rem; }
@@ -706,6 +822,15 @@
             .layer-option img { height: 60px; }
             .generator-buttons { gap: 8px; }
             .randomize-btn, .download-btn { padding: 12px 24px; font-size: 1rem; }
+            
+            /* Buy Modal Mobile */
+            .modal-content { width: 95%; max-height: 95vh; }
+            .modal-header { padding: 16px 20px; }
+            .modal-header h2 { font-size: 1.5rem; }
+            .modal-body { padding: 20px 16px; }
+            .wallet-status .icon { font-size: 3rem; }
+            .wallet-status h3 { font-size: 1.3rem; }
+            .dex-embed-container { padding-bottom: 120%; }
         }
         
         @media (max-width: 480px) {
@@ -720,6 +845,14 @@
             .layer-option img { height: 50px; }
             .layer-tab { padding: 8px 12px; font-size: 0.85rem; }
             .randomize-btn, .download-btn { padding: 10px 20px; font-size: 0.95rem; }
+            
+            /* Buy Modal Extra Small */
+            .modal-header h2 { font-size: 1.2rem; }
+            .modal-close { width: 35px; height: 35px; font-size: 1.2rem; }
+            .wallet-status .icon { font-size: 2.5rem; }
+            .wallet-status h3 { font-size: 1.1rem; }
+            .wallet-status p { font-size: 0.95rem; }
+            .dex-embed-container { padding-bottom: 130%; }
         }
     </style>
 </head>
@@ -768,6 +901,9 @@
                     <div class="feature-item"><i class="fas fa-check-circle"></i> Meme Tokenization</div>
                     <div class="feature-item"><i class="fas fa-check-circle"></i> And More</div>
                     <div class="hero-buttons">
+                        <button onclick="openBuyModal()" class="cta-button" style="border: none; cursor: pointer;">
+                            <i class="fas fa-shopping-cart"></i> Buy Now
+                        </button>
                         <a href="https://www.rootsdao.com/whitepaper" class="cta-button">Learn More</a>
                         <a href="https://t.me/root5portal" target="_blank" rel="noopener noreferrer" class="secondary-button">Join Community</a>
                     </div>
@@ -992,6 +1128,69 @@
         </div>
     </section>
 
+    <!-- Buy Modal -->
+    <div id="buyModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-shopping-cart"></i> Buy ROOT5</h2>
+                <button class="modal-close" onclick="closeBuyModal()" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Loading state -->
+                <div class="wallet-status" id="loadingState">
+                    <div class="icon">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <h3>Detecting Wallet...</h3>
+                    <p>Please wait while we check for a Web3 wallet</p>
+                </div>
+                
+                <!-- No wallet detected -->
+                <div class="wallet-status" id="noWalletState" style="display: none;">
+                    <div class="icon error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>No Wallet Detected</h3>
+                    <p>Install a Solana wallet (Phantom, Solflare) to trade directly, or use Pump.fun</p>
+                    <a href="https://pump.fun/coin/AZEqLUaeDb3u6FnGVcLakprwgmk6bD3GPGzNXBZ1pump" 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       class="cta-button" 
+                       style="display: inline-flex; align-items: center; gap: 12px; text-decoration: none; margin-top: 16px;">
+                        <i class="fas fa-external-link-alt"></i> Buy on Pump.fun
+                    </a>
+                    <div style="margin-top: 32px; padding-top: 32px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        <p style="font-size: 0.95rem; margin-bottom: 16px;">Install a wallet to trade directly:</p>
+                        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                            <a href="https://phantom.app/" target="_blank" rel="noopener noreferrer" class="secondary-button" style="text-decoration: none;">
+                                Install Phantom
+                            </a>
+                            <a href="https://solflare.com/" target="_blank" rel="noopener noreferrer" class="secondary-button" style="text-decoration: none;">
+                                Install Solflare
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Wallet detected - show DexScreener -->
+                <div id="walletDetectedState" style="display: none;">
+                    <div class="wallet-status" style="padding: 20px;">
+                        <div class="icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>Wallet Connected!</h3>
+                        <p style="margin-bottom: 24px;">Trade ROOT5 directly below</p>
+                    </div>
+                    <div class="dex-embed-container">
+                        <iframe src="https://dexscreener.com/solana/BAsuCpi8M39Rs5cHbuoSTa78bPtcrJZy2ad6NJ2VWW6z?embed=1&loadChartSettings=0&trades=0&tabs=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <div class="footer-grid">
@@ -1062,6 +1261,73 @@
 
     <script>
         function copy(text) { navigator.clipboard.writeText(text); alert('Copied!'); }
+        
+        // BUY MODAL & WALLET DETECTION
+        async function openBuyModal() {
+            const modal = document.getElementById('buyModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            
+            // Reset states
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('noWalletState').style.display = 'none';
+            document.getElementById('walletDetectedState').style.display = 'none';
+            
+            // Detect wallet
+            await detectWallet();
+        }
+        
+        function closeBuyModal() {
+            const modal = document.getElementById('buyModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+        
+        function closeModalOnOutsideClick(event) {
+            if (event.target.id === 'buyModal') {
+                closeBuyModal();
+            }
+        }
+        
+        async function detectWallet() {
+            // Wait a bit for dramatic effect
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Check for Solana wallets (Phantom, Solflare, etc.)
+            const hasSolana = typeof window.solana !== 'undefined';
+            
+            // Check for Ethereum wallets (MetaMask, etc.) - backup
+            const hasEthereum = typeof window.ethereum !== 'undefined';
+            
+            // Hide loading state
+            document.getElementById('loadingState').style.display = 'none';
+            
+            if (hasSolana || hasEthereum) {
+                // Wallet detected - show DexScreener embed
+                document.getElementById('walletDetectedState').style.display = 'block';
+                
+                // Optional: Try to connect wallet
+                try {
+                    if (hasSolana && window.solana.isPhantom) {
+                        // Optionally auto-connect Phantom
+                        // await window.solana.connect();
+                        console.log('Phantom wallet detected');
+                    }
+                } catch (error) {
+                    console.log('Wallet connection optional:', error);
+                }
+            } else {
+                // No wallet - show Pump.fun fallback
+                document.getElementById('noWalletState').style.display = 'block';
+            }
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeBuyModal();
+            }
+        });
         
         function toggleMenu() {
             const nav = document.getElementById('nav');
