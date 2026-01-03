@@ -710,10 +710,10 @@
             background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 30, 0.95));
             border: 2px solid rgba(34, 197, 94, 0.3);
             border-radius: 24px;
-            max-width: 900px;
-            width: 90%;
-            max-height: 90vh;
-            overflow: hidden;
+            max-width: 1000px;
+            width: 95%;
+            max-height: 95vh;
+            overflow-y: auto;
             position: relative;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(34, 197, 94, 0.2);
             animation: slideUp 0.3s ease;
@@ -761,7 +761,7 @@
             transform: rotate(90deg);
         }
         .modal-body {
-            padding: 32px;
+            padding: 20px 24px 24px;
         }
         .wallet-status {
             text-align: center;
@@ -790,10 +790,11 @@
         .dex-embed-container {
             position: relative;
             width: 100%;
-            padding-bottom: 100%;
+            padding-bottom: 75%;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 16px;
             overflow: hidden;
+            min-height: 500px;
         }
         .dex-embed-container iframe {
             position: absolute;
@@ -824,13 +825,13 @@
             .randomize-btn, .download-btn { padding: 12px 24px; font-size: 1rem; }
             
             /* Buy Modal Mobile */
-            .modal-content { width: 95%; max-height: 95vh; }
+            .modal-content { width: 98%; max-height: 98vh; }
             .modal-header { padding: 16px 20px; }
             .modal-header h2 { font-size: 1.5rem; }
-            .modal-body { padding: 20px 16px; }
+            .modal-body { padding: 16px 12px 20px; }
             .wallet-status .icon { font-size: 3rem; }
             .wallet-status h3 { font-size: 1.3rem; }
-            .dex-embed-container { padding-bottom: 120%; }
+            .dex-embed-container { padding-bottom: 85%; min-height: 450px; }
         }
         
         @media (max-width: 480px) {
@@ -852,7 +853,7 @@
             .wallet-status .icon { font-size: 2.5rem; }
             .wallet-status h3 { font-size: 1.1rem; }
             .wallet-status p { font-size: 0.95rem; }
-            .dex-embed-container { padding-bottom: 130%; }
+            .dex-embed-container { padding-bottom: 95%; min-height: 400px; }
         }
     </style>
 </head>
@@ -1176,15 +1177,17 @@
                 
                 <!-- Wallet detected - show DexScreener -->
                 <div id="walletDetectedState" style="display: none;">
-                    <div class="wallet-status" style="padding: 20px;">
-                        <div class="icon success">
-                            <i class="fas fa-check-circle"></i>
+                    <div style="text-align: center; padding: 16px 20px; background: rgba(34, 197, 94, 0.1); border-radius: 12px; margin-bottom: 16px;">
+                        <div style="display: inline-flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-check-circle" style="color: var(--primary); font-size: 1.5rem;"></i>
+                            <div style="text-align: left;">
+                                <h3 style="font-size: 1.1rem; margin: 0; color: #f8f8f8;">Wallet Connected!</h3>
+                                <p style="margin: 0; color: #999; font-size: 0.9rem;">Trade ROOT5 directly below</p>
+                            </div>
                         </div>
-                        <h3>Wallet Connected!</h3>
-                        <p style="margin-bottom: 24px;">Trade ROOT5 directly below</p>
                     </div>
                     <div class="dex-embed-container">
-                        <iframe src="https://dexscreener.com/solana/BAsuCpi8M39Rs5cHbuoSTa78bPtcrJZy2ad6NJ2VWW6z?embed=1&loadChartSettings=0&trades=0&tabs=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15"></iframe>
+                        <iframe src="https://dexscreener.com/solana/BAsuCpi8M39Rs5cHbuoSTa78bPtcrJZy2ad6NJ2VWW6z?embed=1&info=0&trades=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=0&chartType=usd&interval=15"></iframe>
                     </div>
                 </div>
             </div>
