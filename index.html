@@ -608,6 +608,7 @@
         .preview-canvas {
             width: 100%;
             max-width: 400px;
+            height: auto;
             aspect-ratio: 1 / 1;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 16px;
@@ -1456,28 +1457,11 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Responsive canvas sizing - sync internal dimensions with displayed size
+        // Simple canvas sizing - just keep aspect ratio
         function resizeCanvas() {
-            // Get the actual displayed size from CSS
-            const rect = canvas.getBoundingClientRect();
-            const displayWidth = rect.width;
-            const displayHeight = rect.height;
-            
-            // Account for device pixel ratio for crisp rendering
-            const dpr = window.devicePixelRatio || 1;
-            
-            // Set internal canvas size to match displayed size * DPR
-            canvas.width = displayWidth * dpr;
-            canvas.height = displayHeight * dpr;
-            
-            // Use setTransform (not scale) to set transform matrix
-            // This replaces any existing transform (not cumulative)
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            
-            // Re-render if we have content
-            if (Object.keys(selected).length > 0) {
-                render();
-            }
+            // Canvas stays at 400x400 internally
+            // CSS handles display sizing
+            render();
         }
         
         window.addEventListener('resize', resizeCanvas);
@@ -1541,23 +1525,22 @@
         }
         
         async function render() {
-            // Get the displayed size (in CSS pixels)
-            const rect = canvas.getBoundingClientRect();
-            const displayWidth = rect.width;
-            const displayHeight = rect.height;
-            
-            // Clear canvas at display size (context is scaled)
-            ctx.clearRect(0, 0, displayWidth, displayHeight);
+            // Use canvas internal dimensions (400x400)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Draw each layer
             for (const type of ['background', 'body', 'head', 'sunglasses', 'hair']) {
-                if (!selected[type]) continue;
+                // Check if type is selected (undefined check, 0 is valid for "None")
+                if (selected[type] === undefined) continue;
+                
+                // Skip if it's the "None" option (0)
+                if (selected[type] === 0) continue;
+                
                 const item = images[type].find(i => i.id === selected[type]);
                 if (item) {
                     const img = await load(item.path);
                     if (img) {
-                        // Draw at display size - context scaling handles DPR
-                        ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     }
                 }
             }
