@@ -1179,7 +1179,7 @@
                 <div id="generator-ui" class="generator-layout" style="display:none;">
                     <div>
                         <h3 style="margin-bottom:24px; font-size:1.5rem;">Preview</h3>
-                        <canvas id="canvas" class="preview-canvas" aria-label="PFP preview canvas"></canvas>
+                        <canvas id="canvas" class="preview-canvas" width="400" height="400" aria-label="PFP preview canvas"></canvas>
                         <div class="generator-buttons">
                             <button class="randomize-btn" onclick="randomize()" aria-label="Randomize PFP layers">
                                 <i class="fas fa-random"></i> Randomize
@@ -1456,34 +1456,31 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Responsive canvas sizing with proper aspect ratio handling
+        // Responsive canvas sizing - sync internal dimensions with displayed size
         function resizeCanvas() {
-            // Get the actual rendered size of the canvas element
-            const displayWidth = canvas.clientWidth;
-            const displayHeight = canvas.clientHeight;
+            // Get the actual displayed size from CSS
+            const rect = canvas.getBoundingClientRect();
+            const displayWidth = rect.width;
+            const displayHeight = rect.height;
             
-            // Get device pixel ratio for high-DPI screens
+            // Account for device pixel ratio for crisp rendering
             const dpr = window.devicePixelRatio || 1;
             
             // Set internal canvas size to match displayed size * DPR
-            // This prevents distortion/stretching
             canvas.width = displayWidth * dpr;
             canvas.height = displayHeight * dpr;
             
-            // Scale the drawing context to account for DPR
-            // This allows us to draw at "logical pixels" (display size)
+            // Use setTransform (not scale) to set transform matrix
+            // This replaces any existing transform (not cumulative)
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             
-            // Re-render after resize
+            // Re-render if we have content
             if (Object.keys(selected).length > 0) {
                 render();
             }
         }
         
         window.addEventListener('resize', resizeCanvas);
-        
-        // Call after a brief delay to ensure canvas has rendered
-        setTimeout(resizeCanvas, 100);
         
         const folders = {
             background: '/layers/background/',
@@ -1544,12 +1541,12 @@
         }
         
         async function render() {
-            // Use the displayed size (clientWidth/clientHeight)
-            // The context is already scaled by setTransform, so we draw at display size
-            const displayWidth = canvas.clientWidth;
-            const displayHeight = canvas.clientHeight;
+            // Get the displayed size (in CSS pixels)
+            const rect = canvas.getBoundingClientRect();
+            const displayWidth = rect.width;
+            const displayHeight = rect.height;
             
-            // Clear the entire canvas
+            // Clear canvas at display size (context is scaled)
             ctx.clearRect(0, 0, displayWidth, displayHeight);
             
             // Draw each layer
@@ -1559,7 +1556,7 @@
                 if (item) {
                     const img = await load(item.path);
                     if (img) {
-                        // Draw image to fill the entire canvas
+                        // Draw at display size - context scaling handles DPR
                         ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
                     }
                 }
