@@ -995,6 +995,367 @@
             .wallet-status p { font-size: 0.95rem; }
             .dex-embed-container { padding-bottom: 95%; min-height: 400px; }
         }
+        
+        /* ============================================ */
+        /* HIDE HUBSPOT BRANDING - COMPREHENSIVE      */
+        /* ============================================ */
+        
+        /* Hide main virality container */
+        #hs-form-virality-container,
+        div[id*="virality-container"],
+        div[id*="virality"],
+        .hs-form-virality-container {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            width: 0 !important;
+            opacity: 0 !important;
+            position: absolute !important;
+            left: -9999px !important;
+            pointer-events: none !important;
+        }
+        
+        /* Hide virality iframe */
+        #hs-form-virality-iframe,
+        iframe[id*="virality"],
+        iframe[title*="HubSpot Virality"],
+        iframe[title*="Virality"],
+        iframe[src*="embedded-viral-link"] {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            width: 0 !important;
+            opacity: 0 !important;
+        }
+        
+        /* Hide any HubSpot branding links */
+        a[href*="hubspot.com/free-forms"],
+        a[href*="hsforms.com"],
+        a[href*="hs-banner"],
+        a[href*="hubs_id=forms-branding"] {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        /* Hide powered by text */
+        div[style*="forms-branding"],
+        span:contains("Powered by HubSpot"),
+        div:contains("Create your own form") {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        /* Hide any dynamically injected branding */
+        .hsfc-FormWrapper > div[style*="margin-top: 5px"],
+        .hsfc-FormWrapper > div[style*="background: rgb(255, 255, 255)"],
+        .hsfc-FormWrapper > div[style*="border: 1px solid rgb(207, 207, 207)"] {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        /* Nuclear option - hide last child if it's the branding container */
+        main > div:last-child:has(iframe[title*="Virality"]),
+        #form-target > div:last-child:has(iframe[title*="Virality"]) {
+            display: none !important;
+        }
+        
+        /* Exit Intent Popup */
+        .exit-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .exit-popup-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .exit-popup-content {
+            position: relative;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 24px;
+            padding: 48px 40px;
+            max-width: 540px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(34, 197, 94, 0.1);
+            animation: slideUp 0.4s ease;
+            text-align: center;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .exit-popup-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #999;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        
+        .exit-popup-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transform: rotate(90deg);
+        }
+        
+        .exit-popup-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #000;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .exit-popup h2 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .exit-popup-subtitle {
+            color: #bbb;
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .exit-popup-benefits {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: rgba(34, 197, 94, 0.05);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 16px;
+        }
+        
+        .exit-popup-benefits li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            color: #ddd;
+            font-size: 1rem;
+        }
+        
+        .exit-popup-benefits i {
+            color: var(--primary);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .exit-popup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .form-group {
+            width: 100%;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: #666;
+        }
+        
+        .exit-popup-submit {
+            width: 100%;
+            padding: 18px 32px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+        }
+        
+        .exit-popup-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.5);
+        }
+        
+        .exit-popup-submit:active {
+            transform: translateY(0);
+        }
+        
+        .exit-popup-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .exit-popup-privacy {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .exit-popup-privacy i {
+            color: var(--primary);
+        }
+        
+        .exit-popup-success {
+            text-align: center;
+            padding: 24px;
+        }
+        
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #000;
+            animation: successPop 0.5s ease;
+        }
+        
+        @keyframes successPop {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .exit-popup-success h3 {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+        
+        .exit-popup-success p {
+            color: #bbb;
+            font-size: 1.1rem;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            .exit-popup-content {
+                padding: 32px 24px;
+                width: 95%;
+                border-radius: 20px;
+            }
+            
+            .exit-popup h2 {
+                font-size: 1.5rem;
+            }
+            
+            .exit-popup-subtitle {
+                font-size: 1rem;
+            }
+            
+            .exit-popup-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+                margin-bottom: 20px;
+            }
+            
+            .exit-popup-benefits {
+                padding: 16px;
+            }
+            
+            .exit-popup-benefits li {
+                font-size: 0.9rem;
+                padding: 8px 0;
+            }
+            
+            .form-input {
+                padding: 14px 16px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .exit-popup-submit {
+                padding: 16px 24px;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1402,6 +1763,70 @@
     }
     </script>
 
+    <!-- Exit Intent Popup -->
+    <div id="exitPopup" class="exit-popup" role="dialog" aria-labelledby="exitPopupTitle" aria-modal="true" style="display: none;">
+        <div class="exit-popup-overlay" onclick="closeExitPopup()"></div>
+        <div class="exit-popup-content">
+            <button class="exit-popup-close" onclick="closeExitPopup()" aria-label="Close popup">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="exit-popup-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            
+            <h2 id="exitPopupTitle">Wait! Don't Miss Out 🌱</h2>
+            <p class="exit-popup-subtitle">Join the ROOT5 DAO community and get exclusive updates on:</p>
+            
+            <ul class="exit-popup-benefits">
+                <li><i class="fas fa-check-circle"></i> Token launches & airdrops</li>
+                <li><i class="fas fa-check-circle"></i> Community events & bounties</li>
+                <li><i class="fas fa-check-circle"></i> Governance proposals & voting</li>
+                <li><i class="fas fa-check-circle"></i> Early access to new features</li>
+            </ul>
+            
+            <form id="exitPopupForm" class="exit-popup-form" onsubmit="submitExitForm(event)">
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        id="exitName" 
+                        name="name" 
+                        placeholder="Your Name (Optional)"
+                        class="form-input"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <input 
+                        type="email" 
+                        id="exitEmail" 
+                        name="email" 
+                        placeholder="Your Email Address*"
+                        required
+                        class="form-input"
+                    >
+                </div>
+                
+                <button type="submit" class="exit-popup-submit" id="exitSubmitBtn">
+                    <span id="exitSubmitText">Join the Community</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                
+                <p class="exit-popup-privacy">
+                    <i class="fas fa-lock"></i> We respect your privacy. Unsubscribe anytime.
+                </p>
+            </form>
+            
+            <div id="exitPopupSuccess" class="exit-popup-success" style="display: none;">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Welcome to ROOT5 DAO! 🎉</h3>
+                <p>Check your inbox for a confirmation email.</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         function copy(text) { navigator.clipboard.writeText(text); alert('Copied!'); }
         
@@ -1654,6 +2079,249 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('generator-ui').style.display = 'grid';
             randomize();
+        });
+        
+        // ============================================
+        // EXIT INTENT POPUP
+        // ============================================
+        
+        // Configuration
+        const EXIT_POPUP_CONFIG = {
+            hubspotPortalId: '244595044',  // Your HubSpot Portal ID
+            hubspotFormId: '1c319461-b6e3-4f70-a79e-417a34263c56',  // Your HubSpot Form ID
+            cookieName: 'root5_email_signup',
+            cookieDays: 30,
+            mobileEnabled: true,
+            desktopThreshold: 30,  // pixels from top before triggering
+            mobileDelay: 5000      // 5 seconds on mobile
+        };
+        
+        // Check if popup should be shown
+        function shouldShowExitPopup() {
+            // Check if already signed up
+            if (localStorage.getItem(EXIT_POPUP_CONFIG.cookieName)) {
+                return false;
+            }
+            
+            // Check if popup was closed in this session
+            if (sessionStorage.getItem('exit_popup_closed')) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Show exit popup
+        function showExitPopup() {
+            if (!shouldShowExitPopup()) return;
+            
+            const popup = document.getElementById('exitPopup');
+            popup.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            
+            // Track popup shown
+            sessionStorage.setItem('exit_popup_shown', 'true');
+        }
+        
+        // Close exit popup
+        function closeExitPopup() {
+            const popup = document.getElementById('exitPopup');
+            popup.style.display = 'none';
+            document.body.style.overflow = ''; // Restore scrolling
+            
+            // Mark as closed in session
+            sessionStorage.setItem('exit_popup_closed', 'true');
+        }
+        
+        // Submit form to HubSpot
+        async function submitExitForm(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('exitSubmitBtn');
+            const submitText = document.getElementById('exitSubmitText');
+            const form = document.getElementById('exitPopupForm');
+            const successDiv = document.getElementById('exitPopupSuccess');
+            
+            // Get form data
+            const name = document.getElementById('exitName').value.trim();
+            const email = document.getElementById('exitEmail').value.trim();
+            
+            // Validate email
+            if (!email || !isValidEmail(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitText.textContent = 'Joining...';
+            
+            try {
+                // Submit to HubSpot (na2 region)
+                const response = await fetch(
+                    `https://api.hsforms.com/submissions/v3/integration/submit/${EXIT_POPUP_CONFIG.hubspotPortalId}/${EXIT_POPUP_CONFIG.hubspotFormId}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            fields: [
+                                {
+                                    objectTypeId: "0-1",
+                                    name: "email",
+                                    value: email
+                                },
+                                ...(name ? [{
+                                    objectTypeId: "0-1",
+                                    name: "firstname",
+                                    value: name
+                                }] : [])
+                            ],
+                            context: {
+                                pageUri: window.location.href,
+                                pageName: document.title
+                            }
+                        })
+                    }
+                );
+                
+                if (response.ok) {
+                    // Success!
+                    form.style.display = 'none';
+                    successDiv.style.display = 'block';
+                    
+                    // Save to localStorage to not show again
+                    localStorage.setItem(EXIT_POPUP_CONFIG.cookieName, 'true');
+                    
+                    // Close popup after 3 seconds
+                    setTimeout(() => {
+                        closeExitPopup();
+                    }, 3000);
+                } else {
+                    throw new Error('Submission failed');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Oops! Something went wrong. Please try again.');
+                
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitText.textContent = 'Join the Community';
+            }
+        }
+        
+        // Validate email
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        // Exit intent detection for desktop
+        let exitIntentShown = false;
+        function detectExitIntent(e) {
+            if (exitIntentShown) return;
+            
+            // Check if cursor is leaving from top of page
+            if (e.clientY <= EXIT_POPUP_CONFIG.desktopThreshold && e.relatedTarget == null && e.target.nodeName.toLowerCase() !== 'select') {
+                exitIntentShown = true;
+                showExitPopup();
+            }
+        }
+        
+        // Mobile exit intent (time-based)
+        function initMobileExitIntent() {
+            if (!EXIT_POPUP_CONFIG.mobileEnabled) return;
+            
+            // Show after user has been on page for specified time
+            setTimeout(() => {
+                if (!exitIntentShown && shouldShowExitPopup()) {
+                    exitIntentShown = true;
+                    showExitPopup();
+                }
+            }, EXIT_POPUP_CONFIG.mobileDelay);
+        }
+        
+        // Initialize exit intent
+        function initExitIntent() {
+            if (!shouldShowExitPopup()) return;
+            
+            // Desktop: mouse leave detection
+            if (window.innerWidth > 768) {
+                document.addEventListener('mouseout', detectExitIntent);
+            } else {
+                // Mobile: time-based
+                initMobileExitIntent();
+            }
+            
+            // Close on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeExitPopup();
+                }
+            });
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            // Wait a bit before initializing (let user engage first)
+            setTimeout(initExitIntent, 2000);
+        });
+        
+        // ============================================
+        // REMOVE HUBSPOT BRANDING (BELT & SUSPENDERS)
+        // ============================================
+        
+        // Actively remove HubSpot branding elements
+        function removeHubSpotBranding() {
+            // Remove virality container
+            const viralityContainer = document.getElementById('hs-form-virality-container');
+            if (viralityContainer) {
+                viralityContainer.remove();
+                console.log('Removed HubSpot branding container');
+            }
+            
+            // Remove any iframes with virality in title
+            document.querySelectorAll('iframe[title*="Virality"], iframe[id*="virality"]').forEach(el => {
+                el.remove();
+            });
+            
+            // Remove any links to HubSpot free forms
+            document.querySelectorAll('a[href*="hubspot.com/free-forms"]').forEach(el => {
+                el.remove();
+            });
+        }
+        
+        // Run immediately and on DOMContentLoaded
+        removeHubSpotBranding();
+        document.addEventListener('DOMContentLoaded', removeHubSpotBranding);
+        
+        // Also run after a delay (in case HubSpot injects it later)
+        setTimeout(removeHubSpotBranding, 1000);
+        setTimeout(removeHubSpotBranding, 2000);
+        setTimeout(removeHubSpotBranding, 3000);
+        
+        // Set up mutation observer to catch dynamically added branding
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // Element node
+                        // Check if it's the branding container
+                        if (node.id === 'hs-form-virality-container' || 
+                            node.id?.includes('virality') ||
+                            node.querySelector?.('#hs-form-virality-container')) {
+                            node.remove();
+                            console.log('Intercepted and removed HubSpot branding');
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Start observing the document
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
         });
     </script>
 </body>
