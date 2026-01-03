@@ -3,8 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whitepaper | ROOT5 DAO</title>
-    <meta name="description" content="Read the Root5DAO whitepaper - The Democratized Meme Credit Union on Solana. Learn about governance, tokenomics, and our vision for community-driven meme tokenization.">
+    <title>Whitepaper | ROOT5 DAO - Democratized Meme Credit Union</title>
+    <meta name="description" content="Read the ROOT5 DAO whitepaper. Learn about our two-tiered governance model, deflationary tokenomics, and vision for community-driven meme tokenization on Solana.">
+    <meta name="keywords" content="ROOT5 whitepaper, DAO tokenomics, Solana governance, meme token economics, crypto whitepaper, DeFi governance, token burning, community DAO">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://root5dao.com/whitepaper">
+    <meta property="og:title" content="ROOT5 DAO Whitepaper - Democratized Meme Credit Union">
+    <meta property="og:description" content="Read the ROOT5 DAO whitepaper. Learn about our two-tiered governance model and deflationary tokenomics.">
+    <meta property="og:image" content="https://root5dao.com/layers/logo.jpg">
+    <meta property="og:site_name" content="ROOT5 DAO">
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://root5dao.com/whitepaper">
+    <meta name="twitter:title" content="ROOT5 DAO Whitepaper - Democratized Meme Credit Union">
+    <meta name="twitter:description" content="Read the ROOT5 DAO whitepaper. Learn about our governance and tokenomics.">
+    <meta name="twitter:image" content="https://root5dao.com/layers/logo.jpg">
+    
+    <!-- Additional Meta Tags -->
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="author" content="ROOT5 DAO">
+    <link rel="canonical" href="https://root5dao.com/whitepaper">
+    
     <link rel="icon" type="image/jpeg" href="/layers/logo.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +66,13 @@
         }
 
         /* Background Orbs */
-        .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .bg-orbs { 
+            position: fixed; 
+            inset: 0; 
+            pointer-events: none; 
+            z-index: 0; 
+            overflow: hidden;
+        }
         .orb {
             position: absolute;
             border-radius: 50%;
@@ -127,11 +156,26 @@
             50% { opacity: 0.4; }
         }
         
-        /* Disable animations on mobile for better performance */
+        /* Mobile optimizations - Fix flickering */
         @media (max-width: 768px) {
+            body {
+                /* Remove fixed attachment on mobile - major cause of flickering */
+                background-attachment: scroll;
+                /* Simplify background on mobile */
+                background-image: 
+                    radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+                    radial-gradient(at 50% 100%, rgba(34, 197, 94, 0.1) 0px, transparent 50%);
+            }
+            
+            /* Completely disable orb animations and reduce complexity */
+            .bg-orbs {
+                display: none;
+            }
+            
             .orb {
                 animation: none !important;
-                opacity: 0.2;
+                opacity: 0;
+                display: none;
             }
         }
 
