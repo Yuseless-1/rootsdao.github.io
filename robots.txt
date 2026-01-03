@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Sitemap: https://root5dao.com/sitemap.xml
+
+# Crawl-delay (optional, helps prevent server overload)
+Crawl-delay: 1
+
+# Block admin/private areas if you have any
+# Disallow: /admin/
+# Disallow: /private/
+
+# Allow all images to be indexed
+User-agent: Googlebot-Image
+Allow: /
+
+# Allow CSS and JS for better rendering
+User-agent: *
+Allow: *.css
+Allow: *.js
