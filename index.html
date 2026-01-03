@@ -616,6 +616,7 @@
             display: block;
             margin-left: auto;
             margin-right: auto;
+            object-fit: contain;
         }
         .generator-buttons { display: flex; flex-direction: column; gap: 12px; }
         .randomize-btn, .download-btn {
@@ -815,13 +816,15 @@
             .platform-link img { max-height: 50px; }
             
             /* PFP Generator Mobile Fixes */
-            .generator-content { padding: 20px 14px; }
+            .generator-content { padding: 18px 12px; }
             .preview-canvas { 
-                height: auto;
-                max-width: 100%;
+                height: auto !important;
+                max-width: 280px;
                 width: 100%;
                 aspect-ratio: 1 / 1;
                 max-height: 280px;
+                margin: 0 auto;
+                display: block;
             }
             .layer-tabs { 
                 justify-content: flex-start; 
@@ -829,17 +832,22 @@
                 flex-wrap: nowrap; 
                 padding-bottom: 8px;
                 -webkit-overflow-scrolling: touch;
+                margin-bottom: 16px;
             }
-            .layer-tab { flex-shrink: 0; white-space: nowrap; padding: 10px 16px; }
+            .layer-tab { flex-shrink: 0; white-space: nowrap; padding: 9px 14px; }
             .layer-options { 
-                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
-                gap: 10px;
+                grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); 
+                gap: 8px;
             }
-            .layer-option { padding: 6px; }
-            .layer-option img { height: 55px; }
-            .layer-option-name { font-size: 0.75rem; }
+            .layer-option { padding: 5px; }
+            .layer-option img { 
+                height: 50px;
+                width: 100%;
+                object-fit: contain;
+            }
+            .layer-option-name { font-size: 0.7rem; }
             .generator-buttons { gap: 8px; }
-            .randomize-btn, .download-btn { padding: 12px 24px; font-size: 1rem; }
+            .randomize-btn, .download-btn { padding: 11px 20px; font-size: 0.95rem; }
             
             /* Buy Modal Mobile */
             .modal-content { width: 98%; max-height: 98vh; }
@@ -870,41 +878,63 @@
                 text-align: left;
             }
             
-            /* PFP Generator - Extra compact for phones */
-            .generator-content { padding: 14px 10px; }
+            /* PFP Generator - Ultra compact for phones */
+            .generator-section p {
+                font-size: 1rem;
+                margin-bottom: 24px;
+            }
+            .generator-content { 
+                padding: 12px 8px; 
+            }
             .generator-layout > div h3 {
-                font-size: 1.3rem;
-                margin-bottom: 12px;
+                font-size: 1.1rem;
+                margin-bottom: 10px;
             }
             .preview-canvas { 
-                height: auto; 
-                aspect-ratio: 1 / 1; 
-                max-height: 260px;
+                height: auto !important;
+                aspect-ratio: 1 / 1;
+                max-height: 220px;
+                max-width: 220px;
+                width: 100%;
+                margin: 0 auto;
+                display: block;
+            }
+            .generator-buttons {
+                gap: 6px;
+                margin-top: 12px;
+            }
+            .randomize-btn, .download-btn { 
+                padding: 10px 16px; 
+                font-size: 0.9rem;
                 width: 100%;
             }
+            .layer-tabs {
+                margin-bottom: 16px;
+            }
             .layer-options { 
-                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); 
-                gap: 8px; 
+                grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); 
+                gap: 6px; 
             }
             .layer-option { 
-                padding: 4px; 
-                border-radius: 8px;
+                padding: 3px; 
+                border-radius: 6px;
             }
-            .layer-option img { height: 45px; }
+            .layer-option img { 
+                height: 40px;
+                width: 100%;
+                object-fit: contain;
+            }
             .layer-option-name { 
-                font-size: 0.65rem; 
+                font-size: 0.6rem; 
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                padding: 2px 4px;
+                padding: 2px 2px;
+                line-height: 1.2;
             }
             .layer-tab { 
-                padding: 8px 14px; 
-                font-size: 0.85rem; 
-            }
-            .randomize-btn, .download-btn { 
-                padding: 11px 20px; 
-                font-size: 0.95rem; 
+                padding: 7px 12px; 
+                font-size: 0.8rem; 
             }
             
             /* Buy Modal Extra Small */
@@ -1158,7 +1188,7 @@
                 <div id="generator-ui" class="generator-layout" style="display:none;">
                     <div>
                         <h3 style="margin-bottom:24px; font-size:1.5rem;">Preview</h3>
-                        <canvas id="canvas" class="preview-canvas" width="400" height="400" aria-label="PFP preview canvas"></canvas>
+                        <canvas id="canvas" class="preview-canvas" width="400" height="400" aria-label="PFP preview canvas" style="aspect-ratio: 1/1;"></canvas>
                         <div class="generator-buttons">
                             <button class="randomize-btn" onclick="randomize()" aria-label="Randomize PFP layers">
                                 <i class="fas fa-random"></i> Randomize
@@ -1439,18 +1469,27 @@
         function resizeCanvas() {
             const container = canvas.parentElement;
             const containerWidth = container.offsetWidth;
-            const maxSize = Math.min(400, containerWidth - 40); // 40px for padding
             
             if (window.innerWidth <= 480) {
+                // Mobile: smaller square canvas
+                const maxSize = Math.min(220, containerWidth - 20);
+                canvas.width = maxSize;
+                canvas.height = maxSize;
+                canvas.style.width = maxSize + 'px';
+                canvas.style.height = maxSize + 'px';
+            } else if (window.innerWidth <= 968) {
+                // Tablet: medium canvas
+                const maxSize = Math.min(280, containerWidth - 40);
                 canvas.width = maxSize;
                 canvas.height = maxSize;
                 canvas.style.width = maxSize + 'px';
                 canvas.style.height = maxSize + 'px';
             } else {
+                // Desktop: full size
                 canvas.width = 400;
                 canvas.height = 400;
                 canvas.style.width = '100%';
-                canvas.style.height = '400px';
+                canvas.style.height = 'auto';
             }
             
             // Re-render after resize
