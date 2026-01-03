@@ -606,7 +606,9 @@
         }
         .generator-layout { display: grid; grid-template-columns: 400px 1fr; gap: 48px; }
         .preview-canvas {
+            width: 100%;
             max-width: 400px;
+            aspect-ratio: 1 / 1;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 16px;
             border: 2px solid rgba(34, 197, 94, 0.3);
@@ -813,11 +815,11 @@
             .platform-link img { max-height: 50px; }
             
             /* PFP Generator Mobile Fixes */
-            .generator-content { padding: 18px 12px; }
-            .preview-canvas { 
-                max-width: 280px;
-                margin: 0 auto;
-                display: block;
+            .generator-content { padding: 20px 16px; }
+            /* Constrain canvas size on tablets - aspect-ratio keeps it square */
+            .preview-canvas {
+                max-width: 350px;
+                margin-bottom: 20px;
             }
             .layer-tabs { 
                 justify-content: flex-start; 
@@ -829,18 +831,18 @@
             }
             .layer-tab { flex-shrink: 0; white-space: nowrap; padding: 9px 14px; }
             .layer-options { 
-                grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); 
-                gap: 8px;
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); 
+                gap: 10px;
             }
             .layer-option { padding: 5px; }
             .layer-option img { 
-                height: 50px;
+                height: 55px;
                 width: 100%;
                 object-fit: contain;
             }
-            .layer-option-name { font-size: 0.7rem; }
-            .generator-buttons { gap: 8px; }
-            .randomize-btn, .download-btn { padding: 11px 20px; font-size: 0.95rem; }
+            .layer-option-name { font-size: 0.75rem; }
+            .generator-buttons { gap: 10px; }
+            .randomize-btn, .download-btn { padding: 12px 24px; font-size: 1rem; }
             
             /* Buy Modal Mobile */
             .modal-content { width: 98%; max-height: 98vh; }
@@ -874,56 +876,56 @@
             /* PFP Generator - Ultra compact for phones */
             .generator-section p {
                 font-size: 1rem;
-                margin-bottom: 24px;
+                margin-bottom: 20px;
             }
             .generator-content { 
-                padding: 12px 8px; 
+                padding: 16px 12px; 
             }
             .generator-layout > div h3 {
-                font-size: 1.1rem;
-                margin-bottom: 10px;
+                font-size: 1.2rem;
+                margin-bottom: 12px;
             }
-            .preview-canvas { 
-                max-width: 220px;
-                margin: 0 auto;
-                display: block;
+            /* Constrain canvas size on mobile - aspect-ratio keeps it square */
+            .preview-canvas {
+                max-width: 280px;
+                margin-bottom: 16px;
             }
             .generator-buttons {
-                gap: 6px;
+                gap: 8px;
                 margin-top: 12px;
             }
             .randomize-btn, .download-btn { 
-                padding: 10px 16px; 
-                font-size: 0.9rem;
+                padding: 12px 18px; 
+                font-size: 0.95rem;
                 width: 100%;
             }
             .layer-tabs {
-                margin-bottom: 16px;
+                margin-bottom: 14px;
             }
             .layer-options { 
-                grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); 
-                gap: 6px; 
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); 
+                gap: 8px; 
             }
             .layer-option { 
-                padding: 3px; 
+                padding: 4px; 
                 border-radius: 6px;
             }
             .layer-option img { 
-                height: 40px;
+                height: 45px;
                 width: 100%;
                 object-fit: contain;
             }
             .layer-option-name { 
-                font-size: 0.6rem; 
+                font-size: 0.65rem; 
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                padding: 2px 2px;
+                padding: 2px;
                 line-height: 1.2;
             }
             .layer-tab { 
-                padding: 7px 12px; 
-                font-size: 0.8rem; 
+                padding: 8px 12px; 
+                font-size: 0.85rem; 
             }
             
             /* Buy Modal Extra Small */
@@ -1177,7 +1179,7 @@
                 <div id="generator-ui" class="generator-layout" style="display:none;">
                     <div>
                         <h3 style="margin-bottom:24px; font-size:1.5rem;">Preview</h3>
-                        <canvas id="canvas" class="preview-canvas" width="400" height="400" aria-label="PFP preview canvas"></canvas>
+                        <canvas id="canvas" class="preview-canvas" aria-label="PFP preview canvas"></canvas>
                         <div class="generator-buttons">
                             <button class="randomize-btn" onclick="randomize()" aria-label="Randomize PFP layers">
                                 <i class="fas fa-random"></i> Randomize
@@ -1454,28 +1456,23 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Responsive canvas sizing
+        // Responsive canvas sizing with proper aspect ratio handling
         function resizeCanvas() {
-            const container = canvas.parentElement;
-            const containerWidth = container.offsetWidth;
-            let canvasSize;
+            // Get the actual rendered size of the canvas element
+            const displayWidth = canvas.clientWidth;
+            const displayHeight = canvas.clientHeight;
             
-            if (window.innerWidth <= 480) {
-                // Mobile: smaller square canvas
-                canvasSize = Math.min(220, containerWidth - 20);
-            } else if (window.innerWidth <= 968) {
-                // Tablet: medium canvas
-                canvasSize = Math.min(280, containerWidth - 40);
-            } else {
-                // Desktop: full size
-                canvasSize = 400;
-            }
+            // Get device pixel ratio for high-DPI screens
+            const dpr = window.devicePixelRatio || 1;
             
-            // Set both internal and display size to same value to prevent distortion
-            canvas.width = canvasSize;
-            canvas.height = canvasSize;
-            canvas.style.width = canvasSize + 'px';
-            canvas.style.height = canvasSize + 'px';
+            // Set internal canvas size to match displayed size * DPR
+            // This prevents distortion/stretching
+            canvas.width = displayWidth * dpr;
+            canvas.height = displayHeight * dpr;
+            
+            // Scale the drawing context to account for DPR
+            // This allows us to draw at "logical pixels" (display size)
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             
             // Re-render after resize
             if (Object.keys(selected).length > 0) {
@@ -1484,6 +1481,9 @@
         }
         
         window.addEventListener('resize', resizeCanvas);
+        
+        // Call after a brief delay to ensure canvas has rendered
+        setTimeout(resizeCanvas, 100);
         
         const folders = {
             background: '/layers/background/',
@@ -1544,15 +1544,24 @@
         }
         
         async function render() {
-            const width = canvas.width;
-            const height = canvas.height;
-            ctx.clearRect(0, 0, width, height);
+            // Use the displayed size (clientWidth/clientHeight)
+            // The context is already scaled by setTransform, so we draw at display size
+            const displayWidth = canvas.clientWidth;
+            const displayHeight = canvas.clientHeight;
+            
+            // Clear the entire canvas
+            ctx.clearRect(0, 0, displayWidth, displayHeight);
+            
+            // Draw each layer
             for (const type of ['background', 'body', 'head', 'sunglasses', 'hair']) {
                 if (!selected[type]) continue;
                 const item = images[type].find(i => i.id === selected[type]);
                 if (item) {
                     const img = await load(item.path);
-                    if (img) ctx.drawImage(img, 0, 0, width, height);
+                    if (img) {
+                        // Draw image to fill the entire canvas
+                        ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+                    }
                 }
             }
         }
@@ -1574,7 +1583,7 @@
         }
         
         window.addEventListener('load', async () => {
-            // Resize canvas for mobile
+            // Ensure canvas is properly sized
             resizeCanvas();
             
             for (const [type, folder] of Object.entries(folders)) {
